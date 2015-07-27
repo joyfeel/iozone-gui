@@ -1,0 +1,16 @@
+{
+  "name": "iozone-gui",
+  "version": "0.0.0",
+  "homepage": "https://github.com/joyfeel/iozone-gui",
+  "authors": [
+    "joyfeel <joybee210@gmail.com>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
