@@ -2,7 +2,8 @@
 
 var gulp = require('gulp'),
 	browserify = require('gulp-browserify'),
-	less = require('gulp-less');
+	less = require('gulp-less'),
+    plumber = require('gulp-plumber');
 
 
 gulp.task('apps', function() {
@@ -21,9 +22,10 @@ gulp.task('watch', function () {
 });
 
 gulp.task('less', function(){
-	return gulp.src('./public/stylesheets/*.less')
-			   .pipe(less())
-			   .pipe(gulp.dest('./public/stylesheets/'));
+	gulp.src('./public/stylesheets/*.less')
+       .pipe(plumber())
+	   .pipe(less())
+	   .pipe(gulp.dest('./public/stylesheets/'));
 });
 
 
