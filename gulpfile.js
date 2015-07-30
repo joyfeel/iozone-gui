@@ -1,7 +1,8 @@
 'use strict';
 
 var gulp = require('gulp'),
-	browserify = require('gulp-browserify');
+	browserify = require('gulp-browserify'),
+	less = require('gulp-less');
 
 
 gulp.task('apps', function() {
@@ -16,8 +17,15 @@ gulp.task('apps', function() {
 // Watch Files For Changes
 gulp.task('watch', function () {
     gulp.watch(['public/javascripts/*.js'], ['apps']);
+    gulp.watch(['public/stylesheets/*.less'], ['less']);
+});
+
+gulp.task('less', function(){
+	return gulp.src('./public/stylesheets/*.less')
+			   .pipe(less())
+			   .pipe(gulp.dest('./public/stylesheets/'));
 });
 
 
 
-gulp.task('default', ['watch', 'apps']);
+gulp.task('default', ['watch', 'apps', 'less']);

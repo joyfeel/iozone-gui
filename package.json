@@ -16,5 +16,8 @@
     "serve-favicon": "~2.3.0",
     "uinexpress": "0.0.5",
     "underscore": "^1.8.3"
+  },
+  "devDependencies": {
+    "gulp-less": "^3.0.3"
   }
 }

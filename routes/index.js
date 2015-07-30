@@ -3,18 +3,25 @@ var router = express.Router();
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
+  res.render('main', { title: 'Express',
+  						description: 'My first app!!!!' });
 });
 
 
 router.get('/about', function(req, res, next) {
-  res.render('about', { title: 'About' });
-  console.log("QQQQ");
+  res.render('main', { 
+  				         title: 'About',
+  					   	 subtitle: 'About subtitle',
+  					   	 description: 'About practice' 
+  					 });
 });
 
 
 router.get('/contact', function(req, res, next) {
-  res.render('contact', { title: 'Contact' });
+  res.render('contact', { 
+  						    title: 'Contact us',
+  							description: 'Send us the email, plz!' 
+  						});
 });
 
 module.exports = router;
