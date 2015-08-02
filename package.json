@@ -16,5 +16,11 @@
     "serve-favicon": "~2.3.0",
     "uinexpress": "0.0.5",
     "underscore": "^1.8.3"
+  },
+  "devDependencies": {
+    "gulp": "^3.9.0",
+    "gulp-browserify": "^0.5.1",
+    "gulp-less": "^3.0.3",
+    "gulp-plumber": "^1.0.1"
   }
 }
