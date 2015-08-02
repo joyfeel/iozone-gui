@@ -1,9 +1,9 @@
 'use strict';
 
 var gulp = require('gulp'),
-	browserify = require('gulp-browserify'),
-	less = require('gulp-less'),
-    plumber = require('gulp-plumber');
+	 browserify = require('gulp-browserify'),
+	 less = require('gulp-less'),
+   plumber = require('gulp-plumber');
 
 
 gulp.task('apps', function() {

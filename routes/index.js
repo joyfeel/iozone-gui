@@ -10,18 +10,25 @@ router.get('/', function(req, res, next) {
 
 router.get('/about', function(req, res, next) {
   res.render('main', { 
-  				         title: 'About',
-  					   	 subtitle: 'About subtitle',
-  					   	 description: 'About practice' 
-  					 });
+  				      title: 'About',
+  					   	subtitle: 'About subtitle',
+  					   	description: 'About practice' 
+  					});
 });
 
 
 router.get('/contact', function(req, res, next) {
   res.render('contact', { 
-  						    title: 'Contact us',
+  					    title: 'Contact us',
   							description: 'Send us the email, plz!' 
-  						});
+  					});
+});
+
+router.get('/practice', function(req, res, next) {
+  res.render('practiceBackbone', { 
+                title: 'Coding the backbone framework!',
+                description: 'That\'s it' 
+            });
 });
 
 module.exports = router;

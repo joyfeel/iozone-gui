@@ -19,4 +19,24 @@ nav {
 	top: 0;
 	left: 0;
 	right: 0;
+
+	> ul {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+
+	li {
+		> a {
+			color: papayawhip;
+			text-decoration: none;
+			float: left;
+			padding: 20px;
+
+			&:hover {
+				color: tomato;
+				background-color: papayawhip;
+			}
+		}
+	}
 }
