@@ -27,8 +27,13 @@ router.get('/contact', function(req, res, next) {
 router.get('/practice', function(req, res, next) {
   res.render('practiceBackbone', { 
                 title: 'Coding the backbone framework!',
-                description: 'That\'s it' 
+                description: 'That\'s it',
+                displayName: 'A',
+                userName: 'A',
+                bio: 'A'
             });
 });
+
+
 
 module.exports = router;
