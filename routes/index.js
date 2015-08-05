@@ -4,7 +4,8 @@ var router = express.Router();
 /* GET home page. */
 router.get('/', function(req, res, next) {
   res.render('main', { title: 'Express',
-  						description: 'My first app!!!!' });
+  					    description: 'My first app!!!!'
+            });
 });
 
 
@@ -12,7 +13,7 @@ router.get('/about', function(req, res, next) {
   res.render('main', { 
   				      title: 'About',
   					   	subtitle: 'About subtitle',
-  					   	description: 'About practice' 
+  					   	description: 'About practice'
   					});
 });
 
@@ -20,20 +21,12 @@ router.get('/about', function(req, res, next) {
 router.get('/contact', function(req, res, next) {
   res.render('contact', { 
   					    title: 'Contact us',
-  							description: 'Send us the email, plz!' 
+  							description: 'Send us the email, plz!'
   					});
 });
 
 router.get('/practice', function(req, res, next) {
-  res.render('practiceBackbone', { 
-                title: 'Coding the backbone framework!',
-                description: 'That\'s it',
-                displayName: 'A',
-                userName: 'A',
-                bio: 'A'
-            });
+    res.render('practiceBackbone');
 });
-
-
 
 module.exports = router;

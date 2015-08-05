@@ -1,10 +1,12 @@
 (function($) {
-
+/*
 	var User = Backbone.Model.extend({});
 
 	var UserView = Backbone.View.extend({
 		el: '#user-card',
-		template: _.template( $('#user-template').text()),
+		//template: _.template( $('#user-template').text()),
+		template: _.template( '<%= displayName %>'),
+		//template: _.template( $('#user-template').html()),
 		initialize: function() {
 			this.model.on('change', this.render, this);
 			this.render();
@@ -21,15 +23,13 @@
 	//main
 	$(document).ready(function() {
 		//Collection: give the instance of model to collection
-		
 		var user = new User({
-			displayName: 'B',
-			userName: 'B',
-			bio: 'B'
+			displayName: 'XD'
 		});
 		
 		var userView = new UserView({
 			model: user
 		});
 	});
+*/
 })(jQuery);
