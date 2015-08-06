@@ -2,8 +2,6 @@ var express = require('express');
 var router = express.Router();
 
 /* GET home page. */
-
-/*
 router.get('/', function(req, res, next) {
   res.render('main', { title: 'Express',
   					    description: 'My first app!!!!'
@@ -13,9 +11,9 @@ router.get('/', function(req, res, next) {
 
 router.get('/about', function(req, res, next) {
   res.render('main', { 
-  				      title: 'About',
-  					   	subtitle: 'About subtitle',
-  					   	description: 'About practice'
+  				      title: 'About1',
+  					   	subtitle: 'About subtitle1',
+  					   	description: 'About practice1'
   					});
 });
 
@@ -30,5 +28,5 @@ router.get('/contact', function(req, res, next) {
 router.get('/practice', function(req, res, next) {
     res.render('practiceBackbone');
 });
-*/
+
 module.exports = router;
