@@ -25,8 +25,8 @@ router.get('/contact', function(req, res, next) {
   					});
 });
 
-router.get('/practice', function(req, res, next) {
-    res.render('practiceBackbone');
+router.get('/chatroom', function(req, res, next) {
+    res.render('chatroom');
 });
 
 module.exports = router;

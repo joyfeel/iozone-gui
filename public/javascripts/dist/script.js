@@ -2,24 +2,22 @@
 
 'use strict';
 
-var About = Backbone.Model.extend({
+var Chatroom = Backbone.Model.extend({
 	defaults: {
-		title: 'About2',
-  		subtitle: 'About subtitle2',
-  		description: 'About practice2'
+		//title: 'Chatroom Title',
+  		//subtitle: 'Chatroom Subtitle',
+  		//data: {
+		description: 'Chatroom description'
+
+  		//}
+  		
 	}
 });
 
-var Contact = Backbone.Model.extend({
-	defaults: {
-		title: 'Contact',
-  		//subtitle: 'About subtitle',
-  		description: 'Contact practice'
-	}
-});
 
-var AboutView = Backbone.View.extend({
-	el: '#about-div',
+var ChatroomView = Backbone.View.extend({
+	el: '#chatroom-div',
+	//template: _.template($('#chatroom-template').html()),
 	template: _.template('<h1><%= description %></h1>'),
 	initialize: function() {
 		this.model.on('change', this.render, this);
@@ -27,21 +25,7 @@ var AboutView = Backbone.View.extend({
 	},
 	render: function() {
 		var compiled = this.template(this.model.toJSON());
-		this.$el.html(compiled);
-
-		return this;
-	}
-});
-
-var ContactView = Backbone.View.extend({
-	el: '#contact-div',
-	template: _.template($('#contact-template').text()),
-	initialize: function() {
-		this.model.on('change', this.render, this);
-		this.render();
-	},
-	render: function() {
-		var compiled = this.template(this.model.toJSON());
+		//var compiled = this.template(this.model.get('description'));
 		this.$el.html(compiled);
 
 		return this;
@@ -51,21 +35,14 @@ var ContactView = Backbone.View.extend({
 
 var Workspace = Backbone.Router.extend({
 	routes: {
-		'contact': 'contact',
-		'about': 'about'
+		'chatrooms': 'chatroom'
 	},
-	about: function() {
-		var about = new About();
-		this.view = new AboutView({
-			model: about
+	chatroom: function() {
+		var chatroom = new Chatroom();
+		this.view = new ChatroomView({
+			model: chatroom
 		});		
 
-	},
-	contact: function() {
-		var contact = new Contact();
-		this.view = new ContactView({
-			model: contact
-		});
 	},
 	get_apple: function() {
 		console.log("Here is your apple!");
@@ -79,9 +56,9 @@ var Workspace = Backbone.Router.extend({
 
 //main
 $(document).ready(function() {
-	var about = new About();
-	var aboutView = new AboutView({
-		model: about
+	var chatroom = new Chatroom();
+	var chatroomView = new ChatroomView({
+		model: chatroom
 	});	
 	//var work = new Workspace();
 	//Backbone.history.start();
