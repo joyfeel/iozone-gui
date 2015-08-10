@@ -1,53 +1,104 @@
 
 'use strict';
 
-var Chatroom = Backbone.Model.extend({
-	defaults: {
-		//title: 'Chatroom Title',
-  		//subtitle: 'Chatroom Subtitle',
-  		//data: {
-		description: 'Chatroom description'
+var app = app || {};
 
-  		//}
-  		
+app.Router = Backbone.Router.extend({
+	routes: {
+		'about': 'about',
+		'contact': 'contact'
+	},
+	about: function() {
+		var about = new app.AboutView();
+	},
+	contact: function() {
+		var contact = new app.ContactView();
+	}
+
+});
+
+app.About = Backbone.Model.extend({
+	defaults: {
+		title: 'About',
+		content: 'Hello...!'
 	}
 });
 
-
-var ChatroomView = Backbone.View.extend({
-	el: '#chatroom-div',
-	//template: _.template($('#chatroom-template').html()),
-	template: _.template('<h1><%= description %></h1>'),
+app.AboutView = Backbone.View.extend({
+	el: '#global-div',
+	template: _.template( $('#about-template').html() ),
 	initialize: function() {
-		this.model.on('change', this.render, this);
+		//_.bindAll(this, 'inputChange');
+
+		this.model = new app.About();
+		this.model.bind("change", this.render);
 		this.render();
 	},
 	render: function() {
-		var compiled = this.template(this.model.toJSON());
-		//var compiled = this.template(this.model.get('description'));
-		this.$el.html(compiled);
+		this.$el.html(this.template(this.model.toJSON()));
 
 		return this;
 	}
 });
 
 
-var Workspace = Backbone.Router.extend({
-	routes: {
-		'chatrooms': 'chatroom'
-	},
-	chatroom: function() {
-		var chatroom = new Chatroom();
-		this.view = new ChatroomView({
-			model: chatroom
-		});		
+app.Contact = Backbone.Model.extend({
+	defaults: {
+		name: 'Joy',
+		email: 'joybee210@gmail.com'
+	}
+});
 
+app.ContactView = Backbone.View.extend({
+	el: '#global-div',
+	template: _.template( $('#contact-template').html() ),
+	initialize: function() {
+		//_.bindAll(this, 'inputChange');
+
+		this.model = new app.Contact();
+		this.model.bind("change", this.render);
+		this.render();
 	},
-	get_apple: function() {
-		console.log("Here is your apple!");
+	render: function() {
+		this.$el.html(this.template(this.model.toJSON()));
+
+		return this;
+	}
+});
+
+app.User = Backbone.Model.extend({
+	defaults: {
+		name: 'joy',
+		email: 'dasd@adsdsa'
+
+	}
+});
+
+app.SignupView = Backbone.View.extend({
+	el: '#global-div',
+	template: _.template( $('#signup-template').html() ),
+
+	events: {
+		'change input': 'inputChange'
 	},
-	get_router: function() {
-		console.log("My Routers!");
+	initialize: function() {
+		_.bindAll(this, 'inputChange');
+
+		this.model = new app.User();
+		this.model.bind("change", this.render);
+		this.render();
+	},
+	render: function() {
+		this.$el.html(this.template(this.model.toJSON()));
+		//console.log($('#signup-template').text());
+		return this;
+	},
+	inputChange: function(e) {
+		var $input = $(e.target);
+
+		var inputName = $input.attr('name');
+
+		this.model.set(inputName, $input.val());
 	}
 
 });
@@ -55,11 +106,8 @@ var Workspace = Backbone.Router.extend({
 
 //main
 $(document).ready(function() {
-	var chatroom = new Chatroom();
-	var chatroomView = new ChatroomView({
-		model: chatroom
-	});	
-	//var work = new Workspace();
-	//Backbone.history.start();
-});
+	var sign = new app.SignupView();
 
+	var route = new app.Router();
+	Backbone.history.start();
+});
