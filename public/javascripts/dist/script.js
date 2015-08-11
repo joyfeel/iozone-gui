@@ -1,18 +1,18 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 
-'use strict';
+//'use strict';
 
 var app = app || {};
 
 app.Router = Backbone.Router.extend({
 	routes: {
 		'about': 'about',
-		'contact': 'contact'
+		'iozone-input': 'iozone_input'
 	},
 	about: function() {
 		var about = new app.AboutView();
 	},
-	contact: function() {
+	iozone_input: function() {
 		var contact = new app.ContactView();
 	}
 
@@ -23,7 +23,7 @@ app.About = Backbone.Model.extend({
 		title: 'About',
 		content: 'Hello...!'
 	}
-});
+}); 
 
 app.AboutView = Backbone.View.extend({
 	el: '#global-div',
@@ -32,7 +32,7 @@ app.AboutView = Backbone.View.extend({
 		//_.bindAll(this, 'inputChange');
 
 		this.model = new app.About();
-		this.model.bind("change", this.render);
+		this.model.bind("change", this.render, this);
 		this.render();
 	},
 	render: function() {
@@ -44,26 +44,68 @@ app.AboutView = Backbone.View.extend({
 
 
 app.Contact = Backbone.Model.extend({
+	url: function() {
+		return 'http://localhost:3000/iozone-input'
+						+ (this.id === null ? '' : '/' + this.id);
+	},
+	id: null,
 	defaults: {
 		name: 'Joy',
-		email: 'joybee210@gmail.com'
+		email: 'joybee210@gmail.com',
+		message: 'QQ',
+		filesize: '128'
 	}
 });
 
 app.ContactView = Backbone.View.extend({
 	el: '#global-div',
-	template: _.template( $('#contact-template').html() ),
+	events: {
+		'click .btn-contact-save': 'save'
+	},
 	initialize: function() {
-		//_.bindAll(this, 'inputChange');
+		_.bindAll(this, 'render');
 
 		this.model = new app.Contact();
-		this.model.bind("change", this.render);
+		this.model.bind('change', this.render, this);
+		this.template = _.template( $('#iozone-input-template').html() )
 		this.render();
 	},
 	render: function() {
 		this.$el.html(this.template(this.model.toJSON()));
 
+		console.log(this.$el.find('select[name="filesize"]').val());
+
 		return this;
+	},
+	save: function(e) {
+		e.preventDefault();
+		
+		var name = this.$el.find('input[name="name"]').val();
+		var email = this.$el.find('input[name="email"]').val();
+		var message = this.$el.find('textarea[name="message"]').val();
+		var filesize = this.$el.find('select[name="filesize"]').val();
+
+
+		this.model.save({
+			name: name,
+			email: email,
+			message: message,
+			filesize: filesize
+		}, {
+			success: function(model, response, options) {
+
+				if (response == 200) {
+					console.log("Successfully save");
+				}
+			}
+			, 
+			error: function(model, response, options) {
+				console.log(response);
+				console.log("Error save");
+			}
+			
+		});
+
 	}
 });
 

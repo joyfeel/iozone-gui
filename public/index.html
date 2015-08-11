@@ -36,7 +36,7 @@
 	<p><%= content %></p>
 </script>
 
-<script type="text/template" id="contact-template">
+<script type="text/template" id="iozone-input-template">
 	<form class="form-horizontal" method="post">
 		<div class="form-group">
 			<label for="name" class="col-sm-2 control-label">Name</label>
@@ -50,37 +50,53 @@
 			<label for="email" class="col-sm-2 control-label">Email</label>
 			<div class="col-sm-10">
 				<input type="text" name="email" class="form-control" id="email" 
-					value="<%=email %>"placeholder="Email" required />	
+					value="<%=email %>" placeholder="Email" required />	
 			</div>
 		</div>
 
 		<div class="form-group">
 			<label for="message" class="col-sm-2 control-label">Message</label>
 			<div class="col-sm-10">
-				<textarea type="text" name="message" class="form-control" id="message" rows="5"></textarea>
+				<textarea type="text" name="message" class="form-control" id="message"
+					rows="5"><%=message %></textarea>
 			</div>
 			
 		</div>
+
+		<div class="form-group">
+			<label for="message" class="col-sm-2 control-label">Select</label>
+			<div class="col-sm-10">
+				<select class="form-control" id="select-test" name="filesize">
+					<option><%=filesize%></option>
+					<option>256</option>
+					<option>512</option>
+					<option>1024</option>
+				</select>
+			</div>
+		</div>		
+
 		<div class="form-group">
 			<div class="col-sm-offset-2 col-sm-10">
-				<button type="submit" class="btn btn-primary">LOL</button>
+				<button type="submit" class="btn btn-primary btn-contact-save">LOL</button>
 			</div>
 		</div>
 	</form>
 </script>
 
+
+
 	<nav>
 		<ul>
 			<li><a href="/">Home</a></li>
 			<li><a href="#about">About</a></li>
-			<li><a href="#contact">Contact</a></li>
+			<li><a href="#iozone-input">Iozone Input</a></li>
 		</ul>
-	</nav>
+	</nav>		
 
-	<div id="global-div">
+
+	<div id="global-div" class="container-fluid">
 
 	</div>
-
 
 	<script src="javascripts/bower_components/jquery/dist/jquery.js"></script>
 	<script src="javascripts/bower_components/underscore/underscore.js"></script>

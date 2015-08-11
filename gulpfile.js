@@ -8,6 +8,7 @@ var gulp = require('gulp'),
 
 gulp.task('apps', function() {
     gulp.src('public/javascripts/*.js')
+        .pipe(plumber())
         .pipe(browserify({
           insertGlobals : false
         }))
