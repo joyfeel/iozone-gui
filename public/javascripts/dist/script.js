@@ -4,6 +4,11 @@
 
 var app = app || {};
 
+
+var template = function(id) {
+	return _.template($('#' + id).html());
+};
+
 app.Router = Backbone.Router.extend({
 	routes: {
 		'about': 'about',
@@ -27,12 +32,13 @@ app.About = Backbone.Model.extend({
 
 app.AboutView = Backbone.View.extend({
 	el: '#global-div',
-	template: _.template( $('#about-template').html() ),
+	//template: _.template( $('#about-template').html() ),
+	template: template('about-template'),
 	initialize: function() {
-		//_.bindAll(this, 'inputChange');
+		_.bindAll(this, 'render');
 
 		this.model = new app.About();
-		this.model.bind("change", this.render, this);
+		this.model.bind("change", this.render);
 		this.render();
 	},
 	render: function() {
@@ -53,7 +59,7 @@ app.Contact = Backbone.Model.extend({
 		name: 'Joy',
 		email: 'joybee210@gmail.com',
 		message: 'QQ',
-		filesize: '128'
+		filesize: ''
 	}
 });
 
@@ -62,12 +68,12 @@ app.ContactView = Backbone.View.extend({
 	events: {
 		'click .btn-contact-save': 'save'
 	},
+	template: template('iozone-input-template'),
 	initialize: function() {
 		_.bindAll(this, 'render');
 
 		this.model = new app.Contact();
-		this.model.bind('change', this.render, this);
-		this.template = _.template( $('#iozone-input-template').html() )
+		this.model.bind('change', this.render);	
 		this.render();
 	},
 	render: function() {
@@ -125,7 +131,7 @@ app.SignupView = Backbone.View.extend({
 		'change input': 'inputChange'
 	},
 	initialize: function() {
-		_.bindAll(this, 'inputChange');
+		_.bindAll(this, 'render', 'inputChange');
 
 		this.model = new app.User();
 		this.model.bind("change", this.render);
@@ -145,7 +151,6 @@ app.SignupView = Backbone.View.extend({
 	}
 
 });
-
 
 //main
 $(document).ready(function() {
