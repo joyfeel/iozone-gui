@@ -9,17 +9,33 @@ var template = function(id) {
 	return _.template($('#' + id).html());
 };
 
+
 app.Router = Backbone.Router.extend({
 	routes: {
 		'about': 'about',
-		'iozone-input': 'iozone_input'
+		'iozone-input': 'iozone_input',
+		'iozone-result': 'iozone_result'
 	},
 	about: function() {
-		var about = new app.AboutView();
+		new app.AboutView();
 	},
 	iozone_input: function() {
-		var contact = new app.ContactView();
-	}
+		new app.IozoneInputView();
+	},
+	iozone_result: function() {
+		//var contact = new app.ContactView();
+		//new app.IozoneResultView();
+
+		var dataSeries = new DataSeries();
+    	new BarGraph({
+        	collection: dataSeries
+    	}).render();
+
+    	setInterval(function() {
+	        dataSeries.randomize();
+	    	}, 2000);
+
+    }
 
 });
 
@@ -48,8 +64,8 @@ app.AboutView = Backbone.View.extend({
 	}
 });
 
-
-app.Contact = Backbone.Model.extend({
+/*
+app.IozoneResult = Backbone.Model.extend({
 	url: function() {
 		return 'http://localhost:3000/iozone-input'
 						+ (this.id === null ? '' : '/' + this.id);
@@ -58,12 +74,45 @@ app.Contact = Backbone.Model.extend({
 	defaults: {
 		name: 'Joy',
 		email: 'joybee210@gmail.com',
-		message: 'QQ',
+		message: 'Test',
+		filesize: ''
+	}
+});
+*/
+
+app.IozoneInput = Backbone.Model.extend({
+	url: function() {
+		return 'http://localhost:3000/iozone-input'
+						+ (this.id === null ? '' : '/' + this.id);
+	}, 
+	id: null,
+	defaults: {
+		name: 'Joy',
+		email: 'joybee210@gmail.com',
+		message: 'Test',
 		filesize: ''
 	}
 });
 
-app.ContactView = Backbone.View.extend({
+app.IozoneResultView = Backbone.View.extend({
+	el: '#global-div',
+	template: template('iozone-result-template'),
+	initialize: function() {
+		_.bindAll(this, 'render');
+
+		this.model = new app.IozoneInput();
+		this.model.bind('change', this.render);	
+		this.render();
+		this.model.fetch();
+	},
+	render: function() {
+		this.$el.html(this.template(this.model.toJSON()));
+
+		return this;
+	}
+});
+
+app.IozoneInputView = Backbone.View.extend({
 	el: '#global-div',
 	events: {
 		'click .btn-contact-save': 'save'
@@ -72,14 +121,15 @@ app.ContactView = Backbone.View.extend({
 	initialize: function() {
 		_.bindAll(this, 'render');
 
-		this.model = new app.Contact();
-		this.model.bind('change', this.render);	
+		this.model = new app.IozoneInput();
+		//this.model.bind('change', this.render);	
 		this.render();
 	},
 	render: function() {
+
 		this.$el.html(this.template(this.model.toJSON()));
 
-		console.log(this.$el.find('select[name="filesize"]').val());
+		//console.log(this.$el.find('select[name="filesize"]').val());
 
 		return this;
 	},
@@ -90,7 +140,6 @@ app.ContactView = Backbone.View.extend({
 		var email = this.$el.find('input[name="email"]').val();
 		var message = this.$el.find('textarea[name="message"]').val();
 		var filesize = this.$el.find('select[name="filesize"]').val();
-
 
 		this.model.save({
 			name: name,
@@ -115,6 +164,10 @@ app.ContactView = Backbone.View.extend({
 	}
 });
 
+
+
+
+/*
 app.User = Backbone.Model.extend({
 	defaults: {
 		name: 'joy',
@@ -122,6 +175,7 @@ app.User = Backbone.Model.extend({
 
 	}
 });
+
 
 app.SignupView = Backbone.View.extend({
 	el: '#global-div',
@@ -151,12 +205,128 @@ app.SignupView = Backbone.View.extend({
 	}
 
 });
+*/
+
+
+var w = 440,
+    h = 200;
+
+
+var DataPoint = Backbone.Model.extend({
+    initialize: function(x) {
+        this.set({
+            x: x
+        });
+    },
+    type: "point",
+    randomize: function() {
+    	this.set({
+        	x: Math.round(Math.random() * 10)
+    	});
+  	}
+});
+
+
+var DataSeries = Backbone.Collection.extend({
+    model: DataPoint,
+
+    fetch: function() {
+        this.reset();
+        this.add([
+            new DataPoint(11),
+            new DataPoint(12),
+            new DataPoint(15),
+            new DataPoint(18)
+            ]);
+    },
+    randomize: function() {
+        this.each(function(m) {
+            m.randomize();
+        });
+    }
+});
+
+
+
+		//this.$el.html(this.template(this.model.toJSON()));
+var BarGraph = Backbone.View.extend({
+    el: "#global-div",
+    template: template('iozone-result-template'),
+    initialize: function() {
+        _.bindAll(this, "render", "frame");
+        this.collection.bind("reset", this.frame);
+        this.collection.bind("change", this.render);
+
+        this.chart = d3.selectAll($(this.el).html(this.template())).append("svg")
+        			   .attr("class", "chart").attr("width", w).attr("height", h)
+        			   .append("g").attr("transform", "translate(10,15)");
+
+        this.collection.fetch();
+    },
+    render: function() {
+        var data = this.collection.models;
+        var x = d3.scale.linear().domain([0, d3.max(data, function(d) {
+            return d.get("x");
+        })]).range([0, w - 10]);
+
+        var y = d3.scale.ordinal().domain([0, 1, 2, 3]).rangeBands([0, h - 20]);
+
+        var self = this;
+        var rect = this.chart.selectAll("rect").data(data, function(d, i) {
+            return i;
+        });
+
+        rect.enter().insert("rect", "text").attr("y", function(d) {
+            return y(d.get("x"));
+        }).attr("width", function(d) {
+            return x(d.get("x"));
+        }).attr("height", y.rangeBand());
+
+        rect.transition().duration(1000).attr("width", function(d) {
+            return x(d.get("x"));
+        }).attr("height", y.rangeBand());
+
+        rect.exit().remove();
+        
+        var text = this.chart.selectAll("text").data(data, function(d, i) {
+            return i;
+        });
+
+       text.enter().append("text")
+        .attr("x", function(d) {
+            return x(d.get("x"));
+        })
+        .attr("y", function(d,i) { return y(i) + y.rangeBand() / 2; })
+        .attr("dx", -3) // padding-right
+        .attr("dy", ".35em") // vertical-align: middle
+        .attr("text-anchor", "end") // text-align: right
+           .text(function(d) { return d.get("x");});
+        
+        text
+        .transition()
+        .duration(1100)
+        .attr("x", function(d) {
+            return x(d.get("x"));
+        })
+         .text(function(d) { return d.get("x");});
+  
+    },
+    frame: function() {
+        this.chart.append("line").attr("y1", 0).attr("y2", h - 10).style("stroke", "#000");
+        this.chart.append("line").attr("x1", 0).attr("x2", w).attr("y1", h - 10).attr("y2", h - 10).style("stroke", "#000");
+    }
+});
+
+
 
 //main
 $(document).ready(function() {
-	var sign = new app.SignupView();
+	//var sign = new app.SignupView();
 
 	var route = new app.Router();
+
+
+
 	Backbone.history.start();
 });
 },{}]},{},[1])

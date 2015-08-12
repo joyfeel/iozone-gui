@@ -16,12 +16,40 @@ router.get('/', function(req, res, next) {
 });
 
 
-router.get('/about', function(req, res, next) {
-    res.render('main', { 
-    		      title: 'About1',
-    			  subtitle: 'About subtitle1',
-    			  description: 'About practice1'
-    		  });
+router.get('/chatroom', function(req, res, next) {
+    res.render('chatroom');
+});
+
+router.get('/iozone-input', function(req, res, next) {
+/*
+    var obj = { 
+        name: 'Carol',
+        email: 'kappacha@gmail.com',
+        message: 'Unit',
+        filesize: '2048' 
+      };
+*/
+    //res.write(JSON.stringify(obj)); //returns "{"test":1}"
+
+    
+
+    res.json({
+        name: 'Carol',
+        email: 'kappacha@gmail.com',
+        message: 'Unit',
+        filesize: '2048'
+    });
+
+
+/*
+    res.status(200).send({
+
+        success: true,
+        error: false
+    });
+*/
+
+
 });
 
 router.post('/iozone-input', function(req, res, next) {
@@ -35,18 +63,18 @@ router.post('/iozone-input', function(req, res, next) {
     console.log(req.body.filesize);
 
 
-      child_process.exec("./iozone3_430_Native/iozone -a -i 0 -s " + req.body.filesize,
-                            function(error, stdout, stderr) {
-                                console.log('stdout: ' + stdout);
-                                console.log('stderr: ' + stderr);
-                                if (error !== null) {
-                                    console.log('exec error: ' + error);
-                                    res.status(500).send({
-                                        success: false,
-                                        error: true
-                                    }); 
-                                }
-                            });
+    child_process.exec("./iozone3_430_Native/iozone -a -i 0 -s " + req.body.filesize,
+                          function(error, stdout, stderr) {
+                              console.log('stdout: ' + stdout);
+                              console.log('stderr: ' + stderr);
+                              if (error !== null) {
+                                  console.log('exec error: ' + error);
+                                  res.status(500).send({
+                                      success: false,
+                                      error: true
+                                  }); 
+                              }
+                          });
 
 /*
     iozone.stdout.on('data', function(data) {
@@ -80,8 +108,8 @@ router.post('/123/contact/1', function(req, res, next) {
 
   res.render('contact', { 
   					    name: req.body.name,
-  							email: req.body.email,
-                message: req.body.message
+  						email: req.body.email,
+                        message: req.body.message
   					});
   
   console.log("backend 2!!!");
