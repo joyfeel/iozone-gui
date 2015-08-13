@@ -1,14 +1,11 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-
-//'use strict';
+'use strict';
 
 var app = app || {};
-
 
 var template = function(id) {
 	return _.template($('#' + id).html());
 };
-
 
 app.Router = Backbone.Router.extend({
 	routes: {
@@ -24,19 +21,20 @@ app.Router = Backbone.Router.extend({
 	},
 	iozone_result: function() {
 		//var contact = new app.ContactView();
-		//new app.IozoneResultView();
+		new app.IozoneResultView();
 
+/*
 		var dataSeries = new DataSeries();
     	new BarGraph({
         	collection: dataSeries
     	}).render();
-
+*/
+    	/*
     	setInterval(function() {
 	        dataSeries.randomize();
 	    	}, 2000);
-
+		*/
     }
-
 });
 
 app.About = Backbone.Model.extend({
@@ -84,13 +82,14 @@ app.IozoneInput = Backbone.Model.extend({
 	url: function() {
 		return 'http://localhost:3000/iozone-input'
 						+ (this.id === null ? '' : '/' + this.id);
-	}, 
+	},
 	id: null,
 	defaults: {
 		name: 'Joy',
 		email: 'joybee210@gmail.com',
 		message: 'Test',
-		filesize: ''
+		filesize: '',
+		data:[]
 	}
 });
 
@@ -106,7 +105,16 @@ app.IozoneResultView = Backbone.View.extend({
 		this.model.fetch();
 	},
 	render: function() {
-		this.$el.html(this.template(this.model.toJSON()));
+		console.log(this.model.get('message'));
+		console.log(this.model.get('data'));
+
+		var test = d3.select(this.el)
+		  .html(this.template(this.model.toJSON()))
+		  .selectAll('div')
+		  .data(this.model.get('data'))
+		  .enter()
+		  .append('div')
+		  .text(String);
 
 		return this;
 	}
@@ -148,24 +156,17 @@ app.IozoneInputView = Backbone.View.extend({
 			filesize: filesize
 		}, {
 			success: function(model, response, options) {
-
 				if (response == 200) {
 					console.log("Successfully save");
 				}
-			}
-			, 
+			}, 
 			error: function(model, response, options) {
 				console.log(response);
 				console.log("Error save");
 			}
-			
 		});
-
 	}
 });
-
-
-
 
 /*
 app.User = Backbone.Model.extend({
@@ -175,7 +176,6 @@ app.User = Backbone.Model.extend({
 
 	}
 });
-
 
 app.SignupView = Backbone.View.extend({
 	el: '#global-div',
@@ -207,10 +207,8 @@ app.SignupView = Backbone.View.extend({
 });
 */
 
-
 var w = 440,
     h = 200;
-
 
 var DataPoint = Backbone.Model.extend({
     initialize: function(x) {
@@ -225,7 +223,6 @@ var DataPoint = Backbone.Model.extend({
     	});
   	}
 });
-
 
 var DataSeries = Backbone.Collection.extend({
     model: DataPoint,
@@ -246,9 +243,6 @@ var DataSeries = Backbone.Collection.extend({
     }
 });
 
-
-
-		//this.$el.html(this.template(this.model.toJSON()));
 var BarGraph = Backbone.View.extend({
     el: "#global-div",
     template: template('iozone-result-template'),
@@ -317,15 +311,10 @@ var BarGraph = Backbone.View.extend({
     }
 });
 
-
-
 //main
 $(document).ready(function() {
 	//var sign = new app.SignupView();
-
 	var route = new app.Router();
-
-
 
 	Backbone.history.start();
 });

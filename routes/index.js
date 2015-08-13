@@ -2,7 +2,6 @@ var express = require('express');
 var router = express.Router();
 var child_process = require('child_process');
 
-
 /* GET home page. */
 router.get('/', function(req, res, next) {
   
@@ -21,34 +20,14 @@ router.get('/chatroom', function(req, res, next) {
 });
 
 router.get('/iozone-input', function(req, res, next) {
-/*
-    var obj = { 
-        name: 'Carol',
-        email: 'kappacha@gmail.com',
-        message: 'Unit',
-        filesize: '2048' 
-      };
-*/
-    //res.write(JSON.stringify(obj)); //returns "{"test":1}"
-
-    
 
     res.json({
         name: 'Carol',
         email: 'kappacha@gmail.com',
-        message: 'Unit',
-        filesize: '2048'
+        message: 'Unitssss',
+        filesize: '2048',
+        data:[3, 3, 4, 5, 6, 7, 8]
     });
-
-
-/*
-    res.status(200).send({
-
-        success: true,
-        error: false
-    });
-*/
-
 
 });
 
