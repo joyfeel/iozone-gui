@@ -1,3 +1,5 @@
+var moment = require('moment');
+
 'use strict';
 
 var app = app || {};
@@ -12,27 +14,26 @@ app.Router = Backbone.Router.extend({
 		'iozone-input': 'iozone_input',
 		'iozone-result': 'iozone_result'
 	},
+	initialize: function() {
+		console.log("Always?");
+        this.view = null;
+    },
 	about: function() {
-		new app.AboutView();
+		this._cleanUp();
+		this.view = new app.AboutView();
 	},
 	iozone_input: function() {
-		new app.IozoneInputView();
+		this._cleanUp();
+		this.view = new app.IozoneInputView();
 	},
 	iozone_result: function() {
-		//var contact = new app.ContactView();
-		new app.IozoneResultView();
-
-/*
-		var dataSeries = new DataSeries();
-    	new BarGraph({
-        	collection: dataSeries
-    	}).render();
-*/
-    	/*
-    	setInterval(function() {
-	        dataSeries.randomize();
-	    	}, 2000);
-		*/
+		this._cleanUp();
+		this.view = new app.IozoneResultView();
+    },
+    _cleanUp: function() {
+        if(this.view)
+            this.view.remove();
+        this.view = null;
     }
 });
 
@@ -58,6 +59,11 @@ app.AboutView = Backbone.View.extend({
 		this.$el.html(this.template(this.model.toJSON()));
 
 		return this;
+	},
+	remove: function() {
+    	this.$el.empty();
+    	this.undelegateEvents();
+    	return this;
 	}
 });
 
@@ -80,11 +86,11 @@ app.IozoneResult = Backbone.Model.extend({
 app.IozoneInput = Backbone.Model.extend({
 	url: function() {
 		return 'http://localhost:3000/iozone-input'
-						+ (this.id === null ? '' : '/' + this.id);
+					+ (this.id === null ? '' : '/' + this.id);
 	},
 	id: null,
 	defaults: {
-		name: 'Joy',
+		name: moment(new Date()),
 		email: 'joybee210@gmail.com',
 		message: 'Test',
 		filesize: '',
@@ -101,21 +107,88 @@ app.IozoneResultView = Backbone.View.extend({
 		this.model = new app.IozoneInput();
 		this.model.bind('change', this.render);	
 		this.render();
-		this.model.fetch();
+		this.model.fetch();  
 	},
 	render: function() {
+		//d3.select(this.el).html(this.template(this.model.toJSON()))
 		console.log(this.model.get('message'));
 		console.log(this.model.get('data'));
 
-		var test = d3.select(this.el)
-		  .html(this.template(this.model.toJSON()))
-		  .selectAll('div')
-		  .data(this.model.get('data'))
-		  .enter()
-		  .append('div')
-		  .text(String);
+
+		this.d3_test(this.model.get('data'));
+
 
 		return this;
+	},
+	d3_test: function(data) {
+		var width = 240,
+			height = 120;
+		var s = d3.select(this.el).html(this.template(this.model.toJSON)).append('svg');
+		
+
+		s.attr({
+			'width': width,
+			'height': height
+		})
+		.style({
+			'border': '1px solid #000'			
+		});
+
+
+    var scaleX = d3.scale.linear()
+                   .range([0,width])
+                   .domain([0,90]);
+
+    var scaleY = d3.scale.linear()
+                   .range([0,height])
+                   .domain([0,300]);
+
+		var line = d3.svg.line()
+					 .x(function(d) {
+					 	return scaleX(d.x);
+					 })
+					 .y(function(d) {
+					 	return scaleY(d.y);
+					 });
+		s.append('path')
+		.attr({
+			'd': line(data),
+			'stroke': "#09c",
+			'fill': 'none'
+		});
+
+/*
+		var svg = d3.select(this.el)
+		  .html(this.template(this.model.toJSON()))
+		  .append('svg')
+		  .attr({
+		      'width': 800,
+		      'height': 800
+		  });
+
+		var line = d3.svg.line()
+					 .x(function(d) {
+					     return d.x;
+					 })
+					 .y(function(d) {
+					 	 return d.y
+					 })
+					 .interpolate('linear-closed')
+                	 .tension(2);
+
+		svg.append('path').attr({
+			'd': line(data),
+			'y': 0,
+			'stroke': '#000',
+			'stroke-width': '5px',
+			'fill': 'none'
+		})
+*/
+	},
+	remove: function() {
+    	this.$el.empty();
+    	this.undelegateEvents();
+    	return this;
 	}
 });
 
@@ -133,10 +206,7 @@ app.IozoneInputView = Backbone.View.extend({
 		this.render();
 	},
 	render: function() {
-
 		this.$el.html(this.template(this.model.toJSON()));
-
-		//console.log(this.$el.find('select[name="filesize"]').val());
 
 		return this;
 	},
@@ -164,48 +234,15 @@ app.IozoneInputView = Backbone.View.extend({
 				console.log("Error save");
 			}
 		});
+	},
+	remove: function() {
+    	this.$el.empty();
+    	this.undelegateEvents();
+    	return this;
 	}
 });
 
 /*
-app.User = Backbone.Model.extend({
-	defaults: {
-		name: 'joy',
-		email: 'dasd@adsdsa'
-
-	}
-});
-
-app.SignupView = Backbone.View.extend({
-	el: '#global-div',
-	template: _.template( $('#signup-template').html() ),
-
-	events: {
-		'change input': 'inputChange'
-	},
-	initialize: function() {
-		_.bindAll(this, 'render', 'inputChange');
-
-		this.model = new app.User();
-		this.model.bind("change", this.render);
-		this.render();
-	},
-	render: function() {
-		this.$el.html(this.template(this.model.toJSON()));
-		//console.log($('#signup-template').text());
-		return this;
-	},
-	inputChange: function(e) {
-		var $input = $(e.target);
-
-		var inputName = $input.attr('name');
-
-		this.model.set(inputName, $input.val());
-	}
-
-});
-*/
-
 var w = 440,
     h = 200;
 
@@ -309,6 +346,7 @@ var BarGraph = Backbone.View.extend({
         this.chart.append("line").attr("x1", 0).attr("x2", w).attr("y1", h - 10).attr("y2", h - 10).style("stroke", "#000");
     }
 });
+*/
 
 //main
 $(document).ready(function() {

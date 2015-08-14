@@ -1,59 +1,33 @@
 var express = require('express');
 var router = express.Router();
-var child_process = require('child_process');
+
+
+var iozone_parser = require('./modules/iozone-parser.js');
+
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
   
-  /*
-  res.render('main', { title: 'Express',
-  					    description: 'My first app!!!!'
+    /*
+    res.render('main', { title: 'Express',
+    					    description: 'My first app!!!!'
             });
-  */
+    */
 
     res.redirect('/public/index.html');
 });
 
 
-router.get('/chatroom', function(req, res, next) {
-    res.render('chatroom');
-});
 
-router.get('/iozone-input', function(req, res, next) {
-
-    res.json({
-        name: 'Carol',
-        email: 'kappacha@gmail.com',
-        message: 'Unitssss',
-        filesize: '2048',
-        data:[3, 3, 4, 5, 6, 7, 8]
-    });
-
-});
 
 router.post('/iozone-input', function(req, res, next) {
     /*
     var iozone 
     = child_process.spawn('./iozone3_430_Native/iozone', ['-a', '-i 0', '-s ' + req.body.filesize]);
     */
-    console.log(req.body.name);
-    console.log(req.body.email);
-    console.log(req.body.message);
-    console.log(req.body.filesize);
 
+    iozone_parser.test(req.body);
 
-    child_process.exec("./iozone3_430_Native/iozone -a -i 0 -s " + req.body.filesize,
-                          function(error, stdout, stderr) {
-                              console.log('stdout: ' + stdout);
-                              console.log('stderr: ' + stderr);
-                              if (error !== null) {
-                                  console.log('exec error: ' + error);
-                                  res.status(500).send({
-                                      success: false,
-                                      error: true
-                                  }); 
-                              }
-                          });
 
 /*
     iozone.stdout.on('data', function(data) {
@@ -69,7 +43,6 @@ router.post('/iozone-input', function(req, res, next) {
     });
 */  
     console.log('Non-blocking!!!!!!!');
-    console.log('Non-blocking!!!!!!!');
 
     res.status(200).send({
         success: true,
@@ -77,6 +50,34 @@ router.post('/iozone-input', function(req, res, next) {
     });
 
 });
+
+
+router.get('/iozone-input', function(req, res, next) {
+    res.json({
+        name: 'Carol',
+        email: 'kappacha@gmail.com',
+        message: 'Unitssss',
+        filesize: '2048',
+        data:[  
+          {x:0, y:100}, 
+          {x:10, y:154}, 
+          {x:20, y:288}, 
+          {x:30, y:187}, 
+          {x:40, y:235}, 
+          {x:50, y:198}, 
+          {x:60, y:172}, 
+          {x:70, y:134}, 
+          {x:80, y:94}, 
+          {x:90, y:88}
+        ]
+    });
+});
+
+
+router.get('/chatroom', function(req, res, next) {
+    res.render('chatroom');
+});
+
 
 router.post('/123/contact/1', function(req, res, next) {
   console.log("backend 1@@!!!");
