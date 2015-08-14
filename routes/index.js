@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 
 
-var iozone_parser = require('./modules/iozone-parser.js');
+var iozone = require('./modules/iozone-parser.js');
 
 
 /* GET home page. */
@@ -17,31 +17,9 @@ router.get('/', function(req, res, next) {
     res.redirect('/public/index.html');
 });
 
-
-
-
 router.post('/iozone-input', function(req, res, next) {
-    /*
-    var iozone 
-    = child_process.spawn('./iozone3_430_Native/iozone', ['-a', '-i 0', '-s ' + req.body.filesize]);
-    */
+    iozone.execute (req.body);  
 
-    iozone_parser.test(req.body);
-
-
-/*
-    iozone.stdout.on('data', function(data) {
-        console.log('stdout: ' + data);
-    });
-
-    iozone.stderr.on('data', function(data) {
-        console.log('stderr: ' + data);
-    });
-
-    iozone.on('exit', function(code) {
-        console.log('child process exited with code ' + code);
-    });
-*/  
     console.log('Non-blocking!!!!!!!');
 
     res.status(200).send({
