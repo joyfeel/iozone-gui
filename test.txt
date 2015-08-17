@@ -1,0 +1,36 @@
+	Iozone: Performance Test of File I/O
+	        Version $Revision: 3.430 $
+		Compiled for 64 bit mode.
+		Build: linux-ia64 
+
+	Contributors:William Norcott, Don Capps, Isom Crawford, Kirby Collins
+	             Al Slater, Scott Rhine, Mike Wisner, Ken Goss
+	             Steve Landherr, Brad Smith, Mark Kelly, Dr. Alain CYR,
+	             Randy Dunlap, Mark Montague, Dan Million, Gavin Brebner,
+	             Jean-Marc Zucconi, Jeff Blomberg, Benny Halevy, Dave Boone,
+	             Erik Habbinga, Kris Strecker, Walter Wong, Joshua Root,
+	             Fabrice Bacchella, Zhenghua Xue, Qin Li, Darren Sawyer,
+	             Vangel Bojaxhi, Ben England, Vikentsi Lapa.
+
+	Run began: Mon Aug 17 10:49:55 2015
+
+	Auto Mode
+	File size set to 512 kB
+	Command line used: iozone3_430_Native/iozone -a -i 0 -s 512
+	Output is in kBytes/sec
+	Time Resolution = 0.000004 seconds.
+	Processor cache size set to 1024 kBytes.
+	Processor cache line size set to 32 bytes.
+	File stride size set to 17 * record size.
+                                                              random    random     bkwd    record    stride                                    
+              kB  reclen    write  rewrite    read    reread    read     write     read   rewrite      read   fwrite frewrite    fread  freread
+             512       4   205693   441394                                                                                            
+             512       8   349285   701282                                                                                            
+             512      16   306949   671881                                                                                            
+             512      32   479432   876802                                                                                            
+             512      64   450374  1053605                                                                                            
+             512     128   455919  1080102                                                                                            
+             512     256   391146  1168874                                                                                            
+             512     512   359819  1051542                                                                                            
+
+iozone test complete.

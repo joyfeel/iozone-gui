@@ -17,8 +17,13 @@ router.get('/', function(req, res, next) {
     res.redirect('/public/index.html');
 });
 
+
+//front-end to back-end
 router.post('/iozone-input', function(req, res, next) {
-    iozone.execute (req.body);  
+    //1.exec iozone
+    //2.save the data to csv
+    //3.
+    iozone.process (req.body);  
 
     console.log('Non-blocking!!!!!!!');
 
