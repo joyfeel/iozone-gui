@@ -3,28 +3,32 @@ var events = require('events');
 //var XLSX = require('xlsx');
 
 var xlsx = require('node-xlsx');
-
-
 var excelParser = require('excel-parser');
-
 var fs = require('fs');
+var csvParser = require('csv')
+//var jsoncsv = require('json-csv')
+var json2csv = require('json2csv');
 
 
 var workflow = new events.EventEmitter();
 
-workflow.on('iozone-exec', function(req_body) {
-	//console.log("@@@@" + req_body.filesize);
+workflow.outcome = {
+    success: false,
+    errfor: {}
+};
+
+workflow.on('iozone-exec', function(req_body, res) {
 	var self = this;
 
-	child_process.exec("iozone3_430_Native/iozone -a -i 0 -s 1024 -Rab 123.xlsx"
+	child_process.exec("iozone3_430_Native/iozone -a -i 0 -s 256 -Rab 123.xlsx"
 		, function (error, stdout, stderr) {
-			console.log('stdout: ' + stdout);
-            console.log('stderr: ' + stderr);
+			//console.log('stdout: ' + stdout);
+            //console.log('stderr: ' + stderr);
 			if (error) {
 				console.log('exec error: ' + error);
 			} else {
                 //self.emit('iozone-save');
-                self.emit('convert_csv');
+                self.emit('convert_csv', res);
 			}
 		}
 	);
@@ -32,93 +36,104 @@ workflow.on('iozone-exec', function(req_body) {
 	console.log("NONONONO");
 });
 
-workflow.on('convert_csv', function() {
+workflow.on('convert_csv', function(res) {
 	var self = this;
 
 	child_process.exec("ssconvert 123.xlsx 123_convert_csv.csv"
 		, function (error, stdout, stderr) {
-			console.log('stdout: ' + stdout);
-            console.log('stderr: ' + stderr);
+			//console.log('stdout: ' + stdout);
+            //console.log('stderr: ' + stderr);
 			if (error) {
 				console.log('exec error: ' + error);
 			} else {
-                self.emit('convert_xlsx');
+                self.emit('convert_xlsx', res);
 			}
 		}
 	);
 });
 
-workflow.on('convert_xlsx', function() {
+workflow.on('convert_xlsx', function(res) {
 	var self = this;
 
 	child_process.exec("ssconvert 123_convert_csv.csv 123_convert_xlsx.xlsx"
 		, function (error, stdout, stderr) {
-			console.log('stdout: ' + stdout);
-            console.log('stderr: ' + stderr);
+			//console.log('stdout: ' + stdout);
+            //console.log('stderr: ' + stderr);
 			if (error) {
 				console.log('exec error: ' + error);
 			} else {
-                self.emit('iozone-save');
+                self.emit('iozone-save', res);
 			}
 		}
 	);
 });
 
-workflow.on('iozone-save', function() {
+workflow.on('iozone-save', function(res) {
 	var obj = xlsx.parse('123_convert_xlsx.xlsx'),
-		csv = []
-		, i;
-	console.log(JSON.stringify(obj));
-	console.log("1@" + obj[0].data[0]);
-	console.log("length is @" + obj[0].data[0].length);
-	console.log("2@" + obj[0].data[0][0]);
-	console.log("3@" + obj[0].data[0][1]);
-	console.log("4@" + obj[0].data[1]);
-	console.log("5@" + obj[0].data[1][0]);
-	console.log("6@" + obj[0].data[1][2]);
+		excel_data = [],
+		i,
+		self = this,
+		csv_write_file;
 
+	var rec_length = obj[0].data[0].length,
+		speed_length = obj[0].data[1].length;
+
+	var rec_start = obj[0].data[0],
+		speed_start = obj[0].data[1];
+
+	var csv_fields = ['speed', 'rec'];
 
 	
-	for (i = 0 + 1; i < obj[0].data[0].length; i++) {
-		csv.push({Speed: obj[0].data[1][i]
-					, rec_length: obj[0].data[0][i]});
-
+	for (i = 0 + 1; i < Math.min(speed_length, rec_length); i++) {
+		excel_data.push({speed: speed_start[i]
+					, rec: rec_start[i]});
 	}
 
-	console.log("csv: " + csv);
-	console.log("csv: " + JSON.stringify(csv));
+ 
+	json2csv({ data: excel_data, fields: csv_fields }, function(err, csv) {
+	    if (err) {
+	    	console.log(err);
+	    }
+	    //csv_write_file = csv;
+	    //console.log(csv);
 
-	
-
-	/*
-[{"name":"123_convert_csv.csv","data":[[null,4,8,16,32,64,128,256,512,1024,2048,4096,8192,16384],[4096,220834,305174,391928,430074,451540,490136,521657,342561,386453,494637,510087],[],[null,4,8,16,32,64,128,256,512,1024,2048,4096,8192,16384],[4096,444645,532721,668940,1081568,1055714,1060602,1166934,983436,1144468,1042453,1239330]]}]
-1@,4,8,16,32,64,128,256,512,1024,2048,4096,8192,16384
-2@undefined
-3@4
-4@4096,220834,305174,391928,430074,451540,490136,521657,342561,386453,494637,510087
-5@4096
-6@305174
-
-
-	*/
-
-
-	/*
-	var workbook = XLSX.readFile('123_convert_xlsx.xlsx');
-	var sheet_name_list = workbook.SheetNames;
-	sheet_name_list.forEach(function(y) { 
-	  var worksheet = workbook.Sheets[y];
-	  for (z in worksheet) {
-	   
-	    if(z[0] === '!') continue;
-	    console.log(y + "!" + z + "=" + JSON.stringify(worksheet[z].v));
-	  }
+	    self.emit('writefile', res, csv);
 	});
-	*/
+
 });
 
-function process (req_body) {
-	workflow.emit('iozone-exec', req_body);
+workflow.on('writefile', function(res, csv) {
+	var self = this;
+	fs.writeFile('./data.csv', csv, function(err) {
+		if (err) {
+			console.log(err);
+		}
+		console.log('Write OK!');
+		self.emit('response', res);
+	});
+});
+
+
+workflow.on('response', function(res) {
+    workflow.outcome.success = true;
+    //return res.send(workflow.outcome);
+
+    return res.status(200).send({
+        success: true,
+        error: false
+    });
+});
+/*
+var myCallback = function () {
+	console.log ("ihihihihihi");
+};
+*/
+
+function process (req_body, res) {
+	return workflow.emit('iozone-exec', req_body, res);
+
+	//console.log ("NQNQNQNQNQNQ");
+	//myCallback();
 }
 
 exports.process = process;

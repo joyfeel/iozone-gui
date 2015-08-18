@@ -23,15 +23,18 @@ router.post('/iozone-input', function(req, res, next) {
     //1.exec iozone
     //2.save the data to csv
     //3.
-    iozone.process (req.body);  
+    //console.log(res);
 
-    console.log('Non-blocking!!!!!!!');
+    return iozone.process (req.body, res);  
 
+    //console.log('Non-blocking!!!!!!!');
+
+/*
     res.status(200).send({
         success: true,
         error: false
     });
-
+*/
 });
 
 
