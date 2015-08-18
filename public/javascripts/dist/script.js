@@ -3212,7 +3212,6 @@ app.Router = Backbone.Router.extend({
 		'iozone-result': 'iozone_result'
 	},
 	initialize: function() {
-		console.log("Always?");
         this.view = null;
     },
 	about: function() {
@@ -3287,7 +3286,7 @@ app.IozoneInput = Backbone.Model.extend({
 	},
 	id: null,
 	defaults: {
-		name: moment(new Date()),
+		name: '',
 		email: 'joybee210@gmail.com',
 		message: 'Test',
 		filesize: '',
@@ -3318,11 +3317,20 @@ app.IozoneResultView = Backbone.View.extend({
 		return this;
 	},
 	d3_test: function(data) {
-		var width = 240,
-			height = 120;
+		d3.select(this.el).html(this.template(this.model.toJSON))
+			.selectAll('p')
+			.data(data)
+			.enter()
+			.append('p')
+			.text(function(d){
+				return d;
+			});
+
+		/*
 		var s = d3.select(this.el).html(this.template(this.model.toJSON)).append('svg');
 		
-
+		var width = 240,
+			height = 120;
 		s.attr({
 			'width': width,
 			'height': height
@@ -3332,13 +3340,13 @@ app.IozoneResultView = Backbone.View.extend({
 		});
 
 
-    var scaleX = d3.scale.linear()
-                   .range([0,width])
-                   .domain([0,90]);
+	    var scaleX = d3.scale.linear()
+	                   .range([0,width])
+	                   .domain([0,90]);
 
-    var scaleY = d3.scale.linear()
-                   .range([0,height])
-                   .domain([0,300]);
+	    var scaleY = d3.scale.linear()
+	                   .range([0,height])
+	                   .domain([0,300]);
 
 		var line = d3.svg.line()
 					 .x(function(d) {
@@ -3353,34 +3361,7 @@ app.IozoneResultView = Backbone.View.extend({
 			'stroke': "#09c",
 			'fill': 'none'
 		});
-
-/*
-		var svg = d3.select(this.el)
-		  .html(this.template(this.model.toJSON()))
-		  .append('svg')
-		  .attr({
-		      'width': 800,
-		      'height': 800
-		  });
-
-		var line = d3.svg.line()
-					 .x(function(d) {
-					     return d.x;
-					 })
-					 .y(function(d) {
-					 	 return d.y
-					 })
-					 .interpolate('linear-closed')
-                	 .tension(2);
-
-		svg.append('path').attr({
-			'd': line(data),
-			'y': 0,
-			'stroke': '#000',
-			'stroke-width': '5px',
-			'fill': 'none'
-		})
-*/
+		*/
 	},
 	remove: function() {
     	this.$el.empty();
@@ -3399,22 +3380,30 @@ app.IozoneInputView = Backbone.View.extend({
 		_.bindAll(this, 'render');
 
 		this.model = new app.IozoneInput();
-		//this.model.bind('change', this.render);	
+		//this.model.bind('remove', this.render, this);	
+		//this.listenTo(this.model, 'change', this.render, this);
+
+		//Render 1 times
+		this.model.set('name', moment(new Date()));
+
 		this.render();
 	},
 	render: function() {
+		console.log("render!!!");
 		this.$el.html(this.template(this.model.toJSON()));
 
 		return this;
 	},
 	save: function(e) {
+		var self = this;
 		e.preventDefault();
 		
 		var name = this.$el.find('input[name="name"]').val();
 		var email = this.$el.find('input[name="email"]').val();
 		var message = this.$el.find('textarea[name="message"]').val();
 		var filesize = this.$el.find('select[name="filesize"]').val();
-
+		
+		this.$el.find('button[type="submit"]').hide();	
 		this.model.save({
 			name: name,
 			email: email,
@@ -3422,9 +3411,10 @@ app.IozoneInputView = Backbone.View.extend({
 			filesize: filesize
 		}, {
 			success: function(model, response, options) {
-				if (response == 200) {
-					console.log("Successfully save");
-				}
+				console.log("Successfully save");	
+				self.model.set('name', moment(new Date()));
+				//Render 2 times
+				self.render();
 			}, 
 			error: function(model, response, options) {
 				console.log(response);
@@ -3433,6 +3423,7 @@ app.IozoneInputView = Backbone.View.extend({
 		});
 	},
 	remove: function() {
+		//this.model.destroy();
     	this.$el.empty();
     	this.undelegateEvents();
     	return this;
@@ -3547,7 +3538,6 @@ var BarGraph = Backbone.View.extend({
 
 //main
 $(document).ready(function() {
-	//var sign = new app.SignupView();
 	var route = new app.Router();
 
 	Backbone.history.start();

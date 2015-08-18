@@ -26,14 +26,13 @@ workflow.on('iozone-exec', function(req_body, res) {
             //console.log('stderr: ' + stderr);
 			if (error) {
 				console.log('exec error: ' + error);
+				return res.status(500).send(workflow.outcome)
 			} else {
-                //self.emit('iozone-save');
                 self.emit('convert_csv', res);
 			}
 		}
 	);
 	
-	console.log("NONONONO");
 });
 
 workflow.on('convert_csv', function(res) {
@@ -45,6 +44,7 @@ workflow.on('convert_csv', function(res) {
             //console.log('stderr: ' + stderr);
 			if (error) {
 				console.log('exec error: ' + error);
+				return res.status(500).send(workflow.outcome)
 			} else {
                 self.emit('convert_xlsx', res);
 			}
@@ -61,6 +61,7 @@ workflow.on('convert_xlsx', function(res) {
             //console.log('stderr: ' + stderr);
 			if (error) {
 				console.log('exec error: ' + error);
+				return res.status(500).send(workflow.outcome)
 			} else {
                 self.emit('iozone-save', res);
 			}
@@ -86,20 +87,16 @@ workflow.on('iozone-save', function(res) {
 	
 	for (i = 0 + 1; i < Math.min(speed_length, rec_length); i++) {
 		excel_data.push({speed: speed_start[i]
-					, rec: rec_start[i]});
+							, rec: rec_start[i]});
 	}
-
  
 	json2csv({ data: excel_data, fields: csv_fields }, function(err, csv) {
 	    if (err) {
 	    	console.log(err);
+	    	return res.status(500).send(workflow.outcome)
 	    }
-	    //csv_write_file = csv;
-	    //console.log(csv);
-
 	    self.emit('writefile', res, csv);
 	});
-
 });
 
 workflow.on('writefile', function(res, csv) {
@@ -107,6 +104,7 @@ workflow.on('writefile', function(res, csv) {
 	fs.writeFile('./data.csv', csv, function(err) {
 		if (err) {
 			console.log(err);
+			return res.status(500).send(workflow.outcome);
 		}
 		console.log('Write OK!');
 		self.emit('response', res);
@@ -116,24 +114,12 @@ workflow.on('writefile', function(res, csv) {
 
 workflow.on('response', function(res) {
     workflow.outcome.success = true;
-    //return res.send(workflow.outcome);
-
-    return res.status(200).send({
-        success: true,
-        error: false
-    });
+    return res.status(200).send(workflow.outcome);
 });
-/*
-var myCallback = function () {
-	console.log ("ihihihihihi");
-};
-*/
+
 
 function process (req_body, res) {
 	return workflow.emit('iozone-exec', req_body, res);
-
-	//console.log ("NQNQNQNQNQNQ");
-	//myCallback();
 }
 
 exports.process = process;
