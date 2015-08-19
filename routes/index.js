@@ -15,22 +15,30 @@ router.post('/iozone-input', function(req, res, next) {
 
 //back-end to front-end
 router.get('/iozone-input', function(req, res, next) {
-    get_data_from_csv.process();
+    //get_data_from_csv.process();
 /*
     return iozone.process (req.body, res, function() {
         res.send ();
     });  
 */
 
-    
-
-    
     res.json({
         name: 'Carol',
         email: 'kappacha@gmail.com',
         message: 'Unitssss',
         filesize: '2048',
-        data:[  5, 10, 15, 20, 10
+        data:[  
+          [5, 20],
+          [490, 90],
+          [250, 50],
+          [100, 33],
+          [330, 95],
+          [410, 12],
+          [475, 44],
+          [25, 67],
+          [85, 21],
+          [220, 88],
+          [600, 150]
 
         /*
           {x:'0', y:'50'}, 

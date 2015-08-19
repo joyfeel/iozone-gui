@@ -117,7 +117,98 @@ app.IozoneResultView = Backbone.View.extend({
 		return this;
 	},
 	d3_test: function(data) {
+		var w = 500;
+		var h = 300;
+		var padding = 30;
 
+
+
+		var xScale = d3.scale.linear()
+							 .domain([0, d3.max(data, function(d) {
+							     return d[0];
+							 })])
+							 .range([padding, w - padding*2]);
+
+		var yScale = d3.scale.linear()
+							 .domain([0, d3.max(data, function(d) {
+							     return d[1];
+							 })])
+							 .range([h - padding, padding]);
+
+		var rScale = d3.scale.linear()
+							 .domain([0, d3.max(data, function(d) {
+							     return d[1];
+							 })])
+							 .range([2, 5]);
+
+
+		var xAxis = d3.svg.axis()
+						  .scale(xScale)
+						  .orient('bottom')
+						  .ticks(5);
+
+		var yAxis = d3.svg.axis()
+						  .scale(yScale)
+						  .orient('left')
+						  .ticks(5);
+
+		var svg = d3.select(this.el).html(this.template(this.model.toJSON))
+					.append('svg')
+					.attr({
+						width: w,
+						height: h
+					});
+
+			svg.selectAll('circle')
+			   .data(data)
+			   .enter()
+			   .append('circle')
+			   .attr({
+			       cx: function(d) {	
+			           return xScale(d[0]);	
+			       }, 
+			       cy: function(d) {	
+			           return yScale(d[1]);	
+			       }, 
+			       r: function(d) {			
+			           //return Math.sqrt(h - d[1]);
+			           //return Math.sqrt((h - d[1])/Math.PI);
+			           return rScale(d[1]);
+			       }
+			   });
+
+			svg.selectAll('text')
+			   .data(data)
+			   .enter()
+			   .append('text')
+			   .text(function(d) {
+			       return d[0] + ',' + d[1];	
+			   })
+			   .attr({
+			       x: function(d) {
+			           return xScale(d[0]);
+			       },
+			       y: function(d) {
+			           return yScale(d[1]);
+			       },
+			       'font-family': 'sans-serif',
+			       'font-size': '12px',
+			       'fill': 'green'
+			   });
+
+
+		//svg.append('g').call(xAxis);
+		svg.append('g')
+			.attr('class', 'axis')
+			.attr('transform', 'translate(0,  '+(h - padding)+')')
+			.call(xAxis);
+
+		svg.append('g')
+			.attr('class', 'axis')
+			.attr('transform', 'translate('+padding+', 0)')
+			.call(yAxis);
+
+/*
 			var w = 500;
 			var h = 100;
 			var barPadding = 1;
@@ -125,6 +216,7 @@ app.IozoneResultView = Backbone.View.extend({
 			var dataset = data;
 			
 			//Create SVG element
+			
 			var svg = d3.select(this.el).html(this.template(this.model.toJSON))
 						.append("svg")
 						.attr("width", w)
@@ -163,118 +255,9 @@ app.IozoneResultView = Backbone.View.extend({
 			   .attr("font-family", "sans-serif")
 			   .attr("font-size", "11px")
 			   .attr("fill", "white");
-/*
-		var self = this;
-		var w = 500,
-			h = 50,
-			barPadding = 1;
-
-		var svg = d3.select(this.el).html(this.template(this.model.toJSON))
-					 .append('svg')
-					 .attr('width', w)
-					 .attr('height', h);
-
-		var rect = svg.selectAll('rect')
-						  .data(data)
-						  .enter()
-						  .append('rect');
-
-		rect.attr("x", function(d, i) {
-				return i * (w / data.length);
-			})
-			 .attr("y", function(d) {
-			     return h-(d*4);
-			 })
-			 .attr("width", w / data.length - barPadding)
-			 .attr("height", function(d) {
-			 	return d*4;
-			 })
-			 .attr('fill', 'green');
-  
-
-		var text = svg.selectAll('text')
-			.data(data)
-			.enter()
-			.append('text');
-
-		text.text(function(d) {
-				return d;
-			})
-			.attr("text-anchor", "middle")
-			.attr('x', function(d, i) {
-				return i * (w / data.length) + (w / data.length - barPadding) / 2;
-			})
-			.attr('y', function(d) {
-				return h - (d * 4) + 14;
-			})
-			.attr("font-family", "sans-serif")
-			.attr("font-size", "11px")
-			.attr("fill", "white");
-*/
-
-		/*				  
-		circles.attr('cx', function(d, i) {
-					return (i * 200) + 25;
-				})
-				.attr('cy', h/2)
-				.attr('r', function(d) {
-					return d;
-				});
-		*/
-
-		/*
-		d3.select(this.el).html(this.template(this.model.toJSON))
-			.selectAll('div')
-			.data(this.model.get('data'))
-			.enter()
-			.append('div')
-			.attr('class', 'bar')
-			.style('height', function(d) {
-				var barHeight = d * 5;
-				return barHeight + 'px';
-			});
-		*/
-			/*
-			.text(function(d){
-				return d;
-			});
-			*/
-		/*
-		var s = d3.select(this.el).html(this.template(this.model.toJSON)).append('svg');
-		
-		var width = 240,
-			height = 120;
-		s.attr({
-			'width': width,
-			'height': height
-		})
-		.style({
-			'border': '1px solid #000'			
-		});
+*/			   
 
 
-	    var scaleX = d3.scale.linear()
-	                   .range([0,width])
-	                   .domain([0,90]);
-
-	    var scaleY = d3.scale.linear()
-	                   .range([0,height])
-	                   .domain([0,300]);
-
-		var line = d3.svg.line()
-					 .x(function(d) {
-					 	return scaleX(d.x);
-					 })
-					 .y(function(d) {
-					 	return scaleY(d.y);
-					 });
-		s.append('path')
-		.attr({
-			'd': line(data),
-			'stroke': "#09c",
-			'fill': 'none'
-		});
-		*/
 	},
 	remove: function() {
     	this.$el.empty();

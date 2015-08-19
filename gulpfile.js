@@ -17,7 +17,7 @@ gulp.task('apps', function() {
         }))
         .pipe(rename({suffix: '.min'}))
         .pipe(uglify())
-        .pipe(gulp.dest('public/javascripts/dist'));
+        .pipe(gulp.dest('public/javascripts/dist/'));
         //.pipe(livereload());
 });
 
