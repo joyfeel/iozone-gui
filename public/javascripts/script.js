@@ -133,7 +133,7 @@ app.IozoneResultView = Backbone.View.extend({
 						  .enter()
 						  .append('circle');
 		circles.attr('cx', function(d, i) {
-					return (i * 50) + 25;
+					return (i * 200) + 25;
 				})
 				.attr('cy', h/2)
 				.attr('r', function(d) {
