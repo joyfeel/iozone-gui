@@ -23,7 +23,7 @@ router.get('/iozone-input', function(req, res, next) {
 */
 
     res.json({
-        name: 'Carol',
+        filename: 'Carol',
         email: 'kappacha@gmail.com',
         message: 'Unitssss',
         filesize: '2048',
@@ -93,7 +93,7 @@ router.post('/123/contact/1', function(req, res, next) {
 
   res.render('contact', { 
   					    name: req.body.name,
-  						email: req.body.email,
+  						  email: req.body.email,
                         message: req.body.message
   					});
   

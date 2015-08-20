@@ -19,7 +19,7 @@ app.engine('html', require('uinexpress').__express);
 app.set('view engine', 'html');
 
 
-//Joy mark the 'jade' template
+//Mark the 'jade' template
 //app.set('view engine', 'jade');
 
 // uncomment after placing your favicon in /public

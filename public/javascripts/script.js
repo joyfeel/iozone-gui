@@ -86,16 +86,98 @@ app.IozoneResult = Backbone.Model.extend({
 
 app.IozoneInput = Backbone.Model.extend({
 	url: function() {
-		return 'http://localhost:3000/iozone-input'
+		return 'http://10.5.48.1:3000/iozone-input'
 					+ (this.id === null ? '' : '/' + this.id);
 	},
 	id: null,
 	defaults: {
-		name: '',
+		filename: '',
 		email: 'joybee210@gmail',
 		message: 'Test',
 		filesize: '',
-		data:[]
+		data:    [],
+		testmode: ''
+	}
+});
+
+
+app.IozoneInputView = Backbone.View.extend({
+	el: '#global-div',
+	events: {
+		'click .btn-contact-save': 'save'
+	},
+	template: template('iozone-input-template'),
+	initialize: function() {
+		_.bindAll(this, 'render');
+
+		this.model = new app.IozoneInput();
+		//this.model.bind('remove', this.render, this);	
+		//this.listenTo(this.model, 'change', this.render, this);
+
+		//Render 1 times
+		this.model.set('name', moment(new Date()));
+		this.render();
+	},
+	render: function() {
+		console.log("render!!!");
+		this.$el.html(this.template(this.model.toJSON()));
+
+		return this;
+	},
+	save: function(e) {
+
+		var self = this;
+
+		e.preventDefault();
+        e.stopPropagation();
+		
+		var filename = this.$el.find('input[name="name"]').val();
+		var email = this.$el.find('input[name="email"]').val();
+		var message = this.$el.find('textarea[name="message"]').val();
+		var filesize = this.$el.find('select[name="filesize"]').val();
+		var testmode = this.$el.find('select[name="testmode"]').val();
+
+ 
+		//this.$el.off('click', '.btn-contact-save');
+		//this.events["click .btn-contact-save"] = undefined;
+        //$(this.el).undelegate('.btn-contact-save', 'click');
+/*
+		console.log(filesize.val());
+		console.log(filesize.text());
+
+		console.log(testmode.val());
+		console.log(testmode.text());
+*/	
+		//this.$el.find('button[type="submit"]').button('loading');
+
+//TODO		
+//http://stackoverflow.com/questions/12542325/backbone-js-view-events-disable-enable
+		this.$el.find('button[type="submit"]').addClass('disabled').text('Loading...');
+
+		this.model.save({
+			filename: filename,
+			email: email,
+			message: message,
+			filesize: filesize,
+			testmode: testmode
+		}, {
+			success: function(model, response, options) {
+				console.log("Successfully save");	
+				self.model.set('name', moment(new Date()));
+				//Render 2 times
+				self.render();
+			}, 
+			error: function(model, response, options) {
+				console.log(response);
+				console.log("Error save");
+			}
+		});
+	},
+	remove: function() {
+		//this.model.destroy();
+    	this.$el.empty();
+    	this.undelegateEvents();
+    	return this;
 	}
 });
 
@@ -112,16 +194,14 @@ app.IozoneResultView = Backbone.View.extend({
 		this.model.fetch();  
 	},
 	render: function() {
-		this.d3_test(this.model.get('data'));
+		this.d3_line_chart(this.model.get('data'));
 
 		return this;
 	},
-	d3_test: function(data) {
+	d3_line_chart: function(data) {
 		var w = 500;
 		var h = 300;
 		var padding = 30;
-
-
 
 		var xScale = d3.scale.linear()
 							 .domain([0, d3.max(data, function(d) {
@@ -266,65 +346,6 @@ app.IozoneResultView = Backbone.View.extend({
 	}
 });
 
-app.IozoneInputView = Backbone.View.extend({
-	el: '#global-div',
-	events: {
-		'click .btn-contact-save': 'save'
-	},
-	template: template('iozone-input-template'),
-	initialize: function() {
-		_.bindAll(this, 'render');
-
-		this.model = new app.IozoneInput();
-		//this.model.bind('remove', this.render, this);	
-		//this.listenTo(this.model, 'change', this.render, this);
-
-		//Render 1 times
-		this.model.set('name', moment(new Date()));
-
-		this.render();
-	},
-	render: function() {
-		console.log("render!!!");
-		this.$el.html(this.template(this.model.toJSON()));
-
-		return this;
-	},
-	save: function(e) {
-		var self = this;
-		e.preventDefault();
-		
-		var name = this.$el.find('input[name="name"]').val();
-		var email = this.$el.find('input[name="email"]').val();
-		var message = this.$el.find('textarea[name="message"]').val();
-		var filesize = this.$el.find('select[name="filesize"]').val();
-		
-		this.$el.find('button[type="submit"]').hide();	
-		this.model.save({
-			name: name,
-			email: email,
-			message: message,
-			filesize: filesize
-		}, {
-			success: function(model, response, options) {
-				console.log("Successfully save");	
-				self.model.set('name', moment(new Date()));
-				//Render 2 times
-				self.render();
-			}, 
-			error: function(model, response, options) {
-				console.log(response);
-				console.log("Error save");
-			}
-		});
-	},
-	remove: function() {
-		//this.model.destroy();
-    	this.$el.empty();
-    	this.undelegateEvents();
-    	return this;
-	}
-});
 
 /*
 var w = 440,

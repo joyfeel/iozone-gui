@@ -1,16 +1,16 @@
+"use strict";
+
 var child_process = require('child_process');
 var events = require('events');
-//var XLSX = require('xlsx');
 
 var xlsx = require('node-xlsx');
-var excelParser = require('excel-parser');
 var fs = require('fs');
-var csvParser = require('csv')
-//var jsoncsv = require('json-csv')
 var json2csv = require('json2csv');
 
-
 var workflow = new events.EventEmitter();
+
+//Store the parsed data
+var data_folder = "./statistical/"
 
 workflow.outcome = {
     success: false,
@@ -19,26 +19,29 @@ workflow.outcome = {
 
 workflow.on('iozone-exec', function(req_body, res) {
 	var self = this;
+	var filename = data_folder + req_body.filename;
 
-	child_process.exec("iozone3_430_Native/iozone -a -i 0 -s 256 -Rab 123.xlsx"
+	child_process.exec("iozone3_430_Native/iozone -I -f /mmc/tmp -a "
+		+ req_body.testmode + " -s " + req_body.filesize
+		+ " -y 4k -q 16m"// + req_body.filesize
+		+ " -b " + filename + ".xlsx"
 		, function (error, stdout, stderr) {
-			//console.log('stdout: ' + stdout);
+			console.log('stdout: ' + stdout);
             //console.log('stderr: ' + stderr);
 			if (error) {
 				console.log('exec error: ' + error);
 				return res.status(500).send(workflow.outcome)
 			} else {
-                self.emit('convert_csv', res);
+                self.emit('convert_csv', res, req_body, filename);
 			}
 		}
-	);
-	
+	);	
 });
 
-workflow.on('convert_csv', function(res) {
+workflow.on('convert_csv', function(res, req_body, filename) {
 	var self = this;
 
-	child_process.exec("ssconvert 123.xlsx 123_convert_csv.csv"
+	child_process.exec("ssconvert " + filename + ".xlsx " +  filename + "_convert_csv.csv"
 		, function (error, stdout, stderr) {
 			//console.log('stdout: ' + stdout);
             //console.log('stderr: ' + stderr);
@@ -46,16 +49,16 @@ workflow.on('convert_csv', function(res) {
 				console.log('exec error: ' + error);
 				return res.status(500).send(workflow.outcome)
 			} else {
-                self.emit('convert_xlsx', res);
+                self.emit('convert_xlsx', res, req_body, filename);
 			}
 		}
 	);
 });
 
-workflow.on('convert_xlsx', function(res) {
+workflow.on('convert_xlsx', function(res, req_body, filename) {
 	var self = this;
 
-	child_process.exec("ssconvert 123_convert_csv.csv 123_convert_xlsx.xlsx"
+	child_process.exec("ssconvert " + filename + "_convert_csv.csv " +  filename + "_convert_xlsx.xlsx"
 		, function (error, stdout, stderr) {
 			//console.log('stdout: ' + stdout);
             //console.log('stderr: ' + stderr);
@@ -63,14 +66,15 @@ workflow.on('convert_xlsx', function(res) {
 				console.log('exec error: ' + error);
 				return res.status(500).send(workflow.outcome)
 			} else {
-                self.emit('iozone-save', res);
+                self.emit('iozone-save', res, req_body, filename);
 			}
 		}
 	);
 });
 
-workflow.on('iozone-save', function(res) {
-	var obj = xlsx.parse('123_convert_xlsx.xlsx'),
+//Need refactorory.
+workflow.on('iozone-save', function(res, req_body, filename) {
+	var obj = xlsx.parse(filename + '_convert_xlsx.xlsx'),
 		excel_data = [],
 		i,
 		self = this,
@@ -95,13 +99,31 @@ workflow.on('iozone-save', function(res) {
 	    	console.log(err);
 	    	return res.status(500).send(workflow.outcome)
 	    }
-	    self.emit('writefile', res, csv);
+	    self.emit('removefile', res, req_body, filename, csv);
 	});
 });
 
-workflow.on('writefile', function(res, csv) {
+workflow.on('removefile', function(res, req_body, filename, csv) {
 	var self = this;
-	fs.writeFile('./data.csv', csv, function(err) {
+
+	child_process.exec("rm -rf " + filename + "*"
+		, function (error, stdout, stderr) {
+			//console.log('stdout: ' + stdout);
+            //console.log('stderr: ' + stderr);
+			if (error) {
+				console.log('rm -rf error: ' + error);
+				return res.status(500).send(workflow.outcome)
+			} 
+			console.log('Remove file OK!');
+			self.emit('writefile', res, req_body, filename, csv);
+		}
+	);
+});
+
+workflow.on('writefile', function(res, req_body, filename, csv) {
+	var self = this;
+
+	fs.writeFile(filename + '.csv', csv, function(err) {
 		if (err) {
 			console.log(err);
 			return res.status(500).send(workflow.outcome);
@@ -113,6 +135,7 @@ workflow.on('writefile', function(res, csv) {
 
 
 workflow.on('response', function(res) {
+	//Success
     workflow.outcome.success = true;
     return res.status(200).send(workflow.outcome);
 });
