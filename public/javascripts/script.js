@@ -10,6 +10,27 @@ var template = function(id) {
 	return _.template($('#' + id).html());
 };
 
+
+app.IozoneInput = Backbone.Model.extend({
+	url: function() {
+		return 'http://10.5.48.1:3000/iozone-input'
+					+ (this.id === null ? '' : '/' + this.id);
+	},
+	id: null,
+	defaults: {
+		filename: '',
+		description: 'Test',
+		filesize: '',
+		data:    [],
+		testmode: ''
+	}
+});
+
+
+app.IozoneInputCollection = Backbone.Collection.extend({
+	model: app.IozoneInput
+});
+
 app.Router = Backbone.Router.extend({
 	routes: {
 		'about': 'about',
@@ -29,7 +50,9 @@ app.Router = Backbone.Router.extend({
 	},
 	iozone_result: function() {
 		this._cleanUp();
-		this.view = new app.IozoneResultView();
+		this.view = new app.IozoneResultView({
+			collection: app.IozoneInputCollection
+		});
     },
     _cleanUp: function() {
         if(this.view)
@@ -78,33 +101,20 @@ app.IozoneResult = Backbone.Model.extend({
 	defaults: {
 		name: 'Joy',
 		email: 'joybee210@gmail.com',
-		message: 'Test',
+		description: 'Test',
 		filesize: ''
 	}
 });
 */
 
-app.IozoneInput = Backbone.Model.extend({
-	url: function() {
-		return 'http://10.5.48.1:3000/iozone-input'
-					+ (this.id === null ? '' : '/' + this.id);
-	},
-	id: null,
-	defaults: {
-		filename: '',
-		email: 'joybee210@gmail',
-		message: 'Test',
-		filesize: '',
-		data:    [],
-		testmode: ''
-	}
-});
+
 
 
 app.IozoneInputView = Backbone.View.extend({
 	el: '#global-div',
 	events: {
-		'click .btn-contact-save': 'save'
+		'click .btn-contact-save': 'save',
+		'click .btn-contact-error': 'error_handle'
 	},
 	template: template('iozone-input-template'),
 	initialize: function() {
@@ -121,23 +131,21 @@ app.IozoneInputView = Backbone.View.extend({
 	render: function() {
 		console.log("render!!!");
 		this.$el.html(this.template(this.model.toJSON()));
+		this.$el.find('.btn-contact-error').hide();
 
 		return this;
 	},
 	save: function(e) {
+		var self = this,
+			filename = this.$el.find('input[name="name"]').val(),
+		    email = this.$el.find('input[name="email"]').val(),
+			description = this.$el.find('textarea[name="description"]').val(),
+			filesize = this.$el.find('select[name="filesize"]').val(),
+			testmode = this.$el.find('select[name="testmode"]').val();
 
-		var self = this;
-
-		e.preventDefault();
+ 		e.preventDefault();
         e.stopPropagation();
-		
-		var filename = this.$el.find('input[name="name"]').val();
-		var email = this.$el.find('input[name="email"]').val();
-		var message = this.$el.find('textarea[name="message"]').val();
-		var filesize = this.$el.find('select[name="filesize"]').val();
-		var testmode = this.$el.find('select[name="testmode"]').val();
 
- 
 		//this.$el.off('click', '.btn-contact-save');
 		//this.events["click .btn-contact-save"] = undefined;
         //$(this.el).undelegate('.btn-contact-save', 'click');
@@ -150,14 +158,14 @@ app.IozoneInputView = Backbone.View.extend({
 */	
 		//this.$el.find('button[type="submit"]').button('loading');
 
-//TODO		
-//http://stackoverflow.com/questions/12542325/backbone-js-view-events-disable-enable
-		this.$el.find('button[type="submit"]').addClass('disabled').text('Loading...');
+		//!!!! this.$el.find('button[type="submit"]').prop('disabled', true);
+		this.$el.find('.btn-contact-save').prop('disabled', true);
+		this.$el.find('.btn-contact-save').addClass('disabled').text('Loading...');
 
 		this.model.save({
 			filename: filename,
 			email: email,
-			message: message,
+			description: description,
 			filesize: filesize,
 			testmode: testmode
 		}, {
@@ -168,10 +176,20 @@ app.IozoneInputView = Backbone.View.extend({
 				self.render();
 			}, 
 			error: function(model, response, options) {
+				self.$el.find('.btn-contact-error').show();
+				self.$el.find('.btn-contact-save').hide();
 				console.log(response);
 				console.log("Error save");
 			}
 		});
+	},
+	error_handle: function (e) {
+		e.preventDefault();
+        e.stopPropagation();
+		alert('Need to mount the device');
+		//this.$el.find('.btn-contact-error').hide();
+		this.model.set('name', moment(new Date()));
+		this.render();
 	},
 	remove: function() {
 		//this.model.destroy();
@@ -181,6 +199,149 @@ app.IozoneInputView = Backbone.View.extend({
 	}
 });
 
+
+app.IozoneItemView = Backbone.View.extend({
+	tagName: 'p',
+	render: function() {
+		this.$el.html(this.model.get('filename'));
+
+		return this;
+	}
+});
+
+app.IozoneResultView = Backbone.View.extend({
+	el: '#global-div',
+	template: template('iozone-result-template'),
+	initialize: function() {
+		//_.bindAll(this, 'render');
+
+		this.model = new app.IozoneInput();
+		this.listenTo(this.model, 'change', this.render, this);
+		//this.model.bind('change', this.render);	
+		this.render();
+		this.model.fetch();  
+	},
+	render: function() {
+		//this.d3_line_chart(this.model.get('data'));
+
+		//this.$el.html(this.template(this.model.toJSON()));
+
+		//this.$el.append(
+			_.map(this.collection.models, function(model, key) {
+				/*
+				return new app.IozoneItemView ({
+					model: model	
+				}).render().el;
+				*/
+
+
+
+				console.log('WTFFF' + model.get('name'));
+			});
+		//);
+
+
+		return this;
+	},
+	d3_line_chart: function(data) {
+		var w = 500;
+		var h = 300;
+		var padding = 30;
+
+		var xScale = d3.scale.linear()
+							 .domain([0, d3.max(data, function(d) {
+							     return d[0];
+							 })])
+							 .range([padding, w - padding*2]);
+
+		var yScale = d3.scale.linear()
+							 .domain([0, d3.max(data, function(d) {
+							     return d[1];
+							 })])
+							 .range([h - padding, padding]);
+
+		var rScale = d3.scale.linear()
+							 .domain([0, d3.max(data, function(d) {
+							     return d[1];
+							 })])
+							 .range([2, 5]);
+
+
+		var xAxis = d3.svg.axis()
+						  .scale(xScale)
+						  .orient('bottom')
+						  .ticks(5);
+
+		var yAxis = d3.svg.axis()
+						  .scale(yScale)
+						  .orient('left')
+						  .ticks(5);
+//self.$el.find('.btn-contact-error').show();
+		var svg = d3.select(this.el).html(this.template(this.model.toJSON))
+					.append('svg')
+					.attr({
+						width: w,
+						height: h
+					});
+
+			svg.selectAll('circle')
+			   .data(data)
+			   .enter()
+			   .append('circle')
+			   .attr({
+			       cx: function(d) {	
+			           return xScale(d[0]);	
+			       }, 
+			       cy: function(d) {	
+			           return yScale(d[1]);	
+			       }, 
+			       r: function(d) {			
+			           //return Math.sqrt(h - d[1]);
+			           //return Math.sqrt((h - d[1])/Math.PI);
+			           return rScale(d[1]);
+			       }
+			   });
+
+			svg.selectAll('text')
+			   .data(data)
+			   .enter()
+			   .append('text')
+			   .text(function(d) {
+			       return d[0] + ',' + d[1];	
+			   })
+			   .attr({
+			       x: function(d) {
+			           return xScale(d[0]);
+			       },
+			       y: function(d) {
+			           return yScale(d[1]);
+			       },
+			       'font-family': 'sans-serif',
+			       'font-size': '12px',
+			       'fill': 'green'
+			   });
+
+		//svg.append('g').call(xAxis);
+		svg.append('g')
+			.attr('class', 'axis')
+			.attr('transform', 'translate(0,  '+(h - padding)+')')
+			.call(xAxis);
+
+		svg.append('g')
+			.attr('class', 'axis')
+			.attr('transform', 'translate('+padding+', 0)')
+			.call(yAxis);
+
+	},
+	remove: function() {
+    	this.$el.empty();
+    	this.undelegateEvents();
+    	return this;
+	}
+});
+
+
+/*
 app.IozoneResultView = Backbone.View.extend({
 	el: '#global-div',
 	template: template('iozone-result-template'),
@@ -231,7 +392,7 @@ app.IozoneResultView = Backbone.View.extend({
 						  .scale(yScale)
 						  .orient('left')
 						  .ticks(5);
-
+//self.$el.find('.btn-contact-error').show();
 		var svg = d3.select(this.el).html(this.template(this.model.toJSON))
 					.append('svg')
 					.attr({
@@ -288,56 +449,6 @@ app.IozoneResultView = Backbone.View.extend({
 			.attr('transform', 'translate('+padding+', 0)')
 			.call(yAxis);
 
-/*
-			var w = 500;
-			var h = 100;
-			var barPadding = 1;
-			
-			var dataset = data;
-			
-			//Create SVG element
-			
-			var svg = d3.select(this.el).html(this.template(this.model.toJSON))
-						.append("svg")
-						.attr("width", w)
-						.attr("height", h);
-			svg.selectAll("rect")
-			   .data(dataset)
-			   .enter()
-			   .append("rect")
-			   .attr("x", function(d, i) {
-			   		return i * (w / dataset.length);
-			   })
-			   .attr("y", function(d) {
-			   		return h - (d * 4);
-			   })
-			   .attr("width", w / dataset.length - barPadding)
-			   .attr("height", function(d) {
-			   		return d * 4;
-			   })
-			   .attr("fill", function(d) {
-					return "rgb(0, 0, " + (d * 10) + ")";
-			   });
-			svg.selectAll("text")
-			   .data(dataset)
-			   .enter()
-			   .append("text")
-			   .text(function(d) {
-			   		return d;
-			   })
-			   .attr("text-anchor", "middle")
-			   .attr("x", function(d, i) {
-			   		return i * (w / dataset.length) + (w / dataset.length - barPadding) / 2;
-			   })
-			   .attr("y", function(d) {
-			   		return h - (d * 4) + 14;
-			   })
-			   .attr("font-family", "sans-serif")
-			   .attr("font-size", "11px")
-			   .attr("fill", "white");
-*/			   
-
-
 	},
 	remove: function() {
     	this.$el.empty();
@@ -345,113 +456,8 @@ app.IozoneResultView = Backbone.View.extend({
     	return this;
 	}
 });
-
-
-/*
-var w = 440,
-    h = 200;
-
-var DataPoint = Backbone.Model.extend({
-    initialize: function(x) {
-        this.set({
-            x: x
-        });
-    },
-    type: "point",
-    randomize: function() {
-    	this.set({
-        	x: Math.round(Math.random() * 10)
-    	});
-  	}
-});
-
-var DataSeries = Backbone.Collection.extend({
-    model: DataPoint,
-
-    fetch: function() {
-        this.reset();
-        this.add([
-            new DataPoint(11),
-            new DataPoint(12),
-            new DataPoint(15),
-            new DataPoint(18)
-            ]);
-    },
-    randomize: function() {
-        this.each(function(m) {
-            m.randomize();
-        });
-    }
-});
-
-var BarGraph = Backbone.View.extend({
-    el: "#global-div",
-    template: template('iozone-result-template'),
-    initialize: function() {
-        _.bindAll(this, "render", "frame");
-        this.collection.bind("reset", this.frame);
-        this.collection.bind("change", this.render);
-
-        this.chart = d3.selectAll($(this.el).html(this.template())).append("svg")
-        			   .attr("class", "chart").attr("width", w).attr("height", h)
-        			   .append("g").attr("transform", "translate(10,15)");
-
-        this.collection.fetch();
-    },
-    render: function() {
-        var data = this.collection.models;
-        var x = d3.scale.linear().domain([0, d3.max(data, function(d) {
-            return d.get("x");
-        })]).range([0, w - 10]);
-
-        var y = d3.scale.ordinal().domain([0, 1, 2, 3]).rangeBands([0, h - 20]);
-
-        var self = this;
-        var rect = this.chart.selectAll("rect").data(data, function(d, i) {
-            return i;
-        });
-
-        rect.enter().insert("rect", "text").attr("y", function(d) {
-            return y(d.get("x"));
-        }).attr("width", function(d) {
-            return x(d.get("x"));
-        }).attr("height", y.rangeBand());
-
-        rect.transition().duration(1000).attr("width", function(d) {
-            return x(d.get("x"));
-        }).attr("height", y.rangeBand());
-
-        rect.exit().remove();
-        
-        var text = this.chart.selectAll("text").data(data, function(d, i) {
-            return i;
-        });
-
-       text.enter().append("text")
-        .attr("x", function(d) {
-            return x(d.get("x"));
-        })
-        .attr("y", function(d,i) { return y(i) + y.rangeBand() / 2; })
-        .attr("dx", -3) // padding-right
-        .attr("dy", ".35em") // vertical-align: middle
-        .attr("text-anchor", "end") // text-align: right
-           .text(function(d) { return d.get("x");});
-        
-        text
-        .transition()
-        .duration(1100)
-        .attr("x", function(d) {
-            return x(d.get("x"));
-        })
-         .text(function(d) { return d.get("x");});
-  
-    },
-    frame: function() {
-        this.chart.append("line").attr("y1", 0).attr("y2", h - 10).style("stroke", "#000");
-        this.chart.append("line").attr("x1", 0).attr("x2", w).attr("y1", h - 10).attr("y2", h - 10).style("stroke", "#000");
-    }
-});
 */
+
 
 //main
 $(document).ready(function() {

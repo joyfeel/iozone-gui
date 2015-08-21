@@ -15,17 +15,16 @@ router.post('/iozone-input', function(req, res, next) {
 
 //back-end to front-end
 router.get('/iozone-input', function(req, res, next) {
+
     //get_data_from_csv.process();
 /*
     return iozone.process (req.body, res, function() {
         res.send ();
     });  
 */
-
-    res.json({
+    res.status('200').json({
         filename: 'Carol',
-        email: 'kappacha@gmail.com',
-        message: 'Unitssss',
+        description: 'Unitssss',
         filesize: '2048',
         data:[  
           [5, 20],
@@ -39,30 +38,66 @@ router.get('/iozone-input', function(req, res, next) {
           [85, 21],
           [220, 88],
           [600, 150]
-
-        /*
-          {x:'0', y:'50'}, 
-          {x:'10', y:'154'}, 
-          {x:'20', y:'154'}, 
-          {x:'30', y:'154'}, 
-
-          {x:'40', y:'154'}, 
-          {x:'50', y:'154'}, 
-          {x:'60', y:'154'}, 
-        */
-          /*
-          {x:20, y:288}, 
-          {x:30, y:187}, 
-          {x:40, y:235}, 
-          {x:50, y:198}, 
-          {x:60, y:172}, 
-          {x:70, y:134}, 
-          {x:80, y:94}, 
-          {x:90, y:88}
-          */
-        ]
+        ],
+        testmode: 'Xyxd'
+    },{
+        filename: 'XDDDD',
+        description: 'Unit123132ssss',
+        filesize: '2048',
+        data:[  
+          [5, 20],
+          [490, 90],
+          [250, 50],
+          [100, 33],
+          [330, 95],
+          [410, 12],
+          [475, 44],
+          [25, 67],
+          [85, 21],
+          [220, 88],
+          [600, 150]
+        ],
+        testmode: 'Xyxd'
+    })
+    /*
+    res.json({
+        filename: 'Carol',
+        description: 'Unitssss',
+        filesize: '2048',
+        data:[  
+          [5, 20],
+          [490, 90],
+          [250, 50],
+          [100, 33],
+          [330, 95],
+          [410, 12],
+          [475, 44],
+          [25, 67],
+          [85, 21],
+          [220, 88],
+          [600, 150]
+        ],
+        testmode: 'Xyxd'
+    },{
+        filename: 'XDDDD',
+        description: 'Unit123132ssss',
+        filesize: '2048',
+        data:[  
+          [5, 20],
+          [490, 90],
+          [250, 50],
+          [100, 33],
+          [330, 95],
+          [410, 12],
+          [475, 44],
+          [25, 67],
+          [85, 21],
+          [220, 88],
+          [600, 150]
+        ],
+        testmode: 'Xyxd'
     });
-    
+    */
 });
 
 /* GET home page. */

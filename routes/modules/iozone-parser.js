@@ -17,6 +17,7 @@ workflow.outcome = {
     errfor: {}
 };
 
+//sudo mount -t ext4 /dev/mmcblk0 /mmc
 workflow.on('iozone-exec', function(req_body, res) {
 	var self = this;
 	var filename = data_folder + req_body.filename;

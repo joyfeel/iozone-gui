@@ -38,74 +38,146 @@
 </script>
 
 <script type="text/template" id="iozone-input-template">
-	<form class="form-horizontal" method="post">
-		<div class="form-group">
-			<label for="name" class="col-sm-2 control-label">Name</label>
-			<div class="col-sm-10">
-				<input type="text" name="name" class="form-control" id="name" 
-					value="<%=name %>"placeholder="Name" required />	
+	<div class="row">
+		<form class="form-horizontal" method="post">
+			<div class="form-group">
+				<label for="name" class="col-sm-2 control-label">Name</label>
+				<div class="col-sm-6">
+					<input type="text" name="name" class="form-control" id="name" 
+						value="<%=name %>"placeholder="Name" required />	
+				</div>
 			</div>
-		</div>
 
-		<div class="form-group">
-			<label for="email" class="col-sm-2 control-label">Email</label>
-			<div class="col-sm-10">
-				<input type="text" name="email" class="form-control" id="email" 
-					value="<%=email %>" placeholder="Email" required />	
+			<div class="form-group">
+				<label for="description" class="col-sm-2 control-label">Description</label>
+				<div class="col-sm-6">
+					<textarea type="text" name="description" class="form-control" id="description"
+						rows="5"><%=description %></textarea>
+				</div>
+				
 			</div>
-		</div>
 
-		<div class="form-group">
-			<label for="message" class="col-sm-2 control-label">Message</label>
-			<div class="col-sm-10">
-				<textarea type="text" name="message" class="form-control" id="message"
-					rows="5"><%=message %></textarea>
+			<div class="form-group">
+				<label for="message" class="col-sm-2 control-label">Test mode</label>
+				<div class="col-sm-6">
+					<select class="form-control" id="testmode" name="testmode">
+						<option value="-i 0">write/re-write</option>
+						<option value="-i 0 -i 1">read/re-read</option>
+						<option value="-i 0 -i 2">random-read/write</option>
+					</select>
+				</div>
 			</div>
-			
-		</div>
 
-		<div class="form-group">
-			<label for="message" class="col-sm-2 control-label">Test mode</label>
-			<div class="col-sm-10">
-				<select class="form-control" id="testmode" name="testmode">
-					<option value="-i 0">write/re-write</option>
-					<option value="-i 0 -i 1">read/re-read</option>
-					<option value="-i 0 -i 2">random-read/write</option>
-				</select>
-			</div>
-		</div>
+			<div class="form-group">
+				<label for="message" class="col-sm-2 control-label">Select</label>
+				<div class="col-sm-6">
+					<select class="form-control" id="select-test" name="filesize">
+						<option value = "128k">128k</option>
+						<option value = "256">256k</option>
+						<option value = "512K">512k</option>
+						<option value = "1M">1m</option>
+						<option value = "2m">2m</option>
+						<option value = "4m">4m</option>
+						<option value = "8m">8m</option>
+						<option value = "16m">16m</option>
+						<option value = "32m">32m</option>
+						<option value = "512m">512m</option>
+					</select>
+				</div>
+			</div>		
 
-		<div class="form-group">
-			<label for="message" class="col-sm-2 control-label">Select</label>
-			<div class="col-sm-10">
-				<select class="form-control" id="select-test" name="filesize">
-					<option value = "128k">128k</option>
-					<option value = "256">256k</option>
-					<option value = "512K">512k</option>
-					<option value = "1M">1m</option>
-					<option value = "2m">2m</option>
-					<option value = "4m">4m</option>
-					<option value = "8m">8m</option>
-					<option value = "16m">16m</option>
-					<option value = "32m">32m</option>
-					<option value = "512m">512m</option>
-				</select>
+			<div class="form-group">
+				<div class="col-sm-offset-2 col-sm-10">
+					<button type="submit" class="btn btn-primary btn-contact-save">Send</button>
+					<button type="submit" class="btn btn-warning btn-contact-error">Error</button>
+				</div>
 			</div>
-		</div>		
+		</form>
 
-		<div class="form-group">
-			<div class="col-sm-offset-2 col-sm-10">
-				<button type="submit" class="btn btn-primary btn-contact-save">LOL</button>
-			</div>
-		</div>
-	</form>
+	</div>
 </script>
+
 
 <!-- <span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> -->
 
-<script type="text/template" id="iozone-result-template">
 
+	
+
+<script type="text/template" id="iozone-result-template">
+	<div class="row">
+		<div class="col-sm-6 col-md-4">
+			<div class="thumbnail">
+				<img src="img/images.png" alt="">
+				<div class = 'lol'>
+				</div>
+				<div class="caption">
+					<h3>Filename</h3>
+					<p>Description</p>
+					<p>
+						<a href="" class="btn btn-primary" role="button"></a>
+						<a href="" class="btn btn-warning" role="button"></a>
+					</p>
+				</div>
+			</div>
+		</div>
+		<div class="col-sm-6 col-md-4">
+			<div class="thumbnail">
+				<img src="img/images.png" alt="">
+				<div class="caption">
+					<h3>Filename</h3>
+					<p>Description</p>
+					<p>
+						<a href="" class="btn btn-primary" role="button"></a>
+						<a href="" class="btn btn-warning" role="button"></a>
+					</p>
+				</div>
+			</div>
+		</div>
+		<div class="col-sm-6 col-md-4">
+			<div class="thumbnail">
+				<img src="img/images.png" alt="">
+				<div class="caption">
+					<h3>Filename</h3>
+					<p>Description</p>
+					<p>
+						<a href="" class="btn btn-primary" role="button"></a>
+						<a href="" class="btn btn-warning" role="button"></a>
+					</p>
+				</div>
+			</div>
+		</div>
+		<div class="col-sm-6 col-md-4">
+			<div class="thumbnail">
+				<img src="img/images.png" alt="">
+				<div class="caption">
+					<h3>Filename</h3>
+					<p>Description</p>
+					<p>
+						<a href="" class="btn btn-primary" role="button"></a>
+						<a href="" class="btn btn-warning" role="button"></a>
+					</p>
+				</div>
+			</div>
+		</div>
+		<div class="col-sm-6 col-md-4">
+			<div class="thumbnail">
+				<img src="img/images.png" alt="">
+				<div class="caption">
+					<h3>Filename</h3>
+					<p>Description</p>
+					<p>
+						<a href="" class="btn btn-primary" role="button"></a>
+						<a href="" class="btn btn-warning" role="button"></a>
+					</p>
+				</div>
+			</div>
+		</div>
+	</div>
 </script>
+
+
+
+
 	<nav>
 		<ul>
 			<li><a href="/">Home</a></li>
@@ -115,7 +187,7 @@
 		</ul>
 	</nav>		
 
-	<div id="global-div" class="container-fluid">
+	<div id="global-div" class="container">
 		
 	</div>
 

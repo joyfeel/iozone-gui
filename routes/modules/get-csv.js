@@ -3,6 +3,8 @@ var fs = require('fs');
 
 var csv = require('csv-parser');
 
+var dir = require('node-dir'); 
+
 function process () {
 	/*
 	fs.readFile('./data.csv', function(err, data) {
