@@ -22,10 +22,10 @@ router.get('/iozone-input', function(req, res, next) {
         res.send ();
     });  
 */
-    res.status('200').json({
-        filename: 'Carol',
-        description: 'Unitssss',
-        filesize: '2048',
+    res.send([{
+        filename: 'Test case 1',
+        description: 'This is an urgent case',
+        filesize: '2048k',
         data:[  
           [5, 20],
           [490, 90],
@@ -37,15 +37,15 @@ router.get('/iozone-input', function(req, res, next) {
           [25, 67],
           [85, 21],
           [220, 88],
-          [600, 150]
+          [500, 150]
         ],
-        testmode: 'Xyxd'
+        testmode: 'write/re-write'
     },{
-        filename: 'XDDDD',
-        description: 'Unit123132ssss',
-        filesize: '2048',
+        filename: 'Test case 2',
+        description: 'Easy easy easy!',
+        filesize: '1024k',
         data:[  
-          [5, 20],
+          [100, 20],
           [490, 90],
           [250, 50],
           [100, 33],
@@ -57,8 +57,62 @@ router.get('/iozone-input', function(req, res, next) {
           [220, 88],
           [600, 150]
         ],
-        testmode: 'Xyxd'
-    })
+        testmode: 'read/re-read'
+    },{
+        filename: 'Test case 2',
+        description: 'Easy easy easy!',
+        filesize: '1024k',
+        data:[  
+          [100, 20],
+          [490, 90],
+          [250, 50],
+          [100, 33],
+          [330, 95],
+          [410, 12],
+          [475, 44],
+          [25, 67],
+          [85, 21],
+          [220, 88],
+          [600, 150]
+        ],
+        testmode: 'read/re-read'
+    },{
+        filename: 'Test case 2',
+        description: 'Easy easy easy!',
+        filesize: '1024k',
+        data:[  
+          [100, 20],
+          [490, 90],
+          [250, 50],
+          [100, 33],
+          [330, 95],
+          [410, 12],
+          [475, 44],
+          [25, 67],
+          [85, 21],
+          [220, 88],
+          [600, 150]
+        ],
+        testmode: 'read/re-read'
+    },{
+        filename: 'Test case 2',
+        description: 'Easy easy easy!',
+        filesize: '1024k',
+        data:[  
+          [100, 20],
+          [490, 90],
+          [250, 50],
+          [100, 33],
+          [330, 95],
+          [410, 12],
+          [475, 44],
+          [25, 67],
+          [85, 21],
+          [220, 88],
+          [600, 150]
+        ],
+        testmode: 'read/re-read'
+    }])
     /*
     res.json({
         filename: 'Carol',
