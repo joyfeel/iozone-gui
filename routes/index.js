@@ -25,7 +25,9 @@ router.get('/iozone-input', function(req, res, next) {
     res.send([{
         filename: 'Test case 1',
         description: 'This is an urgent case',
-        filesize: '2048k',
+        testmode: 'write/re-write',
+        filesize: '128m',
+        recordsize: '512k',
         data:[  
           [5, 20],
           [490, 90],
@@ -38,14 +40,15 @@ router.get('/iozone-input', function(req, res, next) {
           [85, 21],
           [220, 88],
           [500, 150]
-        ],
-        testmode: 'write/re-write'
+        ]
     },{
         filename: 'Test case 2',
-        description: 'Easy easy easy!',
-        filesize: '1024k',
+        description: 'This is an urgent case',
+        testmode: 'write/re-write',
+        filesize: '128m',
+        recordsize: '512k',
         data:[  
-          [100, 20],
+          [5, 20],
           [490, 90],
           [250, 50],
           [100, 33],
@@ -55,15 +58,16 @@ router.get('/iozone-input', function(req, res, next) {
           [25, 67],
           [85, 21],
           [220, 88],
-          [600, 150]
-        ],
-        testmode: 'read/re-read'
+          [500, 150]
+        ]
     },{
-        filename: 'Test case 2',
-        description: 'Easy easy easy!',
-        filesize: '1024k',
+        filename: 'Test case 1',
+        description: 'This is an urgent case',
+        testmode: 'write/re-write',
+        filesize: '128m',
+        recordsize: '512k',
         data:[  
-          [100, 20],
+          [5, 20],
           [490, 90],
           [250, 50],
           [100, 33],
@@ -73,15 +77,16 @@ router.get('/iozone-input', function(req, res, next) {
           [25, 67],
           [85, 21],
           [220, 88],
-          [600, 150]
-        ],
-        testmode: 'read/re-read'
+          [500, 150]
+        ]
     },{
-        filename: 'Test case 2',
-        description: 'Easy easy easy!',
-        filesize: '1024k',
+        filename: 'Test case 1',
+        description: 'This is an urgent case',
+        testmode: 'write/re-write',
+        filesize: '128m',
+        recordsize: '512k',
         data:[  
-          [100, 20],
+          [5, 20],
           [490, 90],
           [250, 50],
           [100, 33],
@@ -91,15 +96,16 @@ router.get('/iozone-input', function(req, res, next) {
           [25, 67],
           [85, 21],
           [220, 88],
-          [600, 150]
-        ],
-        testmode: 'read/re-read'
+          [500, 150]
+        ]
     },{
-        filename: 'Test case 2',
-        description: 'Easy easy easy!',
-        filesize: '1024k',
+        filename: 'Test case 1',
+        description: 'This is an urgent case',
+        testmode: 'write/re-write',
+        filesize: '128m',
+        recordsize: '512k',
         data:[  
-          [100, 20],
+          [5, 20],
           [490, 90],
           [250, 50],
           [100, 33],
@@ -109,9 +115,8 @@ router.get('/iozone-input', function(req, res, next) {
           [25, 67],
           [85, 21],
           [220, 88],
-          [600, 150]
-        ],
-        testmode: 'read/re-read'
+          [500, 150]
+        ]
     }])
     /*
     res.json({

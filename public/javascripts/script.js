@@ -17,9 +17,11 @@ app.IozoneInput = Backbone.Model.extend({
 	defaults: {
 		filename: '',
 		description: 'Test',
+		testmode: '',
 		filesize: '',
-		data:    [],
-		testmode: ''
+		recordsize: '',
+		data:    []
+		
 	}
 });
 
@@ -65,20 +67,17 @@ app.Router = Backbone.Router.extend({
 app.IozoneItemView = Backbone.View.extend({
 	template: template('iozone-result-sub-template'),
 	render: function() {
-		
-
 		this.$el.html(this.template(this.model.toJSON()));
-		//console.log(this.$el);
+
 		this.d3_line_chart(this.model.get('data'));
 
-		//this.$el.html(this.model.get('filename'));
-		this.parentView.$el.find('.row').append( this.$el );
+		this.parentView.$el.find('.chart-row').append( this.$el );
 
 		return this;
 	},
 	d3_line_chart: function(data) {
-		var w = 350,
-			h = 200,
+		var w = 500,
+			h = 300,
 		    padding = 30;
 
 		var xScale = d3.scale.linear()
@@ -109,7 +108,8 @@ app.IozoneItemView = Backbone.View.extend({
 						  .orient('left')
 						  .ticks(5);
 
-		var svg = d3.select(this.el).select('.myd3-line-chart')
+		var svg = d3.select(this.el)
+					.select('.myd3-line-chart')
 					.append('svg')
 					.attr({
 						width: w,
@@ -128,8 +128,6 @@ app.IozoneItemView = Backbone.View.extend({
 			           return yScale(d[1]);	
 			       }, 
 			       r: function(d) {			
-			           //return Math.sqrt(h - d[1]);
-			           //return Math.sqrt((h - d[1])/Math.PI);
 			           return rScale(d[1]);
 			       }
 			   });
@@ -153,7 +151,6 @@ app.IozoneItemView = Backbone.View.extend({
 			       'fill': 'green'
 			   });
 
-		//svg.append('g').call(xAxis);
 		svg.append('g')
 			.attr('class', 'axis')
 			.attr('transform', 'translate(0,  '+(h - padding)+')')
@@ -163,12 +160,106 @@ app.IozoneItemView = Backbone.View.extend({
 			.attr('class', 'axis')
 			.attr('transform', 'translate('+padding+', 0)')
 			.call(yAxis);
-
 	}
 });
+/*
+app.IozoneInputView = Backbone.View.extend({
+	el: '#global-div',
+	events: {
+		'click .btn-contact-save': 'save',
+		'click .btn-contact-error': 'error_handle'
+	},
+	template: template('iozone-input-template'),
+	initialize: function() {
+		_.bindAll(this, 'render');
+
+		this.model = new app.IozoneInput();
+		//this.model.bind('remove', this.render, this);	
+		//this.listenTo(this.model, 'change', this.render, this);
+
+		//Render 1 times
+		this.model.set('name', moment(new Date()));
+		this.render();
+	},
+	render: function() {
+		console.log("render!!!");
+		this.$el.html(this.template(this.model.toJSON()));
+		this.$el.find('.btn-contact-error').hide();
+
+		return this;
+	},
+	save: function(e) {
+		var self = this,
+			filename = this.$el.find('input[name="name"]').val(),
+		    email = this.$el.find('input[name="email"]').val(),
+			description = this.$el.find('textarea[name="description"]').val(),
+			filesize = this.$el.find('select[name="filesize"]').val(),
+			testmode = this.$el.find('select[name="testmode"]').val();
+
+ 		e.preventDefault();
+        e.stopPropagation();
+
+		//this.$el.off('click', '.btn-contact-save');
+		//this.events["click .btn-contact-save"] = undefined;
+        //$(this.el).undelegate('.btn-contact-save', 'click');
+
+		console.log(filesize.val());
+		console.log(filesize.text());
+
+		console.log(testmode.val());
+		console.log(testmode.text());
+	
+		//this.$el.find('button[type="submit"]').button('loading');
+
+		//!!!! this.$el.find('button[type="submit"]').prop('disabled', true);
+		this.$el.find('.btn-contact-save').prop('disabled', true);
+		this.$el.find('.btn-contact-save').addClass('disabled').text('Loading...');
+
+		this.model.save({
+			filename: filename,
+			email: email,
+			description: description,
+			filesize: filesize,
+			testmode: testmode
+		}, {
+			success: function(model, response, options) {
+				console.log("Successfully save");	
+				self.model.set('name', moment(new Date()));
+				//Render 2 times
+				self.render();
+			}, 
+			error: function(model, response, options) {
+				self.$el.find('.btn-contact-error').show();
+				self.$el.find('.btn-contact-save').hide();
+				console.log(response);
+				console.log("Error save");
+			}
+		});
+	},
+	error_handle: function (e) {
+		e.preventDefault();
+        e.stopPropagation();
+		alert('Need to mount the device');
+		//this.$el.find('.btn-contact-error').hide();
+		this.model.set('name', moment(new Date()));
+		this.render();
+	},
+	remove: function() {
+		//this.model.destroy();
+    	this.$el.empty();
+    	this.undelegateEvents();
+    	return this;
+	}
+});
+*/
+
+
 
 app.IozoneResultView = Backbone.View.extend({
 	el: '#global-div',
+	events: {
+		'click .checkbox': 'compare'
+	},
 	template: template('iozone-result-template'),
 	initialize: function() {
 		_.bindAll(this, 'render');
@@ -189,20 +280,17 @@ app.IozoneResultView = Backbone.View.extend({
 		this.collection.fetch();
 	},
 	render: function() {
-		//this.d3_line_chart(this.model.get('data'));
+		var self = this;
 		this.$el.empty();
-
 		this.$el.html(this.template());
 
-		var self = this;
-		
 		this.collection.each(function(submodel) {
 			var subView = new app.IozoneItemView ({
 				model: submodel
 			});
 
 			subView.parentView = self;
-			subView.render();	
+			subView.render();
 		});
 
 		return this;
@@ -210,8 +298,22 @@ app.IozoneResultView = Backbone.View.extend({
 	remove: function() {
     	this.$el.empty();
     	this.undelegateEvents();
+
     	return this;
-	}
+	},
+	compare: function(e) {
+		//alert($(e.currentTarget).is(':checked') ? 'checked' : 'unchecked');
+		//this.showCompletedEnquiries = e.currentTarget.checked;
+		console.log(e.currentTarget.checked);
+
+		return true;
+	},
+	doSomething: function (e) {
+        // now that we need to know, we can just check that attribute
+        if (this.showCompletedEnquiries){
+          console.log('@!@!@!');
+        }
+    }
 });
 
 
@@ -362,8 +464,10 @@ app.IozoneInputView = Backbone.View.extend({
 			filename = this.$el.find('input[name="name"]').val(),
 		    email = this.$el.find('input[name="email"]').val(),
 			description = this.$el.find('textarea[name="description"]').val(),
+			testmode = this.$el.find('select[name="testmode"]').val(),
 			filesize = this.$el.find('select[name="filesize"]').val(),
-			testmode = this.$el.find('select[name="testmode"]').val();
+			recordsize = this.$el.find('select[name="recordsize"]').val();
+			
 
  		e.preventDefault();
         e.stopPropagation();
@@ -388,8 +492,9 @@ app.IozoneInputView = Backbone.View.extend({
 			filename: filename,
 			email: email,
 			description: description,
+			testmode: testmode,
 			filesize: filesize,
-			testmode: testmode
+			recordsize: recordsize
 		}, {
 			success: function(model, response, options) {
 				console.log("Successfully save");	
@@ -426,7 +531,7 @@ app.About = Backbone.Model.extend({
 	defaults: {
 		title: 'About',
 		author: 'joyfeel',
-		content: 'I\'m god'
+		description: 'sudo mount -t ext4 /dev/mmcblk0 /mmc'
 	}
 });
 
@@ -452,7 +557,6 @@ app.AboutView = Backbone.View.extend({
     	return this;
 	}
 });
-
 
 //main
 $(document).ready(function() {

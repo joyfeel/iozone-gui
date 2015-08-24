@@ -24,7 +24,7 @@ workflow.on('iozone-exec', function(req_body, res) {
 
 	child_process.exec("iozone3_430_Native/iozone -I -f /mmc/tmp -a "
 		+ req_body.testmode + " -s " + req_body.filesize
-		+ " -y 4k -q 16m"// + req_body.filesize
+		+ " -y 4k -q " + req_body.recordsize // + req_body.filesize
 		+ " -b " + filename + ".xlsx"
 		, function (error, stdout, stderr) {
 			console.log('stdout: ' + stdout);
@@ -91,8 +91,12 @@ workflow.on('iozone-save', function(res, req_body, filename) {
 
 	
 	for (i = 0 + 1; i < Math.min(speed_length, rec_length); i++) {
+		/*
 		excel_data.push({speed: speed_start[i]
 							, rec: rec_start[i]});
+		*/
+		excel_data.push({rec: rec_start[i]
+							, speed: speed_start[i]});
 	}
  
 	json2csv({ data: excel_data, fields: csv_fields }, function(err, csv) {

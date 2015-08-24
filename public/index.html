@@ -6,127 +6,136 @@
 </head>
 <body>
 
-<script type="text/template" id="signup-template">
-	<div>
-		<form class="form-horizontal" method="post">
-			<div class="form-group">
-				<label for="name" class="col-sm-2 control-label">Name</label>
-				<div class="col-sm-10">
-					<input type="text" name="name" class="form-control" id="name" value="<%= name %>"placeholder="Name" required />	
-				</div>
-			</div>
+	<script type="text/template" id="about-template">
+		<h1><i><%= title %></i></h1>
+		<h2><%= author %></h2>
+		<p><%= description %></p>
+	</script>
 
-			<div class="form-group">
-				<label for="email" class="col-sm-2 control-label">Email</label>
-				<div class="col-sm-10">
-					<input type="text" name="email" class="form-control" id="email" value="<%= email %>" placeholder="Email" required />	
+	<script type="text/template" id="iozone-input-template">
+		<div class="row">
+			<form class="form-horizontal" method="post">
+				<div class="form-group">
+					<label for="name" class="col-sm-2 control-label">Filenames</label>
+					<div class="col-sm-6">
+						<input type="text" name="name" class="form-control" id="name" 
+							value="<%=name %>"placeholder="Name" required />	
+					</div>
 				</div>
-			</div>
 
-			<div class="form-group">
-				<div class="col-sm-offset-2 col-sm-10">
-					<button type="submit" class="btn btn-primary">XD</button>
+				<div class="form-group">
+					<label for="description" class="col-sm-2 control-label">Description</label>
+					<div class="col-sm-6">
+						<textarea type="text" name="description" class="form-control" id="description"
+							rows="5"><%=description %></textarea>
+					</div>
+					
 				</div>
-			</div>
-		</form>
-	</div>
-</script>
 
-<script type="text/template" id="about-template">
-	<h1><i><%= title %></i></h1>
-	<h2><%= author %></h2>
-	<p><%= content %></p>
-</script>
-
-<script type="text/template" id="iozone-input-template">
-	<div class="row">
-		<form class="form-horizontal" method="post">
-			<div class="form-group">
-				<label for="name" class="col-sm-2 control-label">Name</label>
-				<div class="col-sm-6">
-					<input type="text" name="name" class="form-control" id="name" 
-						value="<%=name %>"placeholder="Name" required />	
+				<div class="form-group">
+					<label for="message" class="col-sm-2 control-label">Test mode</label>
+					<div class="col-sm-6">
+						<select class="form-control" id="testmode" name="testmode">
+							<option value="-i 0">write/re-write</option>
+							<option value="-i 0 -i 1">read/re-read</option>
+							<option value="-i 0 -i 2">random-read/write</option>
+						</select>
+					</div>
 				</div>
-			</div>
 
-			<div class="form-group">
-				<label for="description" class="col-sm-2 control-label">Description</label>
-				<div class="col-sm-6">
-					<textarea type="text" name="description" class="form-control" id="description"
-						rows="5"><%=description %></textarea>
-				</div>
-				
-			</div>
+				<div class="form-group">
+					<label for="message" class="col-sm-2 control-label">Filesize</label>
+					<div class="col-sm-6">
+						<select class="form-control" id="select-test" name="filesize">
+							<option value = "4m">4m</option>
+							<option value = "8m">8m</option>
+							<option value = "16m">16m</option>
+							<option value = "32m">32m</option>
+							<option value = "64m">64m</option>
+							<option value = "128m">128m</option>
+							<option value = "256m">256m</option>
+							<option value = "512m">512m</option>
+							<option value = "1g">1g</option>
+							<option value = "2g">2g</option>
+							<option value = "4g">4g</option>
+						</select>
+					</div>
+				</div>		
 
-			<div class="form-group">
-				<label for="message" class="col-sm-2 control-label">Test mode</label>
-				<div class="col-sm-6">
-					<select class="form-control" id="testmode" name="testmode">
-						<option value="-i 0">write/re-write</option>
-						<option value="-i 0 -i 1">read/re-read</option>
-						<option value="-i 0 -i 2">random-read/write</option>
-					</select>
-				</div>
-			</div>
+				<div class="form-group">
+					<label for="message" class="col-sm-2 control-label">Recordsize</label>
+					<div class="col-sm-6">
+						<select class="form-control" id="select-test" name="recordsize">
+							<option value = "4k">4k</option>
+							<option value = "8k">8k</option>
+							<option value = "16k">16k</option>
+							<option value = "32k">32k</option>
+							<option value = "64k">64k</option>
+							<option value = "128k">128k</option>
+							<option value = "256k">256k</option>
+							<option value = "512K">512k</option>
+						</select>
+					</div>
+				</div>	
 
-			<div class="form-group">
-				<label for="message" class="col-sm-2 control-label">Select</label>
-				<div class="col-sm-6">
-					<select class="form-control" id="select-test" name="filesize">
-						<option value = "128k">128k</option>
-						<option value = "256">256k</option>
-						<option value = "512K">512k</option>
-						<option value = "1M">1m</option>
-						<option value = "2m">2m</option>
-						<option value = "4m">4m</option>
-						<option value = "8m">8m</option>
-						<option value = "16m">16m</option>
-						<option value = "32m">32m</option>
-						<option value = "512m">512m</option>
-					</select>
+				<div class="form-group">
+					<div class="col-sm-offset-2 col-sm-10">
+						<button type="submit" class="btn btn-primary btn-contact-save">
+							<span class= "glyphicon glyphicon-send"></span> Send
+						</button>
+						<button type="submit" class="btn btn-warning btn-contact-error">Error</button>
+					</div>
 				</div>
-			</div>		
+			</form>
 
-			<div class="form-group">
-				<div class="col-sm-offset-2 col-sm-10">
-					<button type="submit" class="btn btn-primary btn-contact-save">Send</button>
-					<button type="submit" class="btn btn-warning btn-contact-error">Error</button>
-				</div>
-			</div>
-		</form>
-
-	</div>
-</script>
-
-<script type="text/template" id="iozone-result-sub-template">
-		<div class="col-sm-6 col-md-4">
-			<div class="thumbnail">
-				<div class = 'myd3-line-chart'>
-				</div>
-				<div class="caption">
-					<h3><%= filename %></h3>
-					<p><%= description %></p>
-					<p><%= filesize %></p>
-					<p><%= testmode %></p>
-					<p>
-						<a href="" class="btn btn-primary" role="button"></a>
-						<a href="" class="btn btn-warning" role="button"></a>
-					</p>
-				</div>
-			</div>
 		</div>
-</script>
+	</script>
+
+	<script type="text/template" id="iozone-result-sub-template">
+			<div class="col-sm-6 col-md-4">
+				<div class="thumbnail">
+					<div class = 'myd3-line-chart'>
+					</div>
+					<div class="caption">
+						<h3><%= filename %></h3>
+						<h4><p>Description: <%= description %></p></h4>
+						<h5><p>Testmode: <%= testmode %></p></h5>
+						<p>FileSize: <%= filesize %></p>
+						<p>RecordSize: <%= recordsize %></p>
+
+						<button type="button" class="btn btn-primary"> 
+							 <span class="glyphicon glyphicon-download-alt"></span> Save 
+						</button>
+
+						<button type="button" class="btn btn-danger"> 
+							 <span class="glyphicon glyphicon-trash"></span> Delete
+						</button>
 
 
+ 						<div class="checkbox">
+						    <label>
+						        <input type="checkbox"> Compare
+						    </label>
+						 </div>
+					</div>
+				</div>
+			</div>
+	</script>
 
-<!-- 
-	Full fill the line-chart sets lol.
--->
-<script type="text/template" id="iozone-result-template">
-	<div class="row">
-
-	</div>
-</script>
+	<!-- 
+		Full fill the line-chart sets lol.
+	-->
+	<script type="text/template" id="iozone-result-template">
+		<div class="row chart-row">
+			
+		</div>
+		<div class="row compare-row">
+			<button type="button" class="btn btn-primary btn-compare">
+				<span class="glyphicon glyphicon-stats"></span>
+				Compare
+			</button>
+		</div>
+	</script>
 
 	<nav>
 		<ul>
@@ -137,14 +146,13 @@
 		</ul>
 	</nav>		
 
-	<div id="global-div" class="container">
+	<div id="global-div" class="container-fluid">
 		
 	</div>
 
 
 
-	<script>document.write('<script src="http://' + (location.host || 'localhost')
-.split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>')</script>
+
 
 	<script src="javascripts/bower_components/jquery/dist/jquery.js"></script>
 	<script src="javascripts/bower_components/d3/d3.js"></script>
@@ -155,7 +163,8 @@
 	<script src="javascripts/bower_components/bootstrap/dist/js/bootstrap.js"></script>	
 	<script src="javascripts/dist/script.min.js"></script>
 
-
+	<script>document.write('<script src="http://' + (location.host || 'localhost')
+.split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>')</script>
 
 </body>
 </html>
