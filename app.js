@@ -5,6 +5,7 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
+var mongoose = require('mongoose');
 
 
 var routes = require('./routes/index');
@@ -65,5 +66,34 @@ app.use(function(err, req, res, next) {
   });
 });
 
+
+mongoose.connect ('mongodb://localhost:27017/test');
+mongoose.connection.on('error', function() {
+  console.log('MongoDB: error');
+});
+mongoose.connection.on('open', function() {
+  console.log('MongoDB: connected');
+});
+
+var postSchema = new mongoose.Schema({
+  title  :  { type: String },
+  content   :  { type: String }
+});
+
+var Post = mongoose.model('post', postSchema);
+
+
+var PostEntity = new Post ({
+  title: 'Meow!!!',
+  content: 'Hello!!!!!!'
+});
+
+PostEntity.save(function(err, doc) {
+  if (err) {
+    console.log('db save err' + err);
+  } else {
+    console.log('db save successfully' + doc);
+  }
+});
 
 module.exports = app;
