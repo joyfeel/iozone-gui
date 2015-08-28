@@ -37,6 +37,7 @@ app.IozoneInputCollection = Backbone.Collection.extend({
 app.Router = Backbone.Router.extend({
 	routes: {
 		'about': 'about',
+		'iozone-register': 'iozone_register',
 		'iozone-input': 'iozone_input',
 		'iozone-result': 'iozone_result'
 	},
@@ -46,6 +47,10 @@ app.Router = Backbone.Router.extend({
 	about: function() {
 		this._cleanUp();
 		this.view = new app.AboutView();
+	},
+	iozone_register: function() {
+		this._cleanUp();
+		this.view = new app.IozoneRegisterView();
 	},
 	iozone_input: function() {
 		this._cleanUp();
@@ -525,6 +530,136 @@ app.IozoneInputView = Backbone.View.extend({
     	return this;
 	}
 });
+/*
+
+	flashID: { type: String },
+	company: { type: String },
+	factory: {type: String},
+	CE: {type: Number}
+*/
+
+app.IozoneRegister = Backbone.Model.extend({
+	url: function() {
+		return 'http://localhost:3000/iozone-register'
+					+ (this.id === null ? '' : '/' + this.id);
+	},
+	id: null,
+	defaults: {
+		firmware_version : '',
+		ic_version : '',
+		factory : '',
+		flash_id : '',
+		plant : '',
+		flash_company : ''
+	}
+});
+
+app.IozoneRegisterView = Backbone.View.extend({
+	el: '#global-div',
+	events: {
+		'click .btn-register': 'register',
+		'click .btn-register-error': 'error_handle'
+	},
+	template: template('iozone-register-template'),
+	initialize: function() {
+		_.bindAll(this, 'render');
+
+		this.model = new app.IozoneRegister();
+		//this.model.bind('remove', this.render, this);	
+		//this.listenTo(this.model, 'change', this.render, this);
+
+		//Render 1 times
+		this.render();
+	},
+	render: function() {
+		console.log("render!!!");
+		this.$el.html(this.template(this.model.toJSON()));
+		this.$el.find('.btn-register-error').hide();
+
+		return this;
+	},
+	register: function(e) {
+		e.preventDefault();
+
+		var self = this,
+			firmware_version = this.$el.find('select[name="firmware-version"]').val(),
+			ic_version = this.$el.find('select[name="ic-version"]').val(),
+			factory = this.$el.find('select[name="factory"]').val(),
+			flash_id = this.$el.find('select[name="flash-id"]').val(),
+			plant = this.$el.find('select[name="plant"]').val(),
+			flash_company = this.$el.find('select[name="flash-company"]').val();
+
+		
+			//text() ---> list all the element
+			//val()  ---> list the selected element
+
+        //e.stopPropagation();
+
+		//this.$el.off('click', '.btn-contact-save');
+		//this.events["click .btn-contact-save"] = undefined;
+        //$(this.el).undelegate('.btn-contact-save', 'click');
+
+/*
+		console.log(firmware_version.val());
+		console.log(ic_version.val());
+		console.log(factory.val());
+		console.log(flash_id.val());
+		console.log(plant.val());
+		console.log(flash_company.val());
+*/
+	
+		//this.$el.find('button[type="submit"]').button('loading');
+
+		//!!!! this.$el.find('button[type="submit"]').prop('disabled', true);
+		this.$el.find('.btn-register').prop('disabled', true);
+		this.$el.find('.btn-register').addClass('disabled').text('Loading...');
+
+		console.log(firmware_version);
+		console.log(ic_version);
+		console.log(factory);
+		console.log(flash_id);
+		console.log(plant);
+		console.log(flash_company);
+
+
+		this.model.save({
+			firmware_version: firmware_version,
+			ic_version: ic_version,
+			factory: factory,
+			flash_id: flash_id,
+			plant: plant,
+			flash_company: flash_company
+		}, {
+			success: function(model, response, options) {
+				console.log("Successfully register");	
+
+				console.log (response.status);
+				//Render 2 times
+				self.render();
+			}, 
+			error: function(model, response, options) {
+				self.$el.find('.btn-register-error').show();
+				self.$el.find('.btn-register').hide();
+				console.log(response);
+				console.log("Error save");
+			}
+		});
+	},
+	error_handle: function (e) {
+		e.preventDefault();
+        //e.stopPropagation();
+		alert('DB error');
+		this.$el.find('.btn-register-error').hide();
+		this.render();
+	},
+	remove: function() {
+    	this.$el.empty();
+    	this.undelegateEvents();
+    	return this;
+	}
+});
+
+
 
 
 app.About = Backbone.Model.extend({

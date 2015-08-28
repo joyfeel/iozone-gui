@@ -4,14 +4,69 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-
 var mongoose = require('mongoose');
+
 
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
 
 var app = express();
+
+mongoose.connect ('mongodb://localhost:27017/test2');
+mongoose.connection.on('error', function() {
+  console.log('MongoDB: error');
+});
+
+mongoose.connection.on('open', function() {
+  console.log('MongoDB: connected');
+});
+
+
+var Schema = mongoose.Schema;
+
+/**MongoDB
+ *
+ */
+var emmcSchema = new Schema({
+	//_id: { type: Number },
+	firmware_version: {type: Date, default: Date.now},
+	IC_version: { type: String },
+	plant: { type: Number },
+	factory: { type: String },
+	flashes: [{ type: Schema.Types.ObjectId, ref: 'Flash' }]
+});
+
+var flashSchema = new Schema({
+	//_creator: { type: Number, ref: 'Emmc' },
+	flashID: { type: String },
+	company: { type: String },
+	//emmcs: [{ type: Number, ref:'Emmc' }]
+	emmcs: [{ type: Schema.Types.ObjectId, ref:'Emmc' }]
+});
+
+var reportSchema = new Schema({
+	name: { type: String, unique: true },
+	description: { type: String },
+	testmode: { type: String },
+	size: { type: String },
+	recordSize: {type: String},
+	data: [],
+	emmcId: {type: Schema.Types.ObjectId, ref: 'Emmc'}
+});
+
+var Emmc = mongoose.model('Emmc', emmcSchema),
+	Flash = mongoose.model('Flash', flashSchema),
+	Report = mongoose.model('Report', reportSchema);
+
+app.db = {
+  model: {
+  	Emmc: Emmc,
+    Flash: Flash,
+    Report: Report
+  }
+};
+
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -67,21 +122,32 @@ app.use(function(err, req, res, next) {
 });
 
 
-mongoose.connect ('mongodb://localhost:27017/test');
-mongoose.connection.on('error', function() {
-  console.log('MongoDB: error');
-});
-mongoose.connection.on('open', function() {
-  console.log('MongoDB: connected');
+/*
+var postSchema = new mongoose.Schema({
+  title  :  { type: String },
+  content   :  { type: String },
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'user' },
+  timeCreated: { type: Date, default: Date.now }
 });
 
+var userSchema = new mongoose.Schema({
+  username: { type: String, unique: true, select: false  },
+  displayName: { type: String, unique: true },
+  email: { type: String, unique: true, select: false  },
+  timeCreated: { type: Date, default: Date.now, select: false },
+  facebook: { type: Object, select: false }
+});
+*/
+
+
+
+
+/*
 var postSchema = new mongoose.Schema({
   title  :  { type: String },
   content   :  { type: String }
 });
-
 var Post = mongoose.model('post', postSchema);
-
 
 var PostEntity = new Post ({
   title: 'Meow!!!',
@@ -95,5 +161,6 @@ PostEntity.save(function(err, doc) {
     console.log('db save successfully' + doc);
   }
 });
+*/
 
 module.exports = app;

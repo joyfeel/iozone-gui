@@ -4,7 +4,25 @@ var router = express.Router();
 //var d3 = require('d3');
 
 var iozone = require('./modules/iozone-parser.js');
+
+var registerEmmc = require('./modules/register-emmc.js');
+
 var get_data_from_csv = require('./modules/get-csv.js');
+
+
+//res.status(200).json({status:"ok"});
+//res.status(500).json({status:"not ok"})
+
+
+router.post('/iozone-register', function(req, res, next) {
+    console.log("Register send ok");
+
+    //res.status(500).json({status:"ok"})
+
+
+    return registerEmmc.store(req, res);
+});
+
 
 //front-end to back-end
 router.post('/iozone-input', function(req, res, next) {

@@ -5,12 +5,105 @@
 	<link rel="stylesheet" href="stylesheets/style.css">
 </head>
 <body>
+	<nav>
+		<ul>
+			<li><a href="/">Home</a></li>
+			<li><a href="#about">About</a></li>
+			<li><a href="#iozone-register">Iozone eMMC Register</a></li>
+			<li><a href="#iozone-input">Iozone Input</a></li>
+			<li><a href="#iozone-result">Iozone Result</a></li>
+		</ul>
+	</nav>
 
 	<script type="text/template" id="about-template">
 		<h1><i><%= title %></i></h1>
 		<h2><%= author %></h2>
 		<p><%= description %></p>
 	</script>
+
+
+<!--
+	Need to be refactor
+-->	
+	<script type="text/template" id="iozone-register-template">
+		<div class="row">
+			<form class="form-horizontal" method="post">
+				<div class="form-group">
+					<label for="firmware-version" class="col-sm-2 control-label">Firmware Version</label>
+					<div class="col-sm-6">
+
+						<select class="form-control" id="firmware-version" name="firmware-version">
+							<option value="20150828">20150828</option>
+							<option value="20150829">20150829</option>
+							<option selected="selected" value="20150830">20150830</option>
+						</select>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="ic-version" class="col-sm-2 control-label">IC Version</label>
+					<div class="col-sm-6">
+						<select class="form-control" id="ic-version" name="ic-version">
+							<option value="A">A</option>
+							<option value="B">B</option>
+							<option value="C">C</option>
+							<option value="D">D</option>
+							<option selected="selected" value="D1">D1</option>
+						</select>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="factory" class="col-sm-2 control-label">Packaing Factory</label>
+					<div class="col-sm-6">
+						<select class="form-control" id="factory" name="factory">
+							<option value="Bark">Bark</option>
+							<option selected="selected" value="Meow">Meow</option>
+						</select>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="flash-id" class="col-sm-2 control-label">Flash ID</label>
+					<div class="col-sm-6">
+						<select class="form-control" id="flash-id" name="flash-id">
+							<option value="6ddl">6ddl</option>
+							<option selected="selected" value="7ddl">7ddl</option>
+							<option value="8ddl">8ddl</option>
+						</select>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="plant" class="col-sm-2 control-label">Plant</label>
+					<div class="col-sm-6">
+						<select class="form-control" id="plant" name="plant">
+							<option value="1">1</option>
+							<option selected="selected" value="2">2</option>
+							<option value="4">4</option>
+						</select>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="flash-company" class="col-sm-2 control-label">Flash Company</label>
+					<div class="col-sm-6">
+						<select class="form-control" id="flash-company" name="flash-company">
+							<option value="Toshiba">Toshiba</option>
+							<option selected="selected" value="Hynix">Hynix</option>
+							<option value="Sandisk">Sandisk</option>
+							<option value="Micron">Micron</option>
+						</select>
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="col-sm-offset-2 col-sm-10">
+						<button type="submit" class="btn btn-primary btn-register">
+							<span class= "glyphicon glyphicon-send"></span> Register
+						</button>
+						<button type="submit" class="btn btn-warning btn-register-error">
+							<span class= "glyphicon glyphicon-warning-sign"></span> Error
+						</button>
+					</div>
+				</div>				
+			</form>
+		</div>
+	</script>	
 
 	<script type="text/template" id="iozone-input-template">
 		<div class="row">
@@ -29,7 +122,6 @@
 						<textarea type="text" name="description" class="form-control" id="description"
 							rows="5"><%=description %></textarea>
 					</div>
-					
 				</div>
 
 				<div class="form-group">
@@ -50,7 +142,7 @@
 							<option value = "4m">4m</option>
 							<option value = "8m">8m</option>
 							<option value = "16m">16m</option>
-							<option value = "32m">32m</option>
+							<option selected="selected" value = "32m">32m</option>
 							<option value = "64m">64m</option>
 							<option value = "128m">128m</option>
 							<option value = "256m">256m</option>
@@ -83,11 +175,12 @@
 						<button type="submit" class="btn btn-primary btn-contact-save">
 							<span class= "glyphicon glyphicon-send"></span> Send
 						</button>
-						<button type="submit" class="btn btn-warning btn-contact-error">Error</button>
+						<button type="submit" class="btn btn-warning btn-contact-error">
+							<span class= "glyphicon glyphicon-warning-sign"></span> Error
+						</button>
 					</div>
 				</div>
 			</form>
-
 		</div>
 	</script>
 
@@ -110,7 +203,6 @@
 						<button type="button" class="btn btn-danger"> 
 							 <span class="glyphicon glyphicon-trash"></span> Delete
 						</button>
-
 
  						<div class="checkbox">
 						    <label>
@@ -137,22 +229,9 @@
 		</div>
 	</script>
 
-	<nav>
-		<ul>
-			<li><a href="/">Home</a></li>
-			<li><a href="#about">About</a></li>
-			<li><a href="#iozone-input">Iozone Input</a></li>
-			<li><a href="#iozone-result">Iozone Result</a></li>
-		</ul>
-	</nav>		
-
 	<div id="global-div" class="container-fluid">
 		
 	</div>
-
-
-
-
 
 	<script src="javascripts/bower_components/jquery/dist/jquery.js"></script>
 	<script src="javascripts/bower_components/d3/d3.js"></script>
