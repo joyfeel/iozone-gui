@@ -61,6 +61,10 @@ workflow.on('validation', function(req, res) {
 		factory: req.body.factory
 	});
 
+	console.log("XDDD" + Flash._id);
+
+	//console.log("XDDD1" + req.Flash._id);
+
 	emmc.save(function(err) {
 		console.log("Emmc save db...");
 
@@ -72,6 +76,7 @@ workflow.on('validation', function(req, res) {
 		var flash = new Flash({
 			flashID: req.body.flash_id,
 			company: req.body.flash_company,
+			emmcs : emmc._id
 			//_creator: emmc._id
 		});
 
@@ -83,12 +88,31 @@ workflow.on('validation', function(req, res) {
 			}			
 		});
 
-		workflow.emit('response', res);
+		workflow.emit('response', req, res);
 	});
 });
 
-workflow.on('response', function(res) {
+workflow.on('response', function(req, res) {
 	console.log("Response");
+
+/*
+	req.app.db.model.Flash.find({}, function(err, doc) {
+		console.log('Meow!!!');
+		console.log(doc);
+
+	});
+*/
+	req.app.db.model.Flash.find({})
+	.populate('emmcs')
+	.exec(function (err, flash) {
+  		if (err) {
+  			console.log('WTFFF');
+  		}
+  		console.log('Meows!!!!');
+  		console.log(flash);
+  		//console.log(flash.emmcs.factory);
+
+	});
 
 	return res.status(200).json({status:"ok"});
 });
