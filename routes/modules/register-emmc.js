@@ -83,13 +83,71 @@ workflow.on('validation', function(req, res) {
 					if (flash == null) {
 						childInstance.parents.push(parentInstance);
 						childInstance.save();
-
-						//parentInstance.save();
-						//parentInstance.children.push(flash);
 					} else {
+						console.log('Fuck');
+						console.log(flash);
+						console.log('Fuck2');
+						console.log(qq);
 
+/*Fuck
+{ _id: 55e46f1b3f5b195e47ff931a,
+  flashID: '7ddl',
+  company: 'Hynix',
+  __v: 0,
+  parents: [ 55e46f1b3f5b195e47ff9319 ] }
+Fuck2
+{ __v: 0,
+  firmware_version: '20150830',
+  IC_version: 'G',
+  plant: 2,
+  factory: 'Meow',
+  _id: 55e475f45469f7ab4ff29f08,
+  children: [] }*/
+  						console.log("id!!!!!");
+  						console.log(qq._id);
+  						console.log("...............!!!!!");
+  						console.log(parentInstance);  												
+
+/*
+						parentInstance.update({_id: qq._id}, {$pushAll: {children:[3, 423]}},{upsert:true},function(err, doc){
+						        if(err){
+						                console.log(err);
+						        }else{
+						                console.log("Successfully added");
+						        }
+						});
+*/
+
+					     ParentModel.findByIdAndUpdate(
+					     qq._id,
+					     { $push: {"children": flash}},
+					     {  safe: true, upsert: true},
+					       function(err, model) {
+					         if(err){
+					        	console.log(err);
+					        	//return res.send(err);
+					         }
+					         console.log("good!");
+					         console.log(model);
+					         console.log(model._id);
+					         console.log(flash);
+					         console.log(flash._id);					         					         
+					         ChildModel.findByIdAndUpdate (
+					         	flash._id, 
+					         	{ 
+					         		$push: {"parents": model}
+					         	},
+					     	 	{ 
+					     	 		safe: true, upsert: true
+					     	 	}, function (err, lol) {
+					     	 		if (err) {
+					     	 			console.log(err);
+					     	 		} else {
+					     	 			console.log('lol');
+					     	 		}
+					     	 });
+					      });
 					}
-
 				});
 			});
 		} else {
@@ -114,18 +172,19 @@ workflow.on('validation', function(req, res) {
 							emmc.save();
 							*/
 						} else {
-							console.log('QQQQQ1');
-							
-							console.log('QQQQQ2');
-							console.log(qq);
-							console.log('QQQQQ3');
-							console.log(childInstance);
-							console.log('QQQQQ4');
-							console.log(parentInstance);	
-							console.log('QQQQQ5');
-							console.log(emmc);		
+
+							/*
+							console.log("this is qq");
+							console.log(qq);		
 							emmc.children.remove(qq);											
-							emmc.save(function(err, doc) {});
+							emmc.save(function(err, doc) {
+								console.log("this is doc");
+								console.log(doc);
+
+								//doc.children.push();
+							});
+							*/
+
 							/*
 							parentInstance.children.remove(qq);											
 							parentInstance.save(function(err, doc) {});
@@ -155,7 +214,7 @@ workflow.on('validation', function(req, res) {
 
 	});
 
-
+	
 
 /*
 	ChildModel.findOne({
