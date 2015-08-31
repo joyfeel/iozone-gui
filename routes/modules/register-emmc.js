@@ -51,8 +51,180 @@ workflow.on('validation', function(req, res) {
 
 	var self = this;
 	var Emmc = req.app.db.model.Emmc,
-		Flash = req.app.db.model.Flash;
+		Flash = req.app.db.model.Flash,
+		ParentModel = req.app.db.model.Parent,
+		ChildModel = req.app.db.model.Child;
 
+	var parentInstance = new ParentModel({
+		firmware_version: req.body.firmware_version,
+		IC_version: req.body.ic_version,
+		plant: req.body.plant,
+		factory: req.body.factory
+	});
+
+	var childInstance = new ChildModel({
+		flashID: req.body.flash_id,
+		company: req.body.flash_company
+	});
+
+
+	ParentModel.findOne({
+		firmware_version: req.body.firmware_version,
+		IC_version: req.body.ic_version,
+		plant: req.body.plant,
+		factory: req.body.factory
+	}, function (err, emmc) {
+		if (emmc == null) {
+			parentInstance.save(function(err, qq) {
+				ChildModel.findOne({
+					flashID: req.body.flash_id,
+					company: req.body.flash_company
+				}, function (err, flash) {
+					if (flash == null) {
+						childInstance.parents.push(parentInstance);
+						childInstance.save();
+
+						//parentInstance.save();
+						//parentInstance.children.push(flash);
+					} else {
+
+					}
+
+				});
+			});
+		} else {
+			ChildModel.findOne({
+				flashID: req.body.flash_id,
+				company: req.body.flash_company
+			}, function (err, flash) {
+				if (flash == null) {
+					/*
+					childInstance.parents.push(emmc);
+					childInstance.save();
+
+					emmc.children.remove(childInstance);
+					emmc.save();
+					*/
+					childInstance.parents.push(emmc);
+					childInstance.save(function(err, qq) {
+						if (err) {
+							console.log('WHY???');
+							/*
+							emmc.children.remove(childInstance);
+							emmc.save();
+							*/
+						} else {
+							console.log('QQQQQ1');
+							
+							console.log('QQQQQ2');
+							console.log(qq);
+							console.log('QQQQQ3');
+							console.log(childInstance);
+							console.log('QQQQQ4');
+							console.log(parentInstance);	
+							console.log('QQQQQ5');
+							console.log(emmc);		
+							emmc.children.remove(qq);											
+							emmc.save(function(err, doc) {});
+							/*
+							parentInstance.children.remove(qq);											
+							parentInstance.save(function(err, doc) {});
+							*/
+							/*
+							childInstance
+							console.log(childInstance);
+							*/
+						}
+					});
+				} else {
+
+				}
+			});
+			/*
+			childInstance.parents.push(emmc);
+			childInstance.save(function(err, qq) {
+				if (err) {
+					emmc.children.remove(childInstance);
+					emmc.save(function(err, doc) {});
+				} else {
+					console.log(childInstance);
+				}
+			});
+			*/
+		}		
+
+	});
+
+
+
+/*
+	ChildModel.findOne({
+		flashID: req.body.flash_id,
+		company: req.body.flash_company
+	}, function(err, flash) {
+		if (err) {
+			console.log(err);
+		} else {
+			console.log("@@@@@@");
+			console.log(flash);
+			console.log("@@@@@@2");
+			parentInstance.children.push(flash);
+			console.log("@@@@@@3");
+		}
+	});
+
+
+
+
+	parentInstance.save(function(err, innerparent) {
+		if (err) {
+			console.log(err);
+
+			ParentModel.findOne({
+				firmware_version: req.body.firmware_version,
+				IC_version: req.body.ic_version,
+				plant: req.body.plant,
+				factory: req.body.factory
+			}, function(err, emmc) {
+				console.log(emmc);
+				if (err) {
+					console.log(err);
+				} else {
+					childInstance.parents.push(emmc);
+					childInstance.save(function(err, qq) {
+						if (err) {
+							emmc.children.remove(childInstance);
+							emmc.save(function(err, doc) {});
+						} else {
+							console.log(childInstance);
+						}
+					});
+				}
+			});
+
+		} else {
+			childInstance.parents.push(parentInstance);
+			childInstance.save(function(err, innerchild) {
+				if (err) {
+					console.log(err);
+				} else {
+					console.log(innerchild);
+				}
+			});
+		}
+	});
+*/
+
+
+	/*
+	var parentTwo = new Parent({});
+	parentTwo.save();
+	*/
+
+	//Need to push the old data
+
+
+/*
 	var emmc = new Emmc({
 		//_id: 0,
 		firmware_version: req.body.firmware_version,
@@ -88,8 +260,11 @@ workflow.on('validation', function(req, res) {
 			}			
 		});
 
-		workflow.emit('response', req, res);
+		
 	});
+*/
+
+	workflow.emit('response', req, res);
 });
 
 workflow.on('response', function(req, res) {
@@ -102,6 +277,8 @@ workflow.on('response', function(req, res) {
 
 	});
 */
+
+/*
 	req.app.db.model.Flash.find({})
 	.populate('emmcs')
 	.exec(function (err, flash) {
@@ -113,7 +290,7 @@ workflow.on('response', function(req, res) {
   		//console.log(flash.emmcs.factory);
 
 	});
-
+*/
 	return res.status(200).json({status:"ok"});
 });
 

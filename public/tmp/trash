@@ -1,0 +1,74 @@
+	var self = this;
+	var Emmc = req.app.db.model.Emmc,
+		Flash = req.app.db.model.Flash,
+		Parent = req.app.db.model.Parent,
+		Child = req.app.db.model.Child;
+
+	var parent = new Parent({
+		firmware_version: req.body.firmware_version,
+		IC_version: req.body.ic_version,
+		plant: req.body.plant,
+		factory: req.body.factory
+	});
+
+	var child = new Child({
+		flashID: req.body.flash_id,
+		company: req.body.flash_company
+	});
+
+	//parent.findOne({ firmware_version })
+
+
+	//Todo
+
+	//parent.children.push(child);
+
+	parent.save(function(err, innerparent) {
+		if (err) {
+			console.log(err);
+
+			Parent.findOne({
+				firmware_version: req.body.firmware_version,
+				IC_version: req.body.ic_version,
+				plant: req.body.plant,
+				factory: req.body.factory
+			}, function(err, emmc) {
+				console.log(emmc);
+				//console.log("QQ Show ID 0");
+				//console.log(emmc[0]._id);
+				if (err) {
+					console.log(err);
+				} else {
+					//console.log("WTF???");
+					//console.log(emmc);
+
+					//console.log("child parents");
+					//console.log(child.parents);
+					child.parents.push(emmc);
+					child.save(function(err, qq) {
+						if (err) {
+							emmc.children.remove(child);
+							emmc.save(function(err, doc) {});
+						} else {
+							console.log(child);
+						}
+					});
+				}
+			});
+
+		} else {
+			child.parents.push(parent);
+			child.save(function(err, innerchild) {
+				if (err) {
+					console.log(err);
+				} else {
+					console.log(innerchild);
+				}
+			});
+		}
+	});
+
+
+
+
+	

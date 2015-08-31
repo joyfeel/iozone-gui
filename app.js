@@ -4,16 +4,16 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-var mongoose = require('mongoose');
-
-
+var mongoose = require('mongoose'),
+ 	relationship = require("mongoose-relationship"),
+	uniqueValidator = require('mongoose-unique-validator');
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
 
 var app = express();
 
-mongoose.connect ('mongodb://localhost:27017/test2');
+mongoose.connect ('mongodb://localhost:27017/test21');
 mongoose.connection.on('error', function() {
   console.log('MongoDB: error');
 });
@@ -29,7 +29,6 @@ var Schema = mongoose.Schema;
  *
  */
 var emmcSchema = new Schema({
-	//_id: { type: Number },
 	firmware_version: {type: Date, default: Date.now},
 	IC_version: { type: String },
 	plant: { type: Number },
@@ -38,10 +37,8 @@ var emmcSchema = new Schema({
 });
 
 var flashSchema = new Schema({
-	//_creator: { type: Number, ref: 'Emmc' },
 	flashID: { type: String },
 	company: { type: String },
-	//emmcs: [{ type: Number, ref:'Emmc' }]
 	emmcs: [{ type: Schema.Types.ObjectId, ref:'Emmc' }]
 });
 
@@ -59,11 +56,58 @@ var Emmc = mongoose.model('Emmc', emmcSchema),
 	Flash = mongoose.model('Flash', flashSchema),
 	Report = mongoose.model('Report', reportSchema);
 
+
+var ParentSchema = new Schema({
+	firmware_version: {type: String},
+	IC_version: { type: String },
+	plant: { type: Number },
+	factory: { type: String },
+    children:[{ type:Schema.ObjectId, ref:"Child" }]
+});
+
+ParentSchema.index({ 
+	firmware_version: 1, 
+	IC_version: 1, 
+	plant: 1,
+	factory: 1
+}, {
+	unique: true
+});
+
+//Validator
+//ParentSchema.plugin(uniqueValidator);
+
+var Parent = mongoose.model("Parent", ParentSchema);
+
+var ChildSchema = new Schema({
+	flashID: { type: String },
+	company: { type: String },
+    parents: [{ type:Schema.ObjectId, ref:"Parent", childPath:"children" }]
+});
+
+ChildSchema.index({ 
+	flashID: 1, 
+	company: 1
+}, {
+	unique: true
+});
+
+ChildSchema.plugin(relationship, { relationshipPathName:'parents' });
+var Child = mongoose.model("Child", ChildSchema)
+
+
+
+
+
+
+
 app.db = {
   model: {
   	Emmc: Emmc,
     Flash: Flash,
-    Report: Report
+    Report: Report,
+    Parent: Parent,
+    Child: Child
   }
 };
 
