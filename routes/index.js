@@ -7,6 +7,8 @@ var iozone = require('./modules/iozone-parser.js');
 
 var registerEmmc = require('./modules/register-emmc.js');
 
+var getEmmc = require('./modules/get-emmc.js');
+
 var get_data_from_csv = require('./modules/get-csv.js');
 
 
@@ -15,12 +17,17 @@ var get_data_from_csv = require('./modules/get-csv.js');
 
 
 router.post('/iozone-register', function(req, res, next) {
-    console.log("Register send ok");
-
-    //res.status(500).json({status:"ok"})
-
+    console.log("Register...");
 
     return registerEmmc.store(req, res);
+});
+
+//front-end to back-end
+router.get('/iozone-input', function(req, res, next) {
+    console.log("Get the data from db to generate the emmc & flash field");
+    //return res.status(200).json({status:"ok"});  
+
+    return getEmmc.get(req, res);
 });
 
 
@@ -32,7 +39,7 @@ router.post('/iozone-input', function(req, res, next) {
 
 
 //back-end to front-end
-router.get('/iozone-input', function(req, res, next) {
+router.get('/iozone-report', function(req, res, next) {
 
     //get_data_from_csv.process();
 /*

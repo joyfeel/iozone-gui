@@ -8,6 +8,44 @@ workflow.outcome = {
     errfor: {}
 };
 
+/*
+
+app.db = {
+  model: {
+  	Emmc: Emmc,
+    Flash: Flash,
+    Report: Report
+  }
+};
+
+var emmcSchema = new Schema({
+	firmware_version: {type: Date, default: Date.now},
+	IC_version: { type: String },
+	plant: { type: Number },
+	factory: { type: String },
+	flashes: [{ type: Schema.Types.ObjectId, ref: 'Flash' }]
+});
+
+var flashSchema = new Schema({
+	_creator: { type: Number, ref: 'Flash' },
+	flashID: { type: String },
+	company: { type: String },
+	emmcs: [{ type: Number, ref:'Emmc' }]
+});
+
+		this.model.save({
+			firmware_version: firmware_version,
+			ic_version: ic_version,
+			factory: factory,
+			flash_id: flash_id,
+			plant: plant,
+			flash_company: flash_company
+		}
+
+*/
+
+
+//sudo mount -t ext4 /dev/mmcblk0 /mmc
 workflow.on('validation', function(req, res) {
 	console.log("Flow validation");
 
@@ -86,12 +124,12 @@ workflow.on('validation', function(req, res) {
 					//Update
 				     ParentModel.findByIdAndUpdate (
 				     	emmc._id, 
-				     	{ $addToSet: { "children": flash } },
-				    	{ safe: true, upsert: true, unique: true},
+				     	{ $push: { "children": flash } },
+				    	{ safe: true, upsert: true },
 				       	function(err, find_emmc) {	         					         
 				        	ChildModel.findByIdAndUpdate (flash._id, 
-			        			{ $addToSet: {"parents": find_emmc} }, 
-			        			{  safe: true, upsert: true, unique: true}, 
+			        			{ $push: {"parents": find_emmc} }, 
+			        			{  safe: true, upsert: true }, 
 			        			function (err, lol) {
 			     	 				if (err) {
 			     	 					return res.status(500).json({status:"not ok"})

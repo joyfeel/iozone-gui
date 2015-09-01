@@ -1,3 +1,5 @@
+"use strict";
+
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
@@ -13,7 +15,7 @@ var users = require('./routes/users');
 
 var app = express();
 
-mongoose.connect ('mongodb://localhost:27017/test21');
+mongoose.connect ('mongodb://localhost:27017/test228');
 mongoose.connection.on('error', function() {
   console.log('MongoDB: error');
 });
@@ -62,7 +64,7 @@ var ParentSchema = new Schema({
 	IC_version: { type: String },
 	plant: { type: Number },
 	factory: { type: String },
-    children:[{ type:Schema.ObjectId, ref:"Child" }]
+    children:[{ type:Schema.ObjectId, ref:"Child"}]
 });
 
 ParentSchema.index({ 
@@ -82,7 +84,7 @@ var Parent = mongoose.model("Parent", ParentSchema);
 var ChildSchema = new Schema({
 	flashID: { type: String },
 	company: { type: String },
-    parents: [{ type:Schema.ObjectId, ref:"Parent", childPath:"children" }]
+    parents: [{ type:Schema.ObjectId, ref:"Parent", childPath:"children"}]
 });
 
 ChildSchema.index({ 
@@ -93,13 +95,7 @@ ChildSchema.index({
 });
 
 ChildSchema.plugin(relationship, { relationshipPathName:'parents' });
-var Child = mongoose.model("Child", ChildSchema)
-
-
-
-
-
-
+var Child = mongoose.model("Child", ChildSchema);
 
 app.db = {
   model: {
@@ -110,7 +106,6 @@ app.db = {
     Child: Child
   }
 };
-
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -164,47 +159,5 @@ app.use(function(err, req, res, next) {
     error: {}
   });
 });
-
-
-/*
-var postSchema = new mongoose.Schema({
-  title  :  { type: String },
-  content   :  { type: String },
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'user' },
-  timeCreated: { type: Date, default: Date.now }
-});
-
-var userSchema = new mongoose.Schema({
-  username: { type: String, unique: true, select: false  },
-  displayName: { type: String, unique: true },
-  email: { type: String, unique: true, select: false  },
-  timeCreated: { type: Date, default: Date.now, select: false },
-  facebook: { type: Object, select: false }
-});
-*/
-
-
-
-
-/*
-var postSchema = new mongoose.Schema({
-  title  :  { type: String },
-  content   :  { type: String }
-});
-var Post = mongoose.model('post', postSchema);
-
-var PostEntity = new Post ({
-  title: 'Meow!!!',
-  content: 'Hello!!!!!!'
-});
-
-PostEntity.save(function(err, doc) {
-  if (err) {
-    console.log('db save err' + err);
-  } else {
-    console.log('db save successfully' + doc);
-  }
-});
-*/
 
 module.exports = app;

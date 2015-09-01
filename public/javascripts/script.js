@@ -16,19 +16,32 @@ app.IozoneInput = Backbone.Model.extend({
 	id: null,
 	defaults: {
 		filename: '',
+		devices: [],
 		description: 'Test',
 		testmode: '',
 		filesize: '',
 		recordsize: '',
-		data:    []
-		
+		data: []
 	}
 });
 
-app.IozoneInputCollection = Backbone.Collection.extend({
-	model: app.IozoneInput,
+
+app.IozoneReport = Backbone.Model.extend({
+	defaults: {
+		filename: '',
+		description: 'Test',
+		testmode: '',
+		filesize: '',
+		recordsize: '',
+		data: []
+	}
+});
+
+
+app.IozoneReportCollection = Backbone.Collection.extend({
+	model: app.IozoneReport,
 	url: function() {
-		return 'http://localhost:3000/iozone-input'
+		return 'http://localhost:3000/iozone-report'
 					+ (this.id === null ? '' : '/' + this.id);		
 	},
 	id: null
@@ -59,7 +72,7 @@ app.Router = Backbone.Router.extend({
 	iozone_result: function() {
 		this._cleanUp();
 		this.view = new app.IozoneResultView({
-			collection: app.IozoneInputCollection
+			collection: app.IozoneReportCollection
 		});
     },
     _cleanUp: function() {
@@ -258,8 +271,6 @@ app.IozoneInputView = Backbone.View.extend({
 });
 */
 
-
-
 app.IozoneResultView = Backbone.View.extend({
 	el: '#global-div',
 	events: {
@@ -268,20 +279,13 @@ app.IozoneResultView = Backbone.View.extend({
 	template: template('iozone-result-template'),
 	initialize: function() {
 		_.bindAll(this, 'render');
-
-		//this.model = new app.IozoneInput();
-
-		this.collection = new app.IozoneInputCollection();
+		this.collection = new app.IozoneReportCollection();
 
 		this.collection.on('change', this.render);
 		this.collection.on('add', this.render);
 		this.collection.on('remove', this.render);
 
-		//this.collection.bind('sync', this.render, this);
-		//this.listenTo(this.model, 'change', this.render, this);
-		//this.model.bind('change', this.render);	
 		this.render();
-		//this.model.fetch();
 		this.collection.fetch();
 	},
 	render: function() {
@@ -447,24 +451,31 @@ app.IozoneInputView = Backbone.View.extend({
 	},
 	template: template('iozone-input-template'),
 	initialize: function() {
-		_.bindAll(this, 'render');
-
+		//_.bindAll(this, 'render');
 		this.model = new app.IozoneInput();
-		//this.model.bind('remove', this.render, this);	
-		//this.listenTo(this.model, 'change', this.render, this);
+		this.model.bind('change:devices', this.render, this);
 
-		//Render 1 times
-		this.model.set('name', moment(new Date()));
+		this.model.set('filename', moment(new Date()));
+
 		this.render();
+
+		this.model.fetch();
 	},
 	render: function() {
-		console.log("render!!!");
-		this.$el.html(this.template(this.model.toJSON()));
+		console.log("44444444444444444444");	
+		//this.$el.html(this.template(this.model.attributes));
+
+		this.$el.html(this.template(this.model.attributes));
 		this.$el.find('.btn-contact-error').hide();
 
+
+		//this.$el.find('.btn-contact-save').prop('disabled', true);
+		//this.$el.find('.btn-contact-save').addClass('disabled').text('Loading...');
 		return this;
 	},
 	save: function(e) {
+		e.preventDefault();
+
 		var self = this,
 			filename = this.$el.find('input[name="name"]').val(),
 		    email = this.$el.find('input[name="email"]').val(),
@@ -472,28 +483,13 @@ app.IozoneInputView = Backbone.View.extend({
 			testmode = this.$el.find('select[name="testmode"]').val(),
 			filesize = this.$el.find('select[name="filesize"]').val(),
 			recordsize = this.$el.find('select[name="recordsize"]').val();
-			
 
- 		e.preventDefault();
-        e.stopPropagation();
-
-		//this.$el.off('click', '.btn-contact-save');
-		//this.events["click .btn-contact-save"] = undefined;
-        //$(this.el).undelegate('.btn-contact-save', 'click');
-/*
-		console.log(filesize.val());
-		console.log(filesize.text());
-
-		console.log(testmode.val());
-		console.log(testmode.text());
-*/	
-		//this.$el.find('button[type="submit"]').button('loading');
-
-		//!!!! this.$el.find('button[type="submit"]').prop('disabled', true);
 		this.$el.find('.btn-contact-save').prop('disabled', true);
 		this.$el.find('.btn-contact-save').addClass('disabled').text('Loading...');
 
+		//the save function will trigger the 'change' event immediately
 		this.model.save({
+			//device: device,
 			filename: filename,
 			email: email,
 			description: description,
@@ -503,8 +499,7 @@ app.IozoneInputView = Backbone.View.extend({
 		}, {
 			success: function(model, response, options) {
 				console.log("Successfully save");	
-				self.model.set('name', moment(new Date()));
-				//Render 2 times
+				self.model.set('filename', moment(new Date()));
 				self.render();
 			}, 
 			error: function(model, response, options) {
@@ -517,26 +512,17 @@ app.IozoneInputView = Backbone.View.extend({
 	},
 	error_handle: function (e) {
 		e.preventDefault();
-        e.stopPropagation();
 		alert('Need to mount the device');
-		//this.$el.find('.btn-contact-error').hide();
-		this.model.set('name', moment(new Date()));
+		this.$el.find('.btn-contact-error').hide();
+		this.model.set('filename', moment(new Date()));
 		this.render();
 	},
 	remove: function() {
-		//this.model.destroy();
     	this.$el.empty();
     	this.undelegateEvents();
     	return this;
 	}
 });
-/*
-
-	flashID: { type: String },
-	company: { type: String },
-	factory: {type: String},
-	CE: {type: Number}
-*/
 
 app.IozoneRegister = Backbone.Model.extend({
 	url: function() {
@@ -565,10 +551,6 @@ app.IozoneRegisterView = Backbone.View.extend({
 		_.bindAll(this, 'render');
 
 		this.model = new app.IozoneRegister();
-		//this.model.bind('remove', this.render, this);	
-		//this.listenTo(this.model, 'change', this.render, this);
-
-		//Render 1 times
 		this.render();
 	},
 	render: function() {
@@ -589,38 +571,9 @@ app.IozoneRegisterView = Backbone.View.extend({
 			plant = this.$el.find('select[name="plant"]').val(),
 			flash_company = this.$el.find('select[name="flash-company"]').val();
 
-		
-			//text() ---> list all the element
-			//val()  ---> list the selected element
 
-        //e.stopPropagation();
-
-		//this.$el.off('click', '.btn-contact-save');
-		//this.events["click .btn-contact-save"] = undefined;
-        //$(this.el).undelegate('.btn-contact-save', 'click');
-
-/*
-		console.log(firmware_version.val());
-		console.log(ic_version.val());
-		console.log(factory.val());
-		console.log(flash_id.val());
-		console.log(plant.val());
-		console.log(flash_company.val());
-*/
-	
-		//this.$el.find('button[type="submit"]').button('loading');
-
-		//!!!! this.$el.find('button[type="submit"]').prop('disabled', true);
 		this.$el.find('.btn-register').prop('disabled', true);
 		this.$el.find('.btn-register').addClass('disabled').text('Loading...');
-
-		console.log(firmware_version);
-		console.log(ic_version);
-		console.log(factory);
-		console.log(flash_id);
-		console.log(plant);
-		console.log(flash_company);
-
 
 		this.model.save({
 			firmware_version: firmware_version,
@@ -632,7 +585,6 @@ app.IozoneRegisterView = Backbone.View.extend({
 		}, {
 			success: function(model, response, options) {
 				console.log("Successfully register");	
-
 				console.log (response.status);
 				//Render 2 times
 				self.render();
@@ -647,7 +599,7 @@ app.IozoneRegisterView = Backbone.View.extend({
 	},
 	error_handle: function (e) {
 		e.preventDefault();
-        //e.stopPropagation();
+
 		alert('DB error');
 		this.$el.find('.btn-register-error').hide();
 		this.render();
@@ -659,14 +611,12 @@ app.IozoneRegisterView = Backbone.View.extend({
 	}
 });
 
-
-
-
 app.About = Backbone.Model.extend({
 	defaults: {
 		title: 'About',
 		author: 'joyfeel',
 		description: 'sudo mount -t ext4 /dev/mmcblk0 /mmc'
+
 	}
 });
 
