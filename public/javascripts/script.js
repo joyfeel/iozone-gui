@@ -31,6 +31,7 @@ app.IozoneReport = Backbone.Model.extend({
 	defaults: {
 		reportname: '',
 		description: 'Test',
+		testmodetext: '',
 		testmode: '',
 		filesize: '',
 		recordsize: '',
@@ -481,7 +482,7 @@ app.IozoneInputView = Backbone.View.extend({
 			deviceID = this.$el.find('select[name="device"]').val(),
 			reportname = this.$el.find('input[name="name"]').val(),
 			description = this.$el.find('textarea[name="description"]').val(),
-			//testmode = this.$el.find('select[name="testmode"] option:selected').text(),
+			testmodetext = this.$el.find('select[name="testmode"] option:selected').text(),
 			testmode = this.$el.find('select[name="testmode"]').val(),
 			filesize = this.$el.find('select[name="filesize"]').val(),
 			recordsize = this.$el.find('select[name="recordsize"]').val();
@@ -499,6 +500,7 @@ app.IozoneInputView = Backbone.View.extend({
 			deviceID: deviceID,
 			reportname: reportname,
 			description: description,
+			testmodetext: testmodetext,
 			testmode: testmode,
 			filesize: filesize,
 			recordsize: recordsize
@@ -622,7 +624,6 @@ app.About = Backbone.Model.extend({
 		title: 'About',
 		author: 'joyfeel',
 		description: 'sudo mount -t ext4 /dev/mmcblk0 /mmc'
-
 	}
 });
 

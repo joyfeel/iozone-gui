@@ -4,7 +4,6 @@ var child_process = require('child_process');
 var events = require('events');
 
 var xlsx = require('node-xlsx');
-var fs = require('fs');
 
 var workflow = new events.EventEmitter();
 
@@ -17,7 +16,6 @@ workflow.outcome = {
     errfor: {}
 };
 
-//sudo mount -t ext4 /dev/mmcblk0 /mmc
 workflow.on('iozone-exec', function(req, res) {
 	var self = this;
 	var reportname = data_folder + req.body.reportname;
@@ -85,9 +83,6 @@ workflow.on('iozone-parser', function(res, req, reportname) {
 	var rec_start = obj[0].data[0],
 		speed_start = obj[0].data[1];
 
-	//var csv_fields = ['rec', 'speed'];
-
-	
 	for (i = 0 + 1; i < Math.min(speed_length, rec_length); i++) {
 		measuredata.push({rec: rec_start[i], speed: speed_start[i]});
 	}
@@ -105,7 +100,7 @@ workflow.on('saveDB', function(res, req, reportname) {
 		devicename: req.body.devicename,
 		reportname: req.body.reportname,
 		description: req.body.description,
-		testmode: req.body.testmode,
+		testmode: req.body.testmodetext,
 		filesize: req.body.filesize,
 		recordsize: req.body.recordsize,
 		measuredata: measuredata,
