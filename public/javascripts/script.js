@@ -15,8 +15,10 @@ app.IozoneInput = Backbone.Model.extend({
 	},
 	id: null,
 	defaults: {
-		filename: '',
+		devicename: '',
+		deviceID: '',
 		devices: [],
+		reportname: '',
 		description: 'Test',
 		testmode: '',
 		filesize: '',
@@ -24,11 +26,10 @@ app.IozoneInput = Backbone.Model.extend({
 		data: []
 	}
 });
-
 
 app.IozoneReport = Backbone.Model.extend({
 	defaults: {
-		filename: '',
+		reportname: '',
 		description: 'Test',
 		testmode: '',
 		filesize: '',
@@ -36,7 +37,6 @@ app.IozoneReport = Backbone.Model.extend({
 		data: []
 	}
 });
-
 
 app.IozoneReportCollection = Backbone.Collection.extend({
 	model: app.IozoneReport,
@@ -208,7 +208,7 @@ app.IozoneInputView = Backbone.View.extend({
 	},
 	save: function(e) {
 		var self = this,
-			filename = this.$el.find('input[name="name"]').val(),
+			reportname = this.$el.find('input[name="name"]').val(),
 		    email = this.$el.find('input[name="email"]').val(),
 			description = this.$el.find('textarea[name="description"]').val(),
 			filesize = this.$el.find('select[name="filesize"]').val(),
@@ -234,7 +234,7 @@ app.IozoneInputView = Backbone.View.extend({
 		this.$el.find('.btn-contact-save').addClass('disabled').text('Loading...');
 
 		this.model.save({
-			filename: filename,
+			reportname: reportname,
 			email: email,
 			description: description,
 			filesize: filesize,
@@ -455,7 +455,7 @@ app.IozoneInputView = Backbone.View.extend({
 		this.model = new app.IozoneInput();
 		this.model.bind('change:devices', this.render, this);
 
-		this.model.set('filename', moment(new Date()));
+		this.model.set('reportname', moment(new Date()));
 
 		this.render();
 
@@ -477,9 +477,11 @@ app.IozoneInputView = Backbone.View.extend({
 		e.preventDefault();
 
 		var self = this,
-			filename = this.$el.find('input[name="name"]').val(),
-		    email = this.$el.find('input[name="email"]').val(),
+			devicename = this.$el.find('select[name="device"] option:selected').text(),
+			deviceID = this.$el.find('select[name="device"]').val(),
+			reportname = this.$el.find('input[name="name"]').val(),
 			description = this.$el.find('textarea[name="description"]').val(),
+			//testmode = this.$el.find('select[name="testmode"] option:selected').text(),
 			testmode = this.$el.find('select[name="testmode"]').val(),
 			filesize = this.$el.find('select[name="filesize"]').val(),
 			recordsize = this.$el.find('select[name="recordsize"]').val();
@@ -487,11 +489,15 @@ app.IozoneInputView = Backbone.View.extend({
 		this.$el.find('.btn-contact-save').prop('disabled', true);
 		this.$el.find('.btn-contact-save').addClass('disabled').text('Loading...');
 
+		console.log('YAYAYAY');
+		console.log(devicename);
+		console.log(deviceID);
+
 		//the save function will trigger the 'change' event immediately
 		this.model.save({
-			//device: device,
-			filename: filename,
-			email: email,
+			devicename: devicename,
+			deviceID: deviceID,
+			reportname: reportname,
 			description: description,
 			testmode: testmode,
 			filesize: filesize,
@@ -499,7 +505,7 @@ app.IozoneInputView = Backbone.View.extend({
 		}, {
 			success: function(model, response, options) {
 				console.log("Successfully save");	
-				self.model.set('filename', moment(new Date()));
+				self.model.set('reportname', moment(new Date()));
 				self.render();
 			}, 
 			error: function(model, response, options) {
@@ -514,7 +520,7 @@ app.IozoneInputView = Backbone.View.extend({
 		e.preventDefault();
 		alert('Need to mount the device');
 		this.$el.find('.btn-contact-error').hide();
-		this.model.set('filename', moment(new Date()));
+		this.model.set('reportname', moment(new Date()));
 		this.render();
 	},
 	remove: function() {

@@ -29,17 +29,6 @@
 		<div class="row">
 			<form class="form-horizontal" method="post">
 				<div class="form-group">
-					<label for="firmware-version" class="col-sm-2 control-label">Firmware Version</label>
-					<div class="col-sm-6">
-
-						<select class="form-control" id="firmware-version" name="firmware-version">
-							<option value="20150828">20150828</option>
-							<option value="20150829">20150829</option>
-							<option selected="selected" value="20150830">20150830</option>
-						</select>
-					</div>
-				</div>
-				<div class="form-group">
 					<label for="ic-version" class="col-sm-2 control-label">IC Version</label>
 					<div class="col-sm-6">
 						<select class="form-control" id="ic-version" name="ic-version">
@@ -58,28 +47,15 @@
 							<option selected="selected" value="D1">D1</option>
 						</select>
 					</div>
-				</div>
+				</div>			
 				<div class="form-group">
-					<label for="factory" class="col-sm-2 control-label">Packaing Factory</label>
+					<label for="firmware-version" class="col-sm-2 control-label">Firmware Version</label>
 					<div class="col-sm-6">
-						<select class="form-control" id="factory" name="factory">
-							<option value="Bark">Bark</option>
-							<option selected="selected" value="Meow">Meow</option>
-						</select>
-					</div>
-				</div>
-				<div class="form-group">
-					<label for="flash-id" class="col-sm-2 control-label">Flash ID</label>
-					<div class="col-sm-6">
-						<select class="form-control" id="flash-id" name="flash-id">
-							<option value="6ddl">6ddl</option>
-							<option selected="selected" value="7ddl">7ddl</option>
-							<option value="8ddl">8ddl</option>
-							<option value="9ddl">9ddl</option>
-							<option value="10ddl">10ddl</option>
-							<option value="1ddl">1ddl</option>
-							<option value="2ddl">2ddl</option>
-							<option value="3ddl">3ddl</option>							
+
+						<select class="form-control" id="firmware-version" name="firmware-version">
+							<option value="20150828">20150828</option>
+							<option value="20150829">20150829</option>
+							<option selected="selected" value="20150830">20150830</option>
 						</select>
 					</div>
 				</div>
@@ -94,6 +70,15 @@
 					</div>
 				</div>
 				<div class="form-group">
+					<label for="factory" class="col-sm-2 control-label">Packaing Factory</label>
+					<div class="col-sm-6">
+						<select class="form-control" id="factory" name="factory">
+							<option value="Bark">Bark</option>
+							<option selected="selected" value="Meow">Meow</option>
+						</select>
+					</div>
+				</div>
+				<div class="form-group">
 					<label for="flash-company" class="col-sm-2 control-label">Flash Company</label>
 					<div class="col-sm-6">
 						<select class="form-control" id="flash-company" name="flash-company">
@@ -101,6 +86,21 @@
 							<option selected="selected" value="Hynix">Hynix</option>
 							<option value="Sandisk">Sandisk</option>
 							<option value="Micron">Micron</option>
+						</select>
+					</div>
+				</div>				
+				<div class="form-group">
+					<label for="flash-id" class="col-sm-2 control-label">Flash ID</label>
+					<div class="col-sm-6">
+						<select class="form-control" id="flash-id" name="flash-id">
+							<option value="6ddl">6ddl</option>
+							<option selected="selected" value="7ddl">7ddl</option>
+							<option value="8ddl">8ddl</option>
+							<option value="9ddl">9ddl</option>
+							<option value="10ddl">10ddl</option>
+							<option value="1ddl">1ddl</option>
+							<option value="2ddl">2ddl</option>
+							<option value="3ddl">3ddl</option>							
 						</select>
 					</div>
 				</div>
@@ -122,14 +122,6 @@
 		<div class="row">
 			<form class="form-horizontal" method="post">
 				<div class="form-group">
-					<label for="name" class="col-sm-2 control-label">Report name</label>
-					<div class="col-sm-6">
-						<input type="text" name="name" class="form-control" id="name" 
-							value="<%=filename%>"placeholder="Report Name" required />	
-					</div>
-				</div>
-
-				<div class="form-group">
 					<label for="device" class="col-sm-2 control-label">Deivce</label>
 					<div class="col-sm-6">
 						<select class="form-control" id="device" name="device">
@@ -139,7 +131,13 @@
 						</select>					
 					</div>
 				</div>
-
+				<div class="form-group">
+					<label for="name" class="col-sm-2 control-label">Report name</label>
+					<div class="col-sm-6">
+						<input type="text" name="name" class="form-control" id="name" 
+							value="<%=reportname%>"placeholder="Report Name" required />	
+					</div>
+				</div>
 				<div class="form-group">
 					<label for="description" class="col-sm-2 control-label">Description</label>
 					<div class="col-sm-6">
@@ -214,7 +212,7 @@
 					<div class = 'myd3-line-chart'>
 					</div>
 					<div class="caption">
-						<h3><%= filename %></h3>
+						<h3><%= reportname %></h3>
 						<h4><p>Description: <%= description %></p></h4>
 						<h5><p>Testmode: <%= testmode %></p></h5>
 						<p>FileSize: <%= filesize %></p>

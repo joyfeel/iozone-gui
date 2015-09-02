@@ -11,6 +11,7 @@ var workflow = new events.EventEmitter();
 
 //Store the parsed data
 var data_folder = "./statistical/"
+var measuredata = [];
 
 workflow.outcome = {
     success: false,
@@ -18,31 +19,30 @@ workflow.outcome = {
 };
 
 //sudo mount -t ext4 /dev/mmcblk0 /mmc
-workflow.on('iozone-exec', function(req_body, res) {
+workflow.on('iozone-exec', function(req, res) {
 	var self = this;
-	var filename = data_folder + req_body.filename;
+	var reportname = data_folder + req.body.reportname;
 
 	child_process.exec("iozone3_430_Native/iozone -I -f /mmc/tmp -a "
-		+ req_body.testmode + " -s " + req_body.filesize
-		+ " -y 4k -q " + req_body.recordsize // + req_body.filesize
-		+ " -b " + filename + ".xlsx"
-		, function (error, stdout, stderr) {
-			console.log('stdout: ' + stdout);
-            //console.log('stderr: ' + stderr);
-			if (error) {
-				console.log('exec error: ' + error);
-				return res.status(500).send(workflow.outcome)
-			} else {
-                self.emit('convert_csv', res, req_body, filename);
+			+ req.body.testmode + " -s " + req.body.filesize
+			+ " -y 4k -q " + req.body.recordsize // + req.body.filesize
+			+ " -b " + reportname + ".xlsx",
+			function (error, stdout, stderr) {
+				console.log('stdout: ' + stdout);
+				if (error) {
+					console.log('exec error: ' + error);
+					return res.status(500).send(workflow.outcome)
+				} else {
+	                self.emit('convert_csv', res, req, reportname);
+				}
 			}
-		}
 	);	
 });
 
-workflow.on('convert_csv', function(res, req_body, filename) {
+workflow.on('convert_csv', function(res, req, reportname) {
 	var self = this;
 
-	child_process.exec("ssconvert " + filename + ".xlsx " +  filename + "_convert_csv.csv"
+	child_process.exec("ssconvert " + reportname + ".xlsx " +  reportname + "_convert_csv.csv"
 		, function (error, stdout, stderr) {
 			//console.log('stdout: ' + stdout);
             //console.log('stderr: ' + stderr);
@@ -50,16 +50,16 @@ workflow.on('convert_csv', function(res, req_body, filename) {
 				console.log('exec error: ' + error);
 				return res.status(500).send(workflow.outcome)
 			} else {
-                self.emit('convert_xlsx', res, req_body, filename);
+                self.emit('convert_xlsx', res, req, reportname);
 			}
 		}
 	);
 });
 
-workflow.on('convert_xlsx', function(res, req_body, filename) {
+workflow.on('convert_xlsx', function(res, req, reportname) {
 	var self = this;
 
-	child_process.exec("ssconvert " + filename + "_convert_csv.csv " +  filename + "_convert_xlsx.xlsx"
+	child_process.exec("ssconvert " + reportname + "_convert_csv.csv " +  reportname + "_convert_xlsx.xlsx"
 		, function (error, stdout, stderr) {
 			//console.log('stdout: ' + stdout);
             //console.log('stderr: ' + stderr);
@@ -67,16 +67,15 @@ workflow.on('convert_xlsx', function(res, req_body, filename) {
 				console.log('exec error: ' + error);
 				return res.status(500).send(workflow.outcome)
 			} else {
-                self.emit('iozone-save', res, req_body, filename);
+                self.emit('iozone-parser', res, req, reportname);
 			}
 		}
 	);
 });
 
 //Need refactorory.
-workflow.on('iozone-save', function(res, req_body, filename) {
-	var obj = xlsx.parse(filename + '_convert_xlsx.xlsx'),
-		excel_data = [],
+workflow.on('iozone-parser', function(res, req, reportname) {
+	var obj = xlsx.parse(reportname + '_convert_xlsx.xlsx'),
 		i,
 		self = this,
 		csv_write_file;
@@ -87,31 +86,79 @@ workflow.on('iozone-save', function(res, req_body, filename) {
 	var rec_start = obj[0].data[0],
 		speed_start = obj[0].data[1];
 
-	var csv_fields = ['speed', 'rec'];
+	//var csv_fields = ['rec', 'speed'];
 
 	
 	for (i = 0 + 1; i < Math.min(speed_length, rec_length); i++) {
-		/*
-		excel_data.push({speed: speed_start[i]
-							, rec: rec_start[i]});
-		*/
-		excel_data.push({rec: rec_start[i]
-							, speed: speed_start[i]});
+		measuredata.push({rec: rec_start[i], speed: speed_start[i]});
 	}
+	console.log('0.0!!!!');
+	console.log(measuredata);
  
+ /*
 	json2csv({ data: excel_data, fields: csv_fields }, function(err, csv) {
 	    if (err) {
 	    	console.log(err);
 	    	return res.status(500).send(workflow.outcome)
 	    }
-	    self.emit('removefile', res, req_body, filename, csv);
+
+	    self.emit('removefile', res, req, reportname, csv);
 	});
+*/
+
+	self.emit('saveDB', res, req, reportname);
 });
 
-workflow.on('removefile', function(res, req_body, filename, csv) {
+
+workflow.on('saveDB', function(res, req, reportname) {
 	var self = this;
 
-	child_process.exec("rm -rf " + filename + "*"
+	var ReportModel = req.app.db.model.Report;
+
+	var reportInstance = new ReportModel({
+		devicename: req.body.devicename,
+		reportname: req.body.reportname,
+		description: req.body.description,
+		testmode: req.body.testmode,
+		filesize: req.body.filesize,
+		recordsize: req.body.recordsize,
+		measuredata: measuredata,
+		emmcs: req.body.deviceID
+	});
+
+	measuredata.length = 0;
+
+	reportInstance.save(function (err, new_emmc) {
+		if (err) {
+			console.log('reportInstance err');
+			console.log(err);
+		}
+		console.log(new_emmc);
+		self.emit('response', res);
+	});
+	/*
+var reportSchema = new Schema({
+	devicename: { type: String },
+	deviceID: {type: Number},
+	reportname: { type: String},
+	description: { type: String },
+	testmode: { type: String },
+	filesize: { type: String },
+	recordsize: {type: String},
+	data: [],
+	//emmcId: {type: Schema.Types.ObjectId, ref: 'Emmc'}
+	//emmcId: { type: mongoose.Schema.Types.ObjectId, ref: 'user' },
+	emmcs: { type:Schema.ObjectId, ref:"Emmc", childPath:"reports" }
+});
+	*/
+
+});
+
+/*
+workflow.on('removefile', function(res, req.body, reportname, csv) {
+	var self = this;
+
+	child_process.exec("rm -rf " + reportname + "*"
 		, function (error, stdout, stderr) {
 			//console.log('stdout: ' + stdout);
             //console.log('stderr: ' + stderr);
@@ -120,15 +167,17 @@ workflow.on('removefile', function(res, req_body, filename, csv) {
 				return res.status(500).send(workflow.outcome)
 			} 
 			console.log('Remove file OK!');
-			self.emit('writefile', res, req_body, filename, csv);
+			self.emit('writefile', res, req.body, reportname, csv);
 		}
 	);
 });
+*/
 
-workflow.on('writefile', function(res, req_body, filename, csv) {
+/*
+workflow.on('writefile', function(res, req.body, reportname, csv) {
 	var self = this;
 
-	fs.writeFile(filename + '.csv', csv, function(err) {
+	fs.writeFile(reportname + '.csv', csv, function(err) {
 		if (err) {
 			console.log(err);
 			return res.status(500).send(workflow.outcome);
@@ -137,7 +186,7 @@ workflow.on('writefile', function(res, req_body, filename, csv) {
 		self.emit('response', res);
 	});
 });
-
+*/
 
 workflow.on('response', function(res) {
 	//Success
@@ -146,8 +195,8 @@ workflow.on('response', function(res) {
 });
 
 
-function process (req_body, res) {
-	return workflow.emit('iozone-exec', req_body, res);
+function process (req, res) {
+	return workflow.emit('iozone-exec', req, res);
 }
 
 exports.process = process;
