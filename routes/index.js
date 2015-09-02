@@ -4,13 +4,8 @@ var router = express.Router();
 //var d3 = require('d3');
 
 var iozone = require('./modules/iozone-parser.js');
-
 var registerEmmc = require('./modules/register-emmc.js');
-
 var getEmmc = require('./modules/get-emmc.js');
-
-var get_data_from_csv = require('./modules/get-csv.js');
-
 
 //res.status(200).json({status:"ok"});
 //res.status(500).json({status:"not ok"})
@@ -41,7 +36,6 @@ router.post('/iozone-input', function(req, res, next) {
 //back-end to front-end
 router.get('/iozone-report', function(req, res, next) {
 
-    //get_data_from_csv.process();
 /*
     return iozone.process (req.body, res, function() {
         res.send ();

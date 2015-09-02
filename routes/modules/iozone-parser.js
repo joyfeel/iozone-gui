@@ -5,7 +5,6 @@ var events = require('events');
 
 var xlsx = require('node-xlsx');
 var fs = require('fs');
-var json2csv = require('json2csv');
 
 var workflow = new events.EventEmitter();
 
@@ -92,19 +91,6 @@ workflow.on('iozone-parser', function(res, req, reportname) {
 	for (i = 0 + 1; i < Math.min(speed_length, rec_length); i++) {
 		measuredata.push({rec: rec_start[i], speed: speed_start[i]});
 	}
-	console.log('0.0!!!!');
-	console.log(measuredata);
- 
- /*
-	json2csv({ data: excel_data, fields: csv_fields }, function(err, csv) {
-	    if (err) {
-	    	console.log(err);
-	    	return res.status(500).send(workflow.outcome)
-	    }
-
-	    self.emit('removefile', res, req, reportname, csv);
-	});
-*/
 
 	self.emit('saveDB', res, req, reportname);
 });
@@ -133,29 +119,13 @@ workflow.on('saveDB', function(res, req, reportname) {
 			console.log('reportInstance err');
 			console.log(err);
 		}
-		console.log(new_emmc);
-		self.emit('response', res);
+
+		self.emit('removefile', res, reportname);
 	});
-	/*
-var reportSchema = new Schema({
-	devicename: { type: String },
-	deviceID: {type: Number},
-	reportname: { type: String},
-	description: { type: String },
-	testmode: { type: String },
-	filesize: { type: String },
-	recordsize: {type: String},
-	data: [],
-	//emmcId: {type: Schema.Types.ObjectId, ref: 'Emmc'}
-	//emmcId: { type: mongoose.Schema.Types.ObjectId, ref: 'user' },
-	emmcs: { type:Schema.ObjectId, ref:"Emmc", childPath:"reports" }
-});
-	*/
-
 });
 
-/*
-workflow.on('removefile', function(res, req.body, reportname, csv) {
+
+workflow.on('removefile', function(res, reportname) {
 	var self = this;
 
 	child_process.exec("rm -rf " + reportname + "*"
@@ -167,33 +137,16 @@ workflow.on('removefile', function(res, req.body, reportname, csv) {
 				return res.status(500).send(workflow.outcome)
 			} 
 			console.log('Remove file OK!');
-			self.emit('writefile', res, req.body, reportname, csv);
+			self.emit('response', res);
 		}
 	);
 });
-*/
-
-/*
-workflow.on('writefile', function(res, req.body, reportname, csv) {
-	var self = this;
-
-	fs.writeFile(reportname + '.csv', csv, function(err) {
-		if (err) {
-			console.log(err);
-			return res.status(500).send(workflow.outcome);
-		}
-		console.log('Write OK!');
-		self.emit('response', res);
-	});
-});
-*/
 
 workflow.on('response', function(res) {
 	//Success
     workflow.outcome.success = true;
     return res.status(200).send(workflow.outcome);
 });
-
 
 function process (req, res) {
 	return workflow.emit('iozone-exec', req, res);
