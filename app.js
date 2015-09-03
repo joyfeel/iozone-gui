@@ -35,9 +35,9 @@ var emmcSchema = new Schema({
 	IC_version: { type: String },
 	plant: { type: Number },
 	factory: { type: String },
-    flashes:[{ type:Schema.ObjectId, ref:"Flash"}]
-    //?????????????
-    //reports:[{ type:Schema.ObjectId, ref:"Report" }]
+    flashes: [{ type:Schema.ObjectId, ref:"Flash"}],
+    //++
+    reports:[{ type:Schema.ObjectId, ref:"Report" }]
 });
 
 emmcSchema.index({ 
@@ -49,15 +49,14 @@ emmcSchema.index({
 	unique: true
 });
 
-//Validator
-//emmcSchema.plugin(uniqueValidator);
-
 var Emmc = mongoose.model("Emmc", emmcSchema);
 
 var flashSchema = new Schema({
 	flashID: { type: String },
 	company: { type: String },
-    emmcs: [{ type:Schema.ObjectId, ref:"Emmc", childPath:"flashes"}]
+    emmcs: [{ type:Schema.ObjectId, ref:"Emmc", childPath:"flashes"}],
+    //++
+    reports:[{ type:Schema.ObjectId, ref:"Report" }]
 });
 
 flashSchema.index({ 
@@ -76,13 +75,16 @@ var reportSchema = new Schema({
 	reportname: { type: String},
 	description: { type: String },
 	testmode: { type: String },
+	testmodetext: { type: String },
 	filesize: { type: String },
 	recordsize: {type: String},
     measuredata: { type : Array , "default" : [] },
-	emmcs: { type:Schema.ObjectId, ref:"Emmc", childPath:"reports" }
+	emmcs: { type:Schema.ObjectId, ref:"Emmc", childPath:"reports" },
+	flashes: { type:Schema.ObjectId, ref:"Flash", childPath:"reports" }
 });
 
 reportSchema.plugin(relationship, { relationshipPathName:'emmcs' });
+reportSchema.plugin(relationship, { relationshipPathName:'flashes' });
 var Report = mongoose.model('Report', reportSchema);
 
 app.db = {

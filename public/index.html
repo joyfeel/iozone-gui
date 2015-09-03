@@ -3,6 +3,9 @@
 <head>
 	<link rel="stylesheet" href="javascripts/bower_components/bootstrap/dist/css/bootstrap.css">
 	<link rel="stylesheet" href="stylesheets/style.css">
+
+	<link rel="stylesheet" href="/node_modules/sweetalert/dist/sweetalert.css">
+
 </head>
 <body>
 	<nav>
@@ -126,7 +129,7 @@
 					<div class="col-sm-6">
 						<select class="form-control" id="device" name="device">
 							<% _.each(devices, function(device) { %>
-								<option value=<%=device.emmc_id%>><%=device.emmc_content%></option>
+								<option value='<%=JSON.stringify(device.test)%>'><%=device.emmc_content%></option>
 							<% }); %>
 						</select>					
 					</div>
@@ -135,7 +138,7 @@
 					<label for="name" class="col-sm-2 control-label">Report name</label>
 					<div class="col-sm-6">
 						<input type="text" name="name" class="form-control" id="name" 
-							value="<%=reportname%>"placeholder="Report Name" required />	
+							value=<%=reportname%> placeholder="Report Name" required />	
 					</div>
 				</div>
 				<div class="form-group">
@@ -197,14 +200,18 @@
 						<button type="submit" class="btn btn-primary btn-contact-save">
 							<span class= "glyphicon glyphicon-send"></span> Send
 						</button>
-						<button type="submit" class="btn btn-warning btn-contact-error">
-							<span class= "glyphicon glyphicon-warning-sign"></span> Error
-						</button>
 					</div>
 				</div>
 			</form>
 		</div>
 	</script>
+
+
+						<!--
+							<button type="submit" class="btn btn-warning btn-contact-error">
+								<span class= "glyphicon glyphicon-warning-sign"></span> Error
+							</button>
+						-->
 
 	<script type="text/template" id="iozone-result-sub-template">
 			<div class="col-sm-6 col-md-4">
@@ -252,6 +259,8 @@
 	</script>
 
 	<div id="global-div" class="container-fluid">
+
+
 		
 	</div>
 
@@ -263,6 +272,9 @@
 
 	<script src="javascripts/bower_components/bootstrap/dist/js/bootstrap.js"></script>	
 	<script src="javascripts/dist/script.min.js"></script>
+
+ 	<script src="/node_modules/sweetalert/dist/sweetalert.min.js"></script>
+
 
 	<script>document.write('<script src="http://' + (location.host || 'localhost')
 .split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>')</script>
