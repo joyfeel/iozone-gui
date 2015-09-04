@@ -46,9 +46,13 @@ router.get('/iozone-report', function(req, res, next) {
 
 
 router.delete('/iozone-report/:id', function(req, res, next) {
+  console.log('YAlkjdlkajsdlsakd');
+
+/*
   req.app.db.model.Post.findByIdAndRemove(req.params.id, function(err, posts) {
     res.json(posts);
   });
+*/
 });
 
 

@@ -31,11 +31,12 @@ app.IozoneInput = Backbone.Model.extend({
 });
 
 app.IozoneReport = Backbone.Model.extend({
-	url: function() {
+	urlRoot: function() {
 		return 'http://localhost:3000/iozone-report' +
 					(this.id === null ? '' : '/' + this.id);
 	},
 	id: null,
+	idAttribute: '',
 	defaults: {
 		reportID: '',
 		devicename: '',
@@ -199,24 +200,27 @@ app.IozoneItemView = Backbone.View.extend({
 	},
 	delete: function (e) {
         // now that we need to know, we can just check that attribute
+
+        e.preventDefault();
         var id = $(e.target).data('id');
         //console.log('@@@@@@@@@@@id!');
-        console.log(id);
+        this.model.id = id;
+        this.model.idAttribute = id;
+        console.log(this.model);
         this.model.destroy({
     		success: function (model, response, options) {
             	//swal('Meow!', 'You can view the report of performance test', 'success');
             	//self.render();
-            	console.log("YYYYYYY");
+            	console.log('YYYYYYY');
         	},
         	error: function (model, response, options) {
 				//var responseObj = JSON.parse(response.responseText);
-				console.log("NNNNNNN");
+				console.log('NNNNNNN');
         		//swal('No report!', responseObj.errfor.info, 'error');	
         	}
         });
         
     }
-
 });
 /*
 app.IozoneInputView = Backbone.View.extend({
@@ -365,13 +369,7 @@ app.IozoneResultView = Backbone.View.extend({
 		console.log(e.currentTarget.checked);
 
 		return true;
-	},
-	delete: function (e) {
-        // now that we need to know, we can just check that attribute
-        var id = $(e.target).data('id');
-        console.log('@@@@@@@@@@@id!');
-        console.log(id);
-    }
+	}
 });
 
 
