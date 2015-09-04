@@ -40,23 +40,21 @@ router.post('/iozone-input', function(req, res, next) {
 //back-end to front-end
 router.get('/iozone-report', function(req, res, next) {
     console.log('Get report');
-/*
-    return iozone.process (req.body, res, function() {
-        res.send ();
-    });  
-*/
+
     return getReport.process (req, res);
 });
+
+
+router.delete('/iozone-report/:id', function(req, res, next) {
+  req.app.db.model.Post.findByIdAndRemove(req.params.id, function(err, posts) {
+    res.json(posts);
+  });
+});
+
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
   
-    /*
-    res.render('main', { title: 'Express',
-                            description: 'My first app!!!!'
-            });
-    */
-
     res.redirect('/public/index.html');
 });
 

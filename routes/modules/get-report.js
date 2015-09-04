@@ -30,6 +30,7 @@ function process (req, res) {
 	    		reports.forEach(function (report) {
 	    			var objTemp = {};
 	    			objTemp = {
+	    				reportID: 		report._id,
 			    		devicename: 	report.devicename,
 				        reportname: 	report.reportname,
 				        description: 	report.description,

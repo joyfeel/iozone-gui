@@ -31,7 +31,13 @@ app.IozoneInput = Backbone.Model.extend({
 });
 
 app.IozoneReport = Backbone.Model.extend({
+	url: function() {
+		return 'http://localhost:3000/iozone-report' +
+					(this.id === null ? '' : '/' + this.id);
+	},
+	id: null,
 	defaults: {
+		reportID: '',
 		devicename: '',
 		reportname: '',
 		description: '',
@@ -88,7 +94,14 @@ app.Router = Backbone.Router.extend({
 });
 
 app.IozoneItemView = Backbone.View.extend({
+	events: {
+		'click .btn-delete-report': 'delete'
+	},
 	template: template('iozone-result-sub-template'),
+	initialize: function () {
+		//this.model.on('remove', this.render);
+		//this.render();
+	},
 	render: function() {
 		this.$el.html(this.template(this.model.toJSON()));
 
@@ -183,7 +196,27 @@ app.IozoneItemView = Backbone.View.extend({
 			.attr('class', 'axis')
 			.attr('transform', 'translate('+padding+', 0)')
 			.call(yAxis);
-	}
+	},
+	delete: function (e) {
+        // now that we need to know, we can just check that attribute
+        var id = $(e.target).data('id');
+        //console.log('@@@@@@@@@@@id!');
+        console.log(id);
+        this.model.destroy({
+    		success: function (model, response, options) {
+            	//swal('Meow!', 'You can view the report of performance test', 'success');
+            	//self.render();
+            	console.log("YYYYYYY");
+        	},
+        	error: function (model, response, options) {
+				//var responseObj = JSON.parse(response.responseText);
+				console.log("NNNNNNN");
+        		//swal('No report!', responseObj.errfor.info, 'error');	
+        	}
+        });
+        
+    }
+
 });
 /*
 app.IozoneInputView = Backbone.View.extend({
@@ -280,6 +313,7 @@ app.IozoneResultView = Backbone.View.extend({
 	el: '#global-div',
 	events: {
 		'click .checkbox': 'compare'
+		//'click .btn-delete-report': 'delete'
 	},
 	template: template('iozone-result-template'),
 	initialize: function() {
@@ -332,11 +366,11 @@ app.IozoneResultView = Backbone.View.extend({
 
 		return true;
 	},
-	doSomething: function (e) {
+	delete: function (e) {
         // now that we need to know, we can just check that attribute
-        if (this.showCompletedEnquiries){
-          console.log('@!@!@!');
-        }
+        var id = $(e.target).data('id');
+        console.log('@@@@@@@@@@@id!');
+        console.log(id);
     }
 });
 

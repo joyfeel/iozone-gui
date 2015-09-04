@@ -204,21 +204,6 @@
 	</script>
 
 
-						<!--
-							<button type="submit" class="btn btn-warning btn-contact-error">
-								<span class= "glyphicon glyphicon-warning-sign"></span> Error
-							</button>
-
-		devicename: '',
-		reportname: '',
-		description: '',
-		testmodetext: '',
-		filesize: '',
-		recordsize: '',
-		measuredata: []
-						-->
-
-
 	<script type="text/template" id="iozone-result-sub-template">
 			<div class="col-sm-6 col-md-4">
 				<div class="thumbnail">
@@ -236,7 +221,7 @@
 							 <span class="glyphicon glyphicon-download-alt"></span> Save 
 						</button>
 
-						<button type="button" class="btn btn-danger"> 
+						<button type="button" data-id="<%= reportID %>" class="btn btn-danger btn-delete-report"> 
 							 <span class="glyphicon glyphicon-trash"></span> Delete
 						</button>
 
