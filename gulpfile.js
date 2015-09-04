@@ -6,7 +6,24 @@ var gulp = require('gulp'),
      plumber = require('gulp-plumber'),
      uglify = require('gulp-uglify'),
      rename = require('gulp-rename'),
-     livereload = require('gulp-livereload');
+     livereload = require('gulp-livereload'),
+     jshint = require('gulp-jshint'),
+     stylish = require('jshint-stylish');
+
+
+
+gulp.task('lint-public', function() {
+    gulp.src('public/javascripts/*.js')
+        .pipe(jshint())
+        .pipe(jshint.reporter(stylish));
+});
+
+gulp.task('lint-routes', function() {
+    gulp.src('routes/**/*.js')
+        .pipe(jshint())
+        .pipe(jshint.reporter(stylish));
+});
+
 
 
 gulp.task('apps', function() {
@@ -34,6 +51,9 @@ gulp.task('less', function(){
 gulp.task('watch', function () {
     gulp.watch(['public/javascripts/*.js'], ['apps']);
     gulp.watch(['public/stylesheets/*.less'], ['less']);
+    gulp.watch(['public/javascripts/*.js'], ['lint-public']);
+
+    gulp.watch(['routes/**/*.js'], ['lint-routes']);
 });
 
-gulp.task('default', ['watch', 'apps', 'less']);
+gulp.task('default', ['watch', 'apps', 'less', 'lint-public', 'lint-routes']);

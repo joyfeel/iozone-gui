@@ -1,3 +1,4 @@
+/*jslint node: true */
 "use strict";
 
 var express = require('express');
@@ -31,8 +32,8 @@ var Schema = mongoose.Schema;
  *
  */
 var emmcSchema = new Schema({
-	firmware_version: {type: String},
-	IC_version: { type: String },
+	firmwareVersion: {type: String},
+	icVersion: { type: String },
 	plant: { type: Number },
 	factory: { type: String },
     flashes: [{ type:Schema.ObjectId, ref:"Flash"}],
@@ -41,8 +42,8 @@ var emmcSchema = new Schema({
 });
 
 emmcSchema.index({ 
-	firmware_version: 1, 
-	IC_version: 1, 
+	firmwareVersion: 1, 
+	icVersion: 1, 
 	plant: 1,
 	factory: 1
 }, {
@@ -71,20 +72,19 @@ var Flash = mongoose.model("Flash", flashSchema);
 
 var reportSchema = new Schema({
 	devicename: { type: String },
-	deviceID: {type: String},
 	reportname: { type: String},
 	description: { type: String },
 	testmode: { type: String },
 	testmodetext: { type: String },
 	filesize: { type: String },
 	recordsize: {type: String},
-    measuredata: { type : Array , "default" : [] },
-	emmcs: { type:Schema.ObjectId, ref:"Emmc", childPath:"reports" },
-	flashes: { type:Schema.ObjectId, ref:"Flash", childPath:"reports" }
+  measuredata: { type : Array , "default" : [] },
+	emmcID: { type:Schema.ObjectId, ref:"Emmc", childPath:"reports" },
+	flashID: { type:Schema.ObjectId, ref:"Flash", childPath:"reports" }
 });
 
-reportSchema.plugin(relationship, { relationshipPathName:'emmcs' });
-reportSchema.plugin(relationship, { relationshipPathName:'flashes' });
+reportSchema.plugin(relationship, { relationshipPathName:'emmcID' });
+reportSchema.plugin(relationship, { relationshipPathName:'flashID' });
 var Report = mongoose.model('Report', reportSchema);
 
 app.db = {

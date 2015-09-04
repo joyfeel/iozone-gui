@@ -1,21 +1,168 @@
 'use strict';
 
-var childProcess = require('child_process');
 var events = require('events');
-
-var xlsx = require('node-xlsx');
-//Store the parsed data
-var dataFolder = './statistical/';
 
 function process (req, res) {
 	var workflow = new events.EventEmitter();
-	var measuredata = [];
+	var resArray = [];
 
 	workflow.outcome = {
 	    success: false,
 	    errfor: {}
 	};
 
+	workflow.on('validation', function(req, res) {
+	    console.log('validation');
+	    var ReportModel = req.app.db.model.Report;
+
+	    ReportModel.find({}, function (err, reports) {
+	    	if (err) {
+	    		workflow.outcome.success = false;
+	    		workflow.outcome.errfor.info = 'DB error';
+	    		workflow.emit('response', req, res);	    
+	    	} 
+
+	    	if (reports.length === 0) {
+	    		workflow.outcome.success = false;
+	    		workflow.outcome.errfor.info = 'You must at least test one device';
+	    		workflow.emit('response', req, res);	    		
+	    	} else {
+	    		reports.forEach(function (report) {
+	    			var objTemp = {};
+	    			objTemp = {
+			    		devicename: 	report.devicename,
+				        reportname: 	report.reportname,
+				        description: 	report.description,
+				        testmodetext: 	report.testmodetext,
+				        filesize: 		report.filesize,
+				        recordsize: 	report.recordsize,
+				        measuredata:  	report.measuredata		
+	    			};
+	    			resArray.push(objTemp);
+	    		});
+	    		console.log('Here!!!!!@@');
+	    		console.log(resArray);
+
+	    		workflow.outcome.success = true;
+        		workflow.emit('response', req, res);		
+	    	}
+	    	
+	    });
+	});
+
+	/*
+var reportSchema = new Schema({
+	devicename: { type: String },
+	reportname: { type: String},
+	description: { type: String },
+	testmodetext: { type: String },
+	filesize: { type: String },
+	recordsize: {type: String},
+    measuredata: { type : Array , "default" : [] },
+	emmcID: { type:Schema.ObjectId, ref:"Emmc", childPath:"reports" },
+	flasheID: { type:Schema.ObjectId, ref:"Flash", childPath:"reports" }
+});
+	*/
+
+	workflow.on('response', function(req, res) {
+	    console.log('response');
+
+	    if (workflow.outcome.success) {
+	    	return res.status(200).send(resArray);
+	    	/*
+	    	return res.status(200).send([{
+	    		devicename: 'D1/20150830/2CE/Meow/Hynix/7ddl',
+		        reportname: 'Test case 1',
+		        description: 'This is an urgent case',
+		        testmodetext: 'write/re-write',
+		        filesize: '128m',
+		        recordsize: '512k',
+		        measuredata:[  
+		          [99, 20],
+		          [490, 90],
+		          [250, 50],
+		          [100, 33],
+		          [330, 95],
+		          [410, 12],
+		          [475, 44],
+		          [25, 67],
+		          [85, 21],
+		          [220, 88],
+		          [500, 150]
+		        ]
+		    },{
+	    		devicename: 'D1/20150830/2CE/Meow/Hynix/7ddl',
+		        reportname: 'Test case 1',
+		        description: 'This is an urgent case',
+		        testmodetext: 'write/re-write',
+		        filesize: '128m',
+		        recordsize: '512k',
+		        measuredata:[  
+		          [5, 20],
+		          [490, 90],
+		          [250, 50],
+		          [100, 33],
+		          [330, 95],
+		          [410, 12],
+		          [475, 44],
+		          [25, 67],
+		          [85, 21],
+		          [220, 88],
+		          [500, 150]
+		        ]
+		    },{
+	    		devicename: 'D1/20150830/2CE/Meow/Hynix/7ddl',
+		        reportname: 'Test case 1',
+		        description: 'This is an urgent case',
+		        testmodetext: 'write/re-write',
+		        filesize: '128m',
+		        recordsize: '512k',
+		        measuredata:[  
+		          [5, 20],
+		          [490, 90],
+		          [250, 50],
+		          [100, 33],
+		          [330, 95],
+		          [410, 12],
+		          [475, 44],
+		          [25, 67],
+		          [85, 21],
+		          [220, 88],
+		          [500, 150]
+		        ]
+		    },{
+	    		devicename: 'D1/20150830/2CE/Meow/Hynix/7ddl',
+		        reportname: 'Test case 1',
+		        description: 'This is an urgent case',
+		        testmodetext: 'write/re-write',
+		        filesize: '128m',
+		        recordsize: '512k',
+		        measuredata:[  
+		          [5, 20],
+		          [490, 90],
+		          [250, 50],
+		          [100, 33],
+		          [330, 95],
+		          [410, 12],
+		          [475, 44],
+		          [25, 67],
+		          [85, 21],
+		          [220, 88],
+		          [500, 150]
+		        ]
+		    }]);
+			*/
+	    } else {
+	    	return res.status(500).send(workflow.outcome);
+	    } 
+	});	
+
+	workflow.emit('validation', req, res);
+}
+
+exports.process = process;
+
+/*
 	workflow.on('validation', function(req, res) {
 	    console.log('validation');
 
@@ -105,8 +252,7 @@ function process (req, res) {
 			speedStart = obj[0].data[1];
 
 		for (i = 0 + 1; i < Math.min(speedLength, recLength); i++) {
-			//measuredata.push({rec: recStart[i], speed: speedStart[i]});
-			measuredata.push([recStart[i], speedStart[i]]);
+			measuredata.push({rec: recStart[i], speed: speedStart[i]});
 		}
 
 		self.emit('saveDB', res, req, reportname);
@@ -127,8 +273,8 @@ function process (req, res) {
 			filesize: req.body.filesize,
 			recordsize: req.body.recordsize,
 			measuredata: measuredata,
-			emmcID: req.body.emmcID,
-			flashID: req.body.flashID
+			emmcs: req.body.emmcID,
+			flashes: req.body.flashID
 		});
 
 		reportInstance.save(function (err, newEmmc) {
@@ -172,8 +318,4 @@ function process (req, res) {
 	    	return res.status(500).send(workflow.outcome);
 	    }
 	});
-
-	workflow.emit('validation', req, res);
-}
-
-exports.process = process;
+*/

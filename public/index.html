@@ -4,7 +4,7 @@
 	<link rel="stylesheet" href="javascripts/bower_components/bootstrap/dist/css/bootstrap.css">
 	<link rel="stylesheet" href="stylesheets/style.css">
 
-	<link rel="stylesheet" href="/node_modules/sweetalert/dist/sweetalert.css">
+	<link rel="stylesheet" href="bower_components/sweetalert/dist/sweetalert.css">
 
 </head>
 <body>
@@ -32,9 +32,9 @@
 		<div class="row">
 			<form class="form-horizontal" method="post">
 				<div class="form-group">
-					<label for="ic-version" class="col-sm-2 control-label">IC Version</label>
+					<label for="icVersion" class="col-sm-2 control-label">IC Version</label>
 					<div class="col-sm-6">
-						<select class="form-control" id="ic-version" name="ic-version">
+						<select class="form-control" id="icVersion" name="icVersion">
 							<option value="A">A</option>
 							<option value="B">B</option>
 							<option value="C">C</option>
@@ -52,10 +52,10 @@
 					</div>
 				</div>			
 				<div class="form-group">
-					<label for="firmware-version" class="col-sm-2 control-label">Firmware Version</label>
+					<label for="firmwareVersion" class="col-sm-2 control-label">Firmware Version</label>
 					<div class="col-sm-6">
 
-						<select class="form-control" id="firmware-version" name="firmware-version">
+						<select class="form-control" id="firmwareVersion" name="firmwareVersion">
 							<option value="20150828">20150828</option>
 							<option value="20150829">20150829</option>
 							<option selected="selected" value="20150830">20150830</option>
@@ -82,9 +82,9 @@
 					</div>
 				</div>
 				<div class="form-group">
-					<label for="flash-company" class="col-sm-2 control-label">Flash Company</label>
+					<label for="flashCompany" class="col-sm-2 control-label">Flash Company</label>
 					<div class="col-sm-6">
-						<select class="form-control" id="flash-company" name="flash-company">
+						<select class="form-control" id="flashCompany" name="flashCompany">
 							<option value="Toshiba">Toshiba</option>
 							<option selected="selected" value="Hynix">Hynix</option>
 							<option value="Sandisk">Sandisk</option>
@@ -93,9 +93,9 @@
 					</div>
 				</div>				
 				<div class="form-group">
-					<label for="flash-id" class="col-sm-2 control-label">Flash ID</label>
+					<label for="flashID" class="col-sm-2 control-label">Flash ID</label>
 					<div class="col-sm-6">
-						<select class="form-control" id="flash-id" name="flash-id">
+						<select class="form-control" id="flashID" name="flashID">
 							<option value="6ddl">6ddl</option>
 							<option selected="selected" value="7ddl">7ddl</option>
 							<option value="8ddl">8ddl</option>
@@ -112,9 +112,6 @@
 						<button type="submit" class="btn btn-primary btn-register">
 							<span class= "glyphicon glyphicon-send"></span> Register
 						</button>
-						<button type="submit" class="btn btn-warning btn-register-error">
-							<span class= "glyphicon glyphicon-warning-sign"></span> Error
-						</button>
 					</div>
 				</div>				
 			</form>
@@ -129,7 +126,7 @@
 					<div class="col-sm-6">
 						<select class="form-control" id="device" name="device">
 							<% _.each(devices, function(device) { %>
-								<option value='<%=JSON.stringify(device.test)%>'><%=device.emmc_content%></option>
+								<option value='<%=JSON.stringify(device.test)%>'><%=device.emmcContent%></option>
 							<% }); %>
 						</select>					
 					</div>
@@ -211,7 +208,16 @@
 							<button type="submit" class="btn btn-warning btn-contact-error">
 								<span class= "glyphicon glyphicon-warning-sign"></span> Error
 							</button>
+
+		devicename: '',
+		reportname: '',
+		description: '',
+		testmodetext: '',
+		filesize: '',
+		recordsize: '',
+		measuredata: []
 						-->
+
 
 	<script type="text/template" id="iozone-result-sub-template">
 			<div class="col-sm-6 col-md-4">
@@ -219,9 +225,10 @@
 					<div class = 'myd3-line-chart'>
 					</div>
 					<div class="caption">
-						<h3><%= reportname %></h3>
-						<h4><p>Description: <%= description %></p></h4>
-						<h5><p>Testmode: <%= testmode %></p></h5>
+						<h3><%= devicename %></h3>
+						<h4><%= reportname %></h4>
+						<h5><p>Description: <%= description %></p></h5>
+						<p>Testmode: <%= testmodetext %></p>
 						<p>FileSize: <%= filesize %></p>
 						<p>RecordSize: <%= recordsize %></p>
 
@@ -271,10 +278,12 @@
 	<script src="javascripts/bower_components/backbone/backbone.js"></script>
 
 	<script src="javascripts/bower_components/bootstrap/dist/js/bootstrap.js"></script>	
+
+	<script src="javascripts/bower_components/bootstrap/dist/js/bootstrap.js"></script>	
+
+	<script src="bower_components/sweetalert/dist/sweetalert.min.js"></script>
+
 	<script src="javascripts/dist/script.min.js"></script>
-
- 	<script src="/node_modules/sweetalert/dist/sweetalert.min.js"></script>
-
 
 	<script>document.write('<script src="http://' + (location.host || 'localhost')
 .split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>')</script>

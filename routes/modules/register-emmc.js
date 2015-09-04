@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var events = require('events');
 var workflow = new events.EventEmitter();
@@ -9,57 +9,56 @@ workflow.outcome = {
 };
 
 workflow.on('validation', function(req, res) {
-	console.log("Flow validation");
+	console.log('Flow validation');
 
-	var self = this;
 	var EmmcModel = req.app.db.model.Emmc,
 		FlashModel = req.app.db.model.Flash;
 
 	var emmcInstance = new EmmcModel({
-		firmware_version: req.body.firmware_version,
-		IC_version: req.body.ic_version,
+		firmwareVersion: req.body.firmwareVersion,
+		icVersion: req.body.icVersion,
 		plant: req.body.plant,
 		factory: req.body.factory
 	});
 
 	var flashInstance = new FlashModel({
-		flashID: req.body.flash_id,
-		company: req.body.flash_company
+		flashID: req.body.flashID,
+		company: req.body.flashCompany
 	});
 
 	EmmcModel.findOne({
-		firmware_version: req.body.firmware_version,
-		IC_version: req.body.ic_version,
+		firmwareVersion: req.body.firmwareVersion,
+		icVersion: req.body.icVersion,
 		plant: req.body.plant,
 		factory: req.body.factory
 	}, function (err, emmc) {
 		if (err) {
-			return res.status(500).json({status:"not ok"})
+			return res.status(500).json({status:'not ok'});
 		}
 		if (emmc == null) {
-			emmcInstance.save(function(err, new_emmc) {
+			emmcInstance.save(function(err, newEmmc) {
 				FlashModel.findOne({
-					flashID: req.body.flash_id,
-					company: req.body.flash_company
+					flashID: req.body.flashID,
+					company: req.body.flashCompany
 				}, function (err, flash) {
 					if (err) {
-						return res.status(500).json({status:"not ok"})
+						return res.status(500).json({status:'not ok'});
 					}					
 					if (flash == null) {
 						flashInstance.emmcs.push(emmcInstance);
 						flashInstance.save();
 					} else {
 					     EmmcModel.findByIdAndUpdate (
-					     	new_emmc._id, 
-					     	{ $push: { "flashes": flash } },
+					     	newEmmc._id, 
+					     	{ $push: { 'flashes': flash } },
 					    	{ safe: true, upsert: true },
-					       	function(err, find_emmc) {	         					         
+					       	function(err, findEmmc) {	         					         
 					        	FlashModel.findByIdAndUpdate (flash._id, 
-				        			{ $push: {"emmcs": find_emmc} }, 
+				        			{ $push: {'emmcs': findEmmc} }, 
 				        			{  safe: true, upsert: true }, 
 				        			function (err, lol) {
 				     	 				if (err) {
-				     	 					return res.status(500).json({status:"not ok"})
+				     	 					return res.status(500).json({status:'not ok'});
 				     	 				} else {
 				     	 					console.log('lol');
 				     	 				}
@@ -71,11 +70,11 @@ workflow.on('validation', function(req, res) {
 			});
 		} else {
 			FlashModel.findOne({
-				flashID: req.body.flash_id,
-				company: req.body.flash_company
+				flashID: req.body.flashID,
+				company: req.body.flashCompany
 			}, function (err, flash) {
  				if (err) {
- 					return res.status(500).json({status:"not ok"})
+ 					return res.status(500).json({status:'not ok'});
  				}				
 				if (flash == null) {
 					flashInstance.emmcs.push(emmc);
@@ -84,15 +83,15 @@ workflow.on('validation', function(req, res) {
 					//Update
 				     EmmcModel.findByIdAndUpdate (
 				     	emmc._id, 
-				     	{ $addToSet: { "flashes": flash } },
+				     	{ $addToSet: { 'flashes': flash } },
 				    	{ safe: true, upsert: true, unique: true},
-				       	function(err, find_emmc) {	         					         
+				       	function(err, findEmmc) {	         					         
 				        	FlashModel.findByIdAndUpdate (flash._id, 
-			        			{ $addToSet: {"emmcs": find_emmc} }, 
+			        			{ $addToSet: {'emmcs': findEmmc} }, 
 			        			{  safe: true, upsert: true, unique: true}, 
 			        			function (err, lol) {
 			     	 				if (err) {
-			     	 					return res.status(500).json({status:"not ok"})
+			     	 					return res.status(500).json({status:'not ok'});
 			     	 				} else {
 			     	 					console.log('lol');
 			     	 				}
@@ -108,13 +107,12 @@ workflow.on('validation', function(req, res) {
 });
 
 workflow.on('response', function(req, res) {
-	console.log("Response");
+	console.log('Response');
 
-	return res.status(200).json({status:"ok"});
+	return res.status(200).json({status:'ok'});
 });
 
 function store (req, res) {
-	console.log("Flow start");
 	return workflow.emit('validation', req, res);
 }
 

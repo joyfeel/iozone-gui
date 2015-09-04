@@ -1,11 +1,11 @@
-"use strict";
+'use strict';
 
 var events = require('events');
 
 
 function get (req, res) {
 	var workflow = new events.EventEmitter();
-	var device_content_array = [];
+	var deviceContentArray = [];
 
 	workflow.outcome = {
 	    success: false,
@@ -13,32 +13,31 @@ function get (req, res) {
 	};
 
 	workflow.on('readDB', function (req, res) {
-		var EmmcModel = req.app.db.model.Emmc,
-			FlashModel = req.app.db.model.Flash;
+		var EmmcModel = req.app.db.model.Emmc;
 
 		EmmcModel.find({})
 			.populate('flashes')
 			.exec(function(err, emmcs) {
 			 	emmcs.forEach(function (emmc) {
-			 		var emmc_info = emmc.IC_version + '/' +
-			 						emmc.firmware_version + '/' +
+			 		var emmcInfo = emmc.icVersion + '/' +
+			 						emmc.firmwareVersion + '/' +
 			 						emmc.plant + 'CE/' + 
 			 						emmc.factory + '/';
 
 					emmc.flashes.forEach(function (flash) {
-						var tmp_object = {},
-				 			flash_info = flash.company + '/' + flash.flashID,
-				 			device_info = emmc_info + flash_info;
+						var tmpObject = {},
+				 			flashInfo = flash.company + '/' + flash.flashID,
+				 			deviceInfo = emmcInfo + flashInfo;
 						
-				 		tmp_object = {
+				 		tmpObject = {
 				 			test: {
-				 				flash_id : flash._id,	
-				 				emmc_id : emmc._id
+				 				flashID : flash._id,	
+				 				emmcID : emmc._id
 				 			},
-				 			emmc_content : device_info
+				 			emmcContent : deviceInfo
 				 		};
 
-				 		device_content_array.push(tmp_object);
+				 		deviceContentArray.push(tmpObject);
 					});
 			 	});
 
@@ -48,7 +47,7 @@ function get (req, res) {
 
 	workflow.on('response', function (req, res) {
 		return res.status(200).json({
-			devices: device_content_array
+			devices: deviceContentArray
 		});
 	});
 
