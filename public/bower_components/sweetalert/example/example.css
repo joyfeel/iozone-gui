@@ -89,7 +89,7 @@ p {
       color: #323131; }
 
 button, .button {
-  background-color: #AEDEF4;
+  background-color: #aedef4;
   color: white;
   border: none;
   box-shadow: none;
@@ -107,7 +107,7 @@ button, .button {
   button:active, .button:active {
     background-color: #81ccee; }
   button.cancel, .button.cancel {
-    background-color: #D0D0D0; }
+    background-color: #d0d0d0; }
     button.cancel:hover, .button.cancel:hover {
       background-color: #c8c8c8; }
     button.cancel:active, .button.cancel:active {
@@ -398,13 +398,13 @@ footer {
     .sweet-alert.twitter button.cancel {
       color: #66757e;
       background-color: #f5f8fa;
-      background-image: linear-gradient(#fff, #f5f8fa);
+      background-image: linear-gradient(white, #f5f8fa);
       text-shadow: 0px -1px 0px white;
       margin-right: 9px;
       border: 1px solid #e1e8ed; }
       .sweet-alert.twitter button.cancel:hover, .sweet-alert.twitter button.cancel:focus:hover {
         background-color: #e1e8ed;
-        background-image: linear-gradient(#fff, #e1e8ed);
+        background-image: linear-gradient(white, #e1e8ed);
         -ms-filter: "progid:DXImageTransform.Microsoft.gradient(enabled=false)";
         border-color: #e1e8ed; }
       .sweet-alert.twitter button.cancel:focus {

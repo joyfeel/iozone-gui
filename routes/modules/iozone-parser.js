@@ -38,6 +38,9 @@ function process (req, res) {
 		var self = this;
 		var reportname = dataFolder + req.body.reportname;
 
+		//For MAC
+		//childProcess.exec('iozone -I -f /mmc/tmp -a ' +
+		//For Ubuntu
 		childProcess.exec('iozone3_430_Native/iozone -I -f /mmc/tmp -a ' +
 				req.body.testmode + ' -s ' + req.body.filesize	+
 				' -y 4k -q ' + req.body.recordsize +
@@ -54,6 +57,7 @@ function process (req, res) {
 					}
 				}
 		);
+
 	});
 
 	workflow.on('convert_csv', function(res, req, reportname) {
@@ -101,9 +105,11 @@ function process (req, res) {
 		var recLength = obj[0].data[0].length,
 			speedLength = obj[0].data[1].length;
 
+		var speedStart = obj[0].data[1];
+/*
 		var recStart = obj[0].data[0],
 			speedStart = obj[0].data[1];
-
+*/
 		for (i = 0 + 1; i < Math.min(speedLength, recLength); i++) {
 			//measuredata.push([recStart[i], speedStart[i]]);
 			measuredata.push(speedStart[i]);

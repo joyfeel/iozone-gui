@@ -10,7 +10,7 @@ var template = function(id) {
 
 app.IozoneInput = Backbone.Model.extend({
 	url: function() {
-		return 'http://10.5.48.1:3000/iozone-input' +
+		return 'http://localhost:3000/iozone-input' +
 					(this.id === null ? '' : '/' + this.id);
 	},
 	id: null,
@@ -31,7 +31,7 @@ app.IozoneInput = Backbone.Model.extend({
 });
 
 app.IozoneReport = Backbone.Model.extend({
-	urlRoot: 'http://10.5.48.1:3000/iozone-report',
+	urlRoot: 'http://localhost:3000/iozone-report',
 	//id: null,
 	defaults: {
 		id: null,
@@ -55,7 +55,7 @@ app.IozoneReportCollection = Backbone.Collection.extend({
 	},
 	*/
 	url: function() {
-		return 'http://10.5.48.1:3000/iozone-report';		
+		return 'http://localhost:3000/iozone-report';		
 	},	
 	model: app.IozoneReport	
 });
@@ -435,7 +435,7 @@ app.IozoneInputView = Backbone.View.extend({
 
 app.IozoneRegister = Backbone.Model.extend({
 	url: function() {
-		return 'http://10.5.48.1:3000/iozone-register' +
+		return 'http://localhost:3000/iozone-register' +
 					(this.id === null ? '' : '/' + this.id);
 	},
 	id: null,
