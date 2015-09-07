@@ -10,7 +10,7 @@ var template = function(id) {
 
 app.IozoneInput = Backbone.Model.extend({
 	url: function() {
-		return 'http://localhost:3000/iozone-input' +
+		return 'http://10.5.48.1:3000/iozone-input' +
 					(this.id === null ? '' : '/' + this.id);
 	},
 	id: null,
@@ -31,13 +31,10 @@ app.IozoneInput = Backbone.Model.extend({
 });
 
 app.IozoneReport = Backbone.Model.extend({
-	urlRoot: function() {
-		return 'http://localhost:3000/iozone-report' +
-					(this.id === null ? '' : '/' + this.id);
-	},
-	id: null,
-	idAttribute: '',
+	urlRoot: 'http://10.5.48.1:3000/iozone-report',
+	//id: null,
 	defaults: {
+		id: null,
 		reportID: '',
 		devicename: '',
 		reportname: '',
@@ -50,12 +47,17 @@ app.IozoneReport = Backbone.Model.extend({
 });
 
 app.IozoneReportCollection = Backbone.Collection.extend({
-	model: app.IozoneReport,
+	
+	/*
 	url: function() {
 		return 'http://localhost:3000/iozone-report' +
 					(this.id === null ? '' : '/' + this.id);		
 	},
-	id: null
+	*/
+	url: function() {
+		return 'http://10.5.48.1:3000/iozone-report';		
+	},	
+	model: app.IozoneReport	
 });
 
 app.Router = Backbone.Router.extend({
@@ -99,20 +101,68 @@ app.IozoneItemView = Backbone.View.extend({
 		'click .btn-delete-report': 'delete'
 	},
 	template: template('iozone-result-sub-template'),
-	initialize: function () {
-		//this.model.on('remove', this.render);
-		//this.render();
-	},
 	render: function() {
 		this.$el.html(this.template(this.model.toJSON()));
 
-		this.d3LineChart(this.model.get('measuredata'));
+		this.d3LineChart(this.model.get('devicename'), this.model.get('measuredata'), this.model.get('reportname'));
 
 		this.parentView.$el.find('.chart-row').append( this.$el );
 
 		return this;
 	},
-	d3LineChart: function(data) {
+	d3LineChart: function(devicename, measuredata, reportname) {
+		//this.$el.('.myd3-line-chart')
+
+		this.$el.find('.myd3-line-chart').highcharts({
+	        title: {
+	            text: devicename,
+	            x: -20 //center
+	        },
+	        xAxis: {
+	            categories: ['4', '8', '16', '32', '64', '128',
+	                '256', '512']
+	        },
+	        yAxis: {
+	            title: {
+	                text: 'Speed (kB/sec)'
+	            },
+	            plotLines: [{
+	                value: 0,
+	                width: 1,
+	                color: '#808080'
+	            }]
+	        },
+	        tooltip: {
+	            //valueSuffix: 'kB/sec'
+	            crosshairs: true,
+	            formatter: function () {
+	            	return 'Speed for <b>' + this.x + 'k</b> is <b>' + this.y + '</b>';
+	            }
+	        },
+	        legend: {
+	            layout: 'vertical',
+	            align: 'right',
+	            verticalAlign: 'middle',
+	            borderWidth: 0
+	        },
+	        series: [{
+	            name: reportname,
+	            data: measuredata
+	        }],
+	        credits: {
+      			enabled: false
+  			},
+  			exporting: {
+  				filename: reportname
+  			},
+  			chart: {
+ 				borderColor: '#EBBA95',
+            	borderWidth: 2,
+			    polar: true,
+			    type: 'line'
+			 }
+	    });
+		/*
 		var w = 500,
 			h = 300,
 		    padding = 30;
@@ -197,127 +247,47 @@ app.IozoneItemView = Backbone.View.extend({
 			.attr('class', 'axis')
 			.attr('transform', 'translate('+padding+', 0)')
 			.call(yAxis);
+		*/
 	},
 	delete: function (e) {
         // now that we need to know, we can just check that attribute
-
         e.preventDefault();
+
         var id = $(e.target).data('id');
-        //console.log('@@@@@@@@@@@id!');
-        this.model.id = id;
-        this.model.idAttribute = id;
-        console.log(this.model);
-        this.model.destroy({
-    		success: function (model, response, options) {
-            	//swal('Meow!', 'You can view the report of performance test', 'success');
-            	//self.render();
-            	console.log('YYYYYYY');
-        	},
-        	error: function (model, response, options) {
-				//var responseObj = JSON.parse(response.responseText);
-				console.log('NNNNNNN');
-        		//swal('No report!', responseObj.errfor.info, 'error');	
-        	}
-        });
-        
+        var self = this;
+
+
+		swal({   title: 'Are you sure?',   
+			text: 'You will not be able to recover this report!',   
+			type: 'warning',   showCancelButton: true,   confirmButtonColor: '#DD6B55',   
+			confirmButtonText: 'Yes, delete it!',   closeOnConfirm: false }, 
+			function () {   
+		        self.model.attributes.id = id;
+		        console.log(self.model);
+
+		        self.model.destroy({
+		    		success: function () {
+		            	swal('Deleted!', 'Your report file has been deleted.', 'success'); 
+		        	},
+		        	error: function (model, response, options) {
+						var responseObj = JSON.parse(response.responseText);
+		        		swal('No report!', responseObj.errfor.info, 'error');	
+
+		        		//swal("Error!", "Your report file has been deleted.", "success"); 
+		        	}        	
+		        });				
+				
+			});
+
+
+		   
     }
 });
-/*
-app.IozoneInputView = Backbone.View.extend({
-	el: '#global-div',
-	events: {
-		'click .btn-contact-save': 'save',
-		'click .btn-contact-error': 'error_handle'
-	},
-	template: template('iozone-input-template'),
-	initialize: function() {
-		_.bindAll(this, 'render');
-
-		this.model = new app.IozoneInput();
-		//this.model.bind('remove', this.render, this);	
-		//this.listenTo(this.model, 'change', this.render, this);
-
-		//Render 1 times
-		this.model.set('name', moments(new Date()));
-		this.render();
-	},
-	render: function() {
-		console.log("render!!!");
-		this.$el.html(this.template(this.model.toJSON()));
-		this.$el.find('.btn-contact-error').hide();
-
-		return this;
-	},
-	save: function(e) {
-		var self = this,
-			reportname = this.$el.find('input[name="name"]').val(),
-		    email = this.$el.find('input[name="email"]').val(),
-			description = this.$el.find('textarea[name="description"]').val(),
-			filesize = this.$el.find('select[name="filesize"]').val(),
-			testmode = this.$el.find('select[name="testmode"]').val();
-
- 		e.preventDefault();
-        e.stopPropagation();
-
-		//this.$el.off('click', '.btn-contact-save');
-		//this.events["click .btn-contact-save"] = undefined;
-        //$(this.el).undelegate('.btn-contact-save', 'click');
-
-		console.log(filesize.val());
-		console.log(filesize.text());
-
-		console.log(testmode.val());
-		console.log(testmode.text());
-	
-		//this.$el.find('button[type="submit"]').button('loading');
-
-		//!!!! this.$el.find('button[type="submit"]').prop('disabled', true);
-		this.$el.find('.btn-contact-save').prop('disabled', true);
-		this.$el.find('.btn-contact-save').addClass('disabled').text('Loading...');
-
-		this.model.save({
-			reportname: reportname,
-			email: email,
-			description: description,
-			filesize: filesize,
-			testmode: testmode
-		}, {
-			success: function(model, response, options) {
-				console.log("Successfully save");	
-				self.model.set('name', moments(new Date()));
-				//Render 2 times
-				self.render();
-			}, 
-			error: function(model, response, options) {
-				self.$el.find('.btn-contact-error').show();
-				self.$el.find('.btn-contact-save').hide();
-				console.log(response);
-				console.log("Error save");
-			}
-		});
-	},
-	error_handle: function (e) {
-		e.preventDefault();
-        e.stopPropagation();
-		alert('Need to mount the device');
-		//this.$el.find('.btn-contact-error').hide();
-		this.model.set('name', moments(new Date()));
-		this.render();
-	},
-	remove: function() {
-		//this.model.destroy();
-    	this.$el.empty();
-    	this.undelegateEvents();
-    	return this;
-	}
-});
-*/
 
 app.IozoneResultView = Backbone.View.extend({
 	el: '#global-div',
 	events: {
 		'click .checkbox': 'compare'
-		//'click .btn-delete-report': 'delete'
 	},
 	template: template('iozone-result-template'),
 	initialize: function() {
@@ -372,123 +342,6 @@ app.IozoneResultView = Backbone.View.extend({
 	}
 });
 
-
-/*
-app.IozoneResultView = Backbone.View.extend({
-	el: '#global-div',
-	template: template('iozone-result-template'),
-	initialize: function() {
-		//_.bindAll(this, 'render');
-
-		this.model = new app.IozoneInput();
-		this.listenTo(this.model, 'change', this.render, this);
-		//this.model.bind('change', this.render);	
-		this.render();
-		this.model.fetch();  
-	},
-	render: function() {
-		this.d3_line_chart(this.model.get('data'));
-
-		return this;
-	},
-	d3_line_chart: function(data) {
-		var w = 500;
-		var h = 300;
-		var padding = 30;
-
-		var xScale = d3.scale.linear()
-							 .domain([0, d3.max(data, function(d) {
-							     return d[0];
-							 })])
-							 .range([padding, w - padding*2]);
-
-		var yScale = d3.scale.linear()
-							 .domain([0, d3.max(data, function(d) {
-							     return d[1];
-							 })])
-							 .range([h - padding, padding]);
-
-		var rScale = d3.scale.linear()
-							 .domain([0, d3.max(data, function(d) {
-							     return d[1];
-							 })])
-							 .range([2, 5]);
-
-
-		var xAxis = d3.svg.axis()
-						  .scale(xScale)
-						  .orient('bottom')
-						  .ticks(5);
-
-		var yAxis = d3.svg.axis()
-						  .scale(yScale)
-						  .orient('left')
-						  .ticks(5);
-//self.$el.find('.btn-contact-error').show();
-		var svg = d3.select(this.el).html(this.template(this.model.toJSON))
-					.append('svg')
-					.attr({
-						width: w,
-						height: h
-					});
-
-			svg.selectAll('circle')
-			   .data(data)
-			   .enter()
-			   .append('circle')
-			   .attr({
-			       cx: function(d) {	
-			           return xScale(d[0]);	
-			       }, 
-			       cy: function(d) {	
-			           return yScale(d[1]);	
-			       }, 
-			       r: function(d) {			
-			           //return Math.sqrt(h - d[1]);
-			           //return Math.sqrt((h - d[1])/Math.PI);
-			           return rScale(d[1]);
-			       }
-			   });
-
-			svg.selectAll('text')
-			   .data(data)
-			   .enter()
-			   .append('text')
-			   .text(function(d) {
-			       return d[0] + ',' + d[1];	
-			   })
-			   .attr({
-			       x: function(d) {
-			           return xScale(d[0]);
-			       },
-			       y: function(d) {
-			           return yScale(d[1]);
-			       },
-			       'font-family': 'sans-serif',
-			       'font-size': '12px',
-			       'fill': 'green'
-			   });
-
-
-		//svg.append('g').call(xAxis);
-		svg.append('g')
-			.attr('class', 'axis')
-			.attr('transform', 'translate(0,  '+(h - padding)+')')
-			.call(xAxis);
-
-		svg.append('g')
-			.attr('class', 'axis')
-			.attr('transform', 'translate('+padding+', 0)')
-			.call(yAxis);
-
-	},
-	remove: function() {
-    	this.$el.empty();
-    	this.undelegateEvents();
-    	return this;
-	}
-});
-*/
 
 app.IozoneInputView = Backbone.View.extend({
 	el: '#global-div',
@@ -582,7 +435,7 @@ app.IozoneInputView = Backbone.View.extend({
 
 app.IozoneRegister = Backbone.Model.extend({
 	url: function() {
-		return 'http://localhost:3000/iozone-register' +
+		return 'http://10.5.48.1:3000/iozone-register' +
 					(this.id === null ? '' : '/' + this.id);
 	},
 	id: null,

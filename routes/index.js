@@ -15,6 +15,14 @@ var getReport = require('./modules/get-report.js');
 //res.status(500).json({status:"not ok"})
 
 
+/* GET home page. */
+router.get('/', function(req, res, next) {
+  
+    res.redirect('/public/index.html');
+});
+
+
+
 router.post('/iozone-register', function(req, res, next) {
     console.log('Register...');
 
@@ -46,28 +54,41 @@ router.get('/iozone-report', function(req, res, next) {
 
 
 router.delete('/iozone-report/:id', function(req, res, next) {
-  console.log('YAlkjdlkajsdlsakd');
+    var outcome = {
+        success: false,
+        errfor: {}
+    };
 
-/*
-  req.app.db.model.Post.findByIdAndRemove(req.params.id, function(err, posts) {
-    res.json(posts);
-  });
-*/
+    var ReportModel = req.app.db.model.Report;
+
+    ReportModel.findByIdAndRemove(req.params.id, function(err, report) {
+        if (err) {
+            outcome.errfor.info = 'DB: Delete the report error';
+            return res.status(500).send(outcome);
+        } else {
+            console.log(report);
+            outcome.success = true;
+            return res.status(200).send(outcome);                
+        }
+    });
+
 });
 
-
-/* GET home page. */
-router.get('/', function(req, res, next) {
-  
-    res.redirect('/public/index.html');
+router.post('/iozone-report', function(req, res, next) {
+  console.log('Save ok!');
 });
 
+router.post('/iozone-report/:id', function(req, res, next) {
+  console.log('Save ok222222222???!');
+});
 
+router.put('/iozone-report/:id', function(req, res, next) {
+    console.log('Put ok!');
+});
 
 router.get('/chatroom', function(req, res, next) {
     res.render('chatroom');
 });
-
 
 router.post('/123/contact/1', function(req, res, next) {
   console.log('backend 1@@!!!');

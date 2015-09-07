@@ -105,8 +105,8 @@ function process (req, res) {
 			speedStart = obj[0].data[1];
 
 		for (i = 0 + 1; i < Math.min(speedLength, recLength); i++) {
-			//measuredata.push({rec: recStart[i], speed: speedStart[i]});
-			measuredata.push([recStart[i], speedStart[i]]);
+			//measuredata.push([recStart[i], speedStart[i]]);
+			measuredata.push(speedStart[i]);
 		}
 
 		self.emit('saveDB', res, req, reportname);
