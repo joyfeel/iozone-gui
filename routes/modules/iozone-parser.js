@@ -39,9 +39,9 @@ function process (req, res) {
 		var reportname = dataFolder + req.body.reportname;
 
 		//For MAC
-		//childProcess.exec('iozone -I -f /mmc/tmp -a ' +
+		childProcess.exec('iozone -I -f /mmc/tmp -a ' +
 		//For Ubuntu
-		childProcess.exec('iozone3_430_Native/iozone -I -f /mmc/tmp -a ' +
+		//childProcess.exec('iozone3_430_Native/iozone -I -f /mmc/tmp -a ' +
 				req.body.testmode + ' -s ' + req.body.filesize	+
 				' -y 4k -q ' + req.body.recordsize +
 				' -b ' + reportname + '.xlsx',
@@ -100,16 +100,43 @@ function process (req, res) {
 	workflow.on('iozone-parser', function(res, req, reportname) {
 		var obj = xlsx.parse(reportname + '_convert_xlsx.xlsx'),
 			i,
+			speedStart,
 			self = this;
+
+		console.log(obj);
+
+		console.log(JSON.stringify(obj));
 
 		var recLength = obj[0].data[0].length,
 			speedLength = obj[0].data[1].length;
 
-		var speedStart = obj[0].data[1];
+		switch (req.body.testmodetext) {
+			case 'write':
+				speedStart = obj[0].data[1];
+				break;
+			case 're-write':
+				speedStart = obj[0].data[4];
+				break;
+			case 'read':
+				speedStart = obj[0].data[7];
+				break;
+			case 're-read':
+				speedStart = obj[0].data[10];
+				break;
+			case 'random-read':
+				speedStart = obj[0].data[7];
+				break;
+			case 'random-write':
+				speedStart = obj[0].data[10];
+				break;																				
+		}
+
+		//var speedStart = obj[0].data[1];
 /*
 		var recStart = obj[0].data[0],
 			speedStart = obj[0].data[1];
 */
+		//The first data is always 4096
 		for (i = 0 + 1; i < Math.min(speedLength, recLength); i++) {
 			//measuredata.push([recStart[i], speedStart[i]]);
 			measuredata.push(speedStart[i]);
@@ -164,7 +191,6 @@ function process (req, res) {
 					workflow.outcome.success = false;
 					self.emit('response', res);
 				} 
-				console.log('Remove file OK!');
 				workflow.outcome.success = true;
 				self.emit('response', res);
 			}
