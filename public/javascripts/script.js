@@ -31,7 +31,7 @@ app.IozoneInput = Backbone.Model.extend({
 });
 
 app.IozoneReport = Backbone.Model.extend({
-	urlRoot: 'http://localhost:3000/iozone-report',
+	urlRoot: '',
 	//id: null,
 	defaults: {
 		id: null,
@@ -48,24 +48,27 @@ app.IozoneReport = Backbone.Model.extend({
 
 app.IozoneReportCollection = Backbone.Collection.extend({
 	
-	/*
+	
 	url: function() {
 		return 'http://localhost:3000/iozone-report' +
 					(this.id === null ? '' : '/' + this.id);		
 	},
-	*/
+	id: null,
+	/*
 	url: function() {
 		return 'http://localhost:3000/iozone-report';		
-	},	
+	},
+	*/	
 	model: app.IozoneReport	
 });
 
 app.Router = Backbone.Router.extend({
 	routes: {
-		'about': 'about',
-		'iozone-register': 'iozoneRegister',
-		'iozone-input': 'iozoneInput',
-		'iozone-result': 'iozoneResult'
+		'about': 				'about',
+		'iozone-register': 		'iozoneRegister',
+		'iozone-input': 		'iozoneInput',
+		'iozone-result': 		'iozoneResult',
+		'iozone-result/:key': 	'iozoneResultSingle'
 	},
 	initialize: function() {
         this.view = null;
@@ -85,7 +88,15 @@ app.Router = Backbone.Router.extend({
 	iozoneResult: function() {
 		this._cleanUp();
 		this.view = new app.IozoneResultView({
-			collection: app.IozoneReportCollection
+			collection: new app.IozoneReportCollection(),
+			id: null
+		});
+    },
+    iozoneResultSingle: function (key) {
+		this._cleanUp();
+		this.view = new app.IozoneResultView({
+			collection: new app.IozoneReportCollection(),
+			id: key
 		});
     },
     _cleanUp: function() {
@@ -99,6 +110,7 @@ app.Router = Backbone.Router.extend({
 app.IozoneItemView = Backbone.View.extend({
 	events: {
 		'click .btn-delete-report': 'delete'
+		//'click .compare-checkbox': 'compareChecked',
 	},
 	template: template('iozone-result-sub-template'),
 	render: function() {
@@ -119,8 +131,7 @@ app.IozoneItemView = Backbone.View.extend({
 	            x: -20 //center
 	        },
 	        xAxis: {
-	            categories: ['4', '8', '16', '32', '64', '128',
-	                '256', '512']
+	            categories: ['4', '8', '16', '32', '64', '128', '256', '512']
 	        },
 	        yAxis: {
 	            title: {
@@ -256,7 +267,6 @@ app.IozoneItemView = Backbone.View.extend({
         var id = $(e.target).data('id');
         var self = this;
 
-
 		swal({   title: 'Are you sure?',   
 			text: 'You will not be able to recover this report!',   
 			type: 'warning',   showCancelButton: true,   confirmButtonColor: '#DD6B55',   
@@ -271,34 +281,108 @@ app.IozoneItemView = Backbone.View.extend({
 		        	},
 		        	error: function (model, response, options) {
 						var responseObj = JSON.parse(response.responseText);
-		        		swal('No report!', responseObj.errfor.info, 'error');	
-
-		        		//swal("Error!", "Your report file has been deleted.", "success"); 
+		        		swal('No report!', responseObj.errfor.info, 'error');
 		        	}        	
-		        });				
-				
+		        });	
 			});
-
-
-		   
     }
+    /*,
+	compareChecked: function(e) {
+		//alert($(e.currentTarget).is(':checked') ? 'checked' : 'unchecked');
+		//this.showCompletedEnquiries = e.currentTarget.checked;
+		//e.preventDefault();
+		e.stopPropagation();
+		//e.preventDefault();
+		console.log('compareChecked');
+		//console.log(e.currentTarget.checked);
+		console.log(this.model.toJSON());
+
+
+		//return true;
+	}
+	*/
 });
+
+app.IozoneCompareReport = Backbone.Model.extend({
+	url: function() {
+			return 'http://localhost:3000/iozone-report' +
+						(this.id === null ? '' : '/' + this.id);		
+		},
+	id: null,
+	defaults: {
+		devicename: '',
+		reportname: '',
+		description: '',
+		testmode: '',
+		testmodetext: '',
+		filesize: '',
+		recordsize: '',
+		emmcID: '',
+		flashID: '',
+		measuredata: [],
+		comparedReports: []
+	}
+});
+
+/*
+app.IozoneReport = Backbone.Model.extend({
+	urlRoot: '',
+	//id: null,
+	defaults: {
+		id: null,
+		reportID: '',
+		devicename: '',
+		reportname: '',
+		description: '',
+		testmodetext: '',
+		filesize: '',
+		recordsize: '',
+		measuredata: []
+	}
+});
+
+app.IozoneReportCollection = Backbone.Collection.extend({
+	
+	
+	url: function() {
+		return 'http://localhost:3000/iozone-report' +
+					(this.id === null ? '' : '/' + this.id);		
+	},
+	id: null,
+	url: function() {
+		return 'http://localhost:3000/iozone-report';		
+	},
+	
+	model: app.IozoneReport	
+});
+*/
 
 app.IozoneResultView = Backbone.View.extend({
 	el: '#global-div',
 	events: {
-		'click .checkbox': 'compare'
+		//'click .checkbox': 'compareChecked',
+		//'click .compare-checkbox': 'compareChecked',
+		'click .btn-compare' : 'compare'
 	},
 	template: template('iozone-result-template'),
 	initialize: function() {
 		_.bindAll(this, 'render');
-		this.collection = new app.IozoneReportCollection();
 
 		this.collection.on('change', this.render);
 		this.collection.on('add', this.render);
 		this.collection.on('remove', this.render);
 
-		this.render();
+		//this.$el.html('<img src="../img/spinner.gif">');
+		//this.$el.append('<div class="loading">Loading...</div>');
+/*
+		this.collection.on('reset', function() {
+			console.log('@@@@@@@@@@!!!');
+      		this.$el.html('<img src="../img/spinner.gif">');
+    	}, this);
+*/
+		//this.render();
+
+		this.collection.id = this.id;	
 		this.collection.fetch({
     		success: function (model, response, options) {
             	//swal('Meow!', 'You can view the report of performance test', 'success');
@@ -333,13 +417,125 @@ app.IozoneResultView = Backbone.View.extend({
 
     	return this;
 	},
-	compare: function(e) {
+	/*
+	compareChecked: function(e) {
 		//alert($(e.currentTarget).is(':checked') ? 'checked' : 'unchecked');
 		//this.showCompletedEnquiries = e.currentTarget.checked;
-		console.log(e.currentTarget.checked);
+		//e.preventDefault();
+		e.stopPropagation();
+		//e.preventDefault();
+		console.log('compareChecked');
+		//console.log(e.currentTarget.checked);
+		console.log(this.collection.models[0].toJSON());
+		console.log(this.collection.models[1].toJSON());
 
-		return true;
+
+		//return true;
+	},
+	*/
+	compare: function () {
+		//var numberNotChecked = this.$el.find('input:checkbox:not(":checked")').length;
+		var numberChecked,
+			arrChecked = [],
+			checkedElement,
+			i,
+			testmodetext,
+			testmode,
+			self;
+
+		self = this;
+
+		numberChecked = this.$el.find('input[type="checkbox"]:checked').length;
+		checkedElement = this.$el.find('input[type="checkbox"]:checked.compare-checkbox');
+
+		testmodetext = this.collection.models[0].get('testmodetext');
+		testmode 	 = this.collection.models[0].get('testmode');
+
+		for (i = 0; i < numberChecked; i++) {
+			arrChecked.push(checkedElement[i].getAttribute('data-id'));
+		}
+		console.log(arrChecked);
+
+		swal({   
+			title: 'An input!',   
+			text: 'Write something interesting:',   
+			type: 'input',   
+			showCancelButton: true,   
+			closeOnConfirm: false,   
+			animation: 'slide-from-top',   
+			inputPlaceholder: 'Write something'
+		}, function(reportname){   
+			if (reportname === false) {
+				return false;      
+			}
+			if (reportname === '') {     
+				swal.showInputError('You need to write something!');     
+
+				return false;
+			}      
+			swal('Nice!', 'You wrote: ' + reportname, 'success');
+
+			console.log(reportname);
+
+			self.testmodel = new app.IozoneCompareReport();
+			self.testmodel.save({
+				/*
+				devicename: '',
+				emmcID: '',
+				flashID: '',
+				*/
+				reportname: reportname,
+				description: 'descriptionsssssssss',
+				testmodetext: testmodetext,
+				testmode: testmode,
+				/*
+				filesize: '',
+				recordsize: '',
+				measuredata: [],
+				*/
+				comparedReports: arrChecked
+			}, {		
+				success: function(model, response, options) {
+					console.log('Successfully save111');
+				}, 
+				error: function(model, response, options) {
+					console.log('Error save222');		
+				}
+			});			
+		});
+
+
+/*
+		this.testmodel = new app.IozoneCompareReport();
+		this.testmodel.save({
+			devicename: 'devicename',
+			emmcID: 'emmcID',
+			flashID: 'flashID',
+			reportname: 'reportname',
+			description: 'description',
+			testmodetext: 'testmodetext',
+			testmode: 'testmode',
+			filesize: 'filesize',
+			recordsize: 'recordsize'
+		}, {		
+			success: function(model, response, options) {
+				console.log('Successfully save111');
+			}, 
+			error: function(model, response, options) {
+				console.log('Error save222');		
+			}
+		});
+*/
+		//1. new model
+
+		//2. push the new model to the collection
+
+
+		//3. collection REST-post to the backend DB
+
+
 	}
+	
 });
 
 
@@ -362,14 +558,8 @@ app.IozoneInputView = Backbone.View.extend({
 		this.model.fetch();
 	},
 	render: function() {
-		//this.$el.html(this.template(this.model.attributes));
-
 		this.$el.html(this.template(this.model.attributes));
-		//this.$el.find('.btn-contact-error').hide();
 
-
-		//this.$el.find('.btn-contact-save').prop('disabled', true);
-		//this.$el.find('.btn-contact-save').addClass('disabled').text('Loading...');
 		return this;
 	},
 	save: function(e) {

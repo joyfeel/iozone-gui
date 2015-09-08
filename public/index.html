@@ -14,7 +14,13 @@
 			<li><a href="#about">About</a></li>
 			<li><a href="#iozone-register">Device Register</a></li>
 			<li><a href="#iozone-input">Performance Test</a></li>
-			<li><a href="#iozone-result">Test Report</a></li>
+			<li><a href="#iozone-result">All Reports</a></li>
+			<li><a href="#iozone-result/write">Write Report</a></li>
+			<li><a href="#iozone-result/re-write">Re-Write Report</a></li>
+			<li><a href="#iozone-result/read">Read Report</a></li>
+			<li><a href="#iozone-result/re-read">Re-Read Report</a></li>
+			<li><a href="#iozone-result/random-write">Random Write Report</a></li>
+			<li><a href="#iozone-result/random-read">Random Read Report</a></li>
 		</ul>
 	</nav>
 
@@ -23,7 +29,6 @@
 		<h2><%= author %></h2>
 		<p><%= description %></p>
 	</script>
-
 
 <!--
 	Need to be refactor
@@ -154,8 +159,8 @@
 							<option value="-i 0">re-write</option>
 							<option value="-i 0 -i 1">read</option>
 							<option value="-i 0 -i 1">re-read</option>
-							<option value="-i 0 -i 2">random-read</option>
 							<option value="-i 0 -i 2">random-write</option>
+							<option value="-i 0 -i 2">random-read</option>
 						</select>
 					</div>
 				</div>
@@ -207,6 +212,12 @@
 	</script>
 
 
+<!--
+	<button type="button" class="btn btn-primary"> 
+		 <span class="glyphicon glyphicon-download-alt"></span> Save 
+	</button>
+-->						
+
 	<script type="text/template" id="iozone-result-sub-template">
 			<div class="col-sm-6 col-md-4">
 				<div class="thumbnail">
@@ -219,17 +230,13 @@
 						<p>FileSize: <%= filesize %></p>
 						<p>RecordSize: <%= recordsize %></p>
 
-						<button type="button" class="btn btn-primary"> 
-							 <span class="glyphicon glyphicon-download-alt"></span> Save 
-						</button>
-
 						<button type="button" data-id="<%= reportID %>" class="btn btn-danger btn-delete-report"> 
 							 <span class="glyphicon glyphicon-trash"></span> Delete
 						</button>
 
  						<div class="checkbox">
 						    <label>
-						        <input type="checkbox"> Compare
+						        <input data-id="<%= reportID %>" class='compare-checkbox' type='checkbox'>Compare
 						    </label>
 						 </div>
 					</div>
@@ -241,21 +248,22 @@
 		Full fill the line-chart sets lol.
 	-->
 	<script type="text/template" id="iozone-result-template">
+		<div class="row compare-row">
+			<div class="col-sm-6 col-md-4">
+				<button type="button" class="btn btn-primary btn-compare">
+					<span class="glyphicon glyphicon-stats"></span>
+					Compare
+				</button>
+			</div>
+		</div>
 		<div class="row chart-row">
 			
 		</div>
-		<div class="row compare-row">
-			<button type="button" class="btn btn-primary btn-compare">
-				<span class="glyphicon glyphicon-stats"></span>
-				Compare
-			</button>
-		</div>
+
 	</script>
 
 	<div id="global-div" class="container-fluid">
 
-
-		
 	</div>
 
 	<script src="javascripts/bower_components/jquery/dist/jquery.js"></script>

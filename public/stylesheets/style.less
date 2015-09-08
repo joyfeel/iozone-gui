@@ -97,7 +97,24 @@ div.bar {
     to { transform: scale(1) rotate(360deg);}
 }
 
+/*
 .thumbnail {
     border: 1px solid #39f;
     box-shadow: none;
+}
+*/
+
+.thumbnail {
+	display: block;
+    padding: 4px;
+    line-height: 1;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.thumbnail:hover {
+    border-color: #0088cc;
+    -webkit-box-shadow: 0 1px 4px rgba(0, 105, 214, 0.25);
+    -moz-box-shadow: 0 1px 4px rgba(0, 105, 214, 0.25);
+    box-shadow: 0 1px 4px rgba(0, 105, 214, 0.25);
 }

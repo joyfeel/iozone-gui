@@ -180,7 +180,7 @@ function process (req, res) {
 
 	workflow.on('removefile', function(res, reportname) {
 		var self = this;
-
+		console.log(reportname);
 		childProcess.exec('rm -rf ' + reportname + '*',
 			function (error, stdout, stderr) {
 				//console.log('stdout: ' + stdout);
