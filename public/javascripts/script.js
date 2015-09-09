@@ -46,19 +46,26 @@ app.IozoneReport = Backbone.Model.extend({
 	}
 });
 
-app.IozoneReportCollection = Backbone.Collection.extend({
-	
-	
+app.IozoneComparedReport = app.IozoneReport.extend({
+	url: function() {
+		return 'http://localhost:3000/iozone-report' +
+					(this.id === null ? '' : '/' + this.id);		
+	},
+	idAttribute: '_id',
+	defaults: {
+		id: null,
+		reportname: '',
+		testmodetext: '',		
+		series: []
+	}
+});
+
+app.IozoneReportCollection = Backbone.Collection.extend({	
 	url: function() {
 		return 'http://localhost:3000/iozone-report' +
 					(this.id === null ? '' : '/' + this.id);		
 	},
 	id: null,
-	/*
-	url: function() {
-		return 'http://localhost:3000/iozone-report';		
-	},
-	*/	
 	model: app.IozoneReport	
 });
 
@@ -107,24 +114,85 @@ app.Router = Backbone.Router.extend({
     }
 });
 
+
+app.IozoneItemViewTest = Backbone.View.extend({
+	template: template('iozone-result-sub-template'),
+	render: function() {
+		this.$el.html(this.template(this.model.toJSON()));
+
+		//console.log(this.model.toJSON());
+		this.d3LineChart(this.model.get('series'));
+
+		this.parentView.$el.find('.chart-row').append( this.$el );
+
+		return this;
+	},
+	d3LineChart: function(series) {
+		this.$el.find('.myd3-line-chart').highcharts({
+	        title: {
+	            text: 'QQQQQQ',
+	            x: -20 //center
+	        },
+	        xAxis: {
+	            categories: ['4', '8', '16', '32', '64', '128', '256', '512']
+	        },
+	        yAxis: {
+	            title: {
+	                text: 'Speed (kB/sec)'
+	            },
+	            plotLines: [{
+	                value: 0,
+	                width: 1,
+	                color: '#808080'
+	            }]
+	        },
+	        tooltip: {
+	            //valueSuffix: 'kB/sec'
+	            crosshairs: true,
+	            formatter: function () {
+	            	return 'Speed for <b>' + this.x + 'k</b> is <b>' + this.y + '</b>';
+	            }
+	        },
+	        legend: {
+	            layout: 'vertical',
+	            align: 'right',
+	            verticalAlign: 'middle',
+	            borderWidth: 0
+	        },
+	        series: series,
+	        credits: {
+      			enabled: false
+  			},
+  			exporting: {
+  				filename: 'HHHIHI'
+  			},
+  			chart: {
+ 				borderColor: '#EBBA95',
+            	borderWidth: 2,
+			    polar: true,
+			    type: 'line'
+			 }
+	    });
+	}
+});
+
 app.IozoneItemView = Backbone.View.extend({
 	events: {
 		'click .btn-delete-report': 'delete'
-		//'click .compare-checkbox': 'compareChecked',
 	},
 	template: template('iozone-result-sub-template'),
 	render: function() {
 		this.$el.html(this.template(this.model.toJSON()));
 
-		this.d3LineChart(this.model.get('devicename'), this.model.get('measuredata'), this.model.get('reportname'));
+		this.d3LineChart(this.model.get('devicename'),
+							this.model.get('measuredata'),
+							this.model.get('reportname'));
 
 		this.parentView.$el.find('.chart-row').append( this.$el );
 
 		return this;
 	},
 	d3LineChart: function(devicename, measuredata, reportname) {
-		//this.$el.('.myd3-line-chart')
-
 		this.$el.find('.myd3-line-chart').highcharts({
 	        title: {
 	            text: devicename,
@@ -173,92 +241,6 @@ app.IozoneItemView = Backbone.View.extend({
 			    type: 'line'
 			 }
 	    });
-		/*
-		var w = 500,
-			h = 300,
-		    padding = 30;
-
-		var xScale = d3.scale.linear()
-							 .domain([0, d3.max(data, function(d) {
-							     return d[0];
-							 })])
-							 .range([padding, w - padding*2]);
-
-		var yScale = d3.scale.linear()
-							 .domain([0, d3.max(data, function(d) {
-							     return d[1];
-							 })])
-							 .range([h - padding, padding]);
-
-		var rScale = d3.scale.linear()
-							 .domain([0, d3.max(data, function(d) {
-							     return d[1];
-							 })])
-							 .range([2, 5]);
-
-		var xAxis = d3.svg.axis()
-						  .scale(xScale)
-						  .orient('bottom')
-						  .ticks(5);
-
-		var yAxis = d3.svg.axis()
-						  .scale(yScale)
-						  .orient('left')
-						  .ticks(5);
-
-		var svg = d3.select(this.el)
-					.select('.myd3-line-chart')
-					.append('svg')
-					.attr({
-						width: w,
-						height: h
-					});
-
-			svg.selectAll('circle')
-			   .data(data)
-			   .enter()
-			   .append('circle')
-			   .attr({
-			       cx: function(d) {	
-			           return xScale(d[0]);	
-			       }, 
-			       cy: function(d) {	
-			           return yScale(d[1]);	
-			       }, 
-			       r: function(d) {			
-			           return rScale(d[1]);
-			       }
-			   });
-
-			svg.selectAll('text')
-			   .data(data)
-			   .enter()
-			   .append('text')
-			   .text(function(d) {
-			       return d[0] + ',' + d[1];	
-			   })
-			   .attr({
-			       x: function(d) {
-			           return xScale(d[0]);
-			       },
-			       y: function(d) {
-			           return yScale(d[1]);
-			       },
-			       'font-family': 'sans-serif',
-			       'font-size': '12px',
-			       'fill': 'green'
-			   });
-
-		svg.append('g')
-			.attr('class', 'axis')
-			.attr('transform', 'translate(0,  '+(h - padding)+')')
-			.call(xAxis);
-
-		svg.append('g')
-			.attr('class', 'axis')
-			.attr('transform', 'translate('+padding+', 0)')
-			.call(yAxis);
-		*/
 	},
 	delete: function (e) {
         // now that we need to know, we can just check that attribute
@@ -286,23 +268,9 @@ app.IozoneItemView = Backbone.View.extend({
 		        });	
 			});
     }
-    /*,
-	compareChecked: function(e) {
-		//alert($(e.currentTarget).is(':checked') ? 'checked' : 'unchecked');
-		//this.showCompletedEnquiries = e.currentTarget.checked;
-		//e.preventDefault();
-		e.stopPropagation();
-		//e.preventDefault();
-		console.log('compareChecked');
-		//console.log(e.currentTarget.checked);
-		console.log(this.model.toJSON());
-
-
-		//return true;
-	}
-	*/
 });
 
+/*
 app.IozoneCompareReport = Backbone.Model.extend({
 	url: function() {
 			return 'http://localhost:3000/iozone-report' +
@@ -310,67 +278,33 @@ app.IozoneCompareReport = Backbone.Model.extend({
 		},
 	id: null,
 	defaults: {
-		devicename: '',
 		reportname: '',
-		description: '',
-		testmode: '',
 		testmodetext: '',
-		filesize: '',
-		recordsize: '',
-		emmcID: '',
-		flashID: '',
-		measuredata: [],
-		comparedReports: []
+		series: []
 	}
-});
-
-/*
-app.IozoneReport = Backbone.Model.extend({
-	urlRoot: '',
-	//id: null,
-	defaults: {
-		id: null,
-		reportID: '',
-		devicename: '',
-		reportname: '',
-		description: '',
-		testmodetext: '',
-		filesize: '',
-		recordsize: '',
-		measuredata: []
-	}
-});
-
-app.IozoneReportCollection = Backbone.Collection.extend({
-	
-	
-	url: function() {
-		return 'http://localhost:3000/iozone-report' +
-					(this.id === null ? '' : '/' + this.id);		
-	},
-	id: null,
-	url: function() {
-		return 'http://localhost:3000/iozone-report';		
-	},
-	
-	model: app.IozoneReport	
 });
 */
 
 app.IozoneResultView = Backbone.View.extend({
 	el: '#global-div',
 	events: {
-		//'click .checkbox': 'compareChecked',
-		//'click .compare-checkbox': 'compareChecked',
 		'click .btn-compare' : 'compare'
 	},
 	template: template('iozone-result-template'),
 	initialize: function() {
+		/*
 		_.bindAll(this, 'render');
 
 		this.collection.on('change', this.render);
 		this.collection.on('add', this.render);
 		this.collection.on('remove', this.render);
+
+		*/
+
+		//this.listenTo(this.collection, 'add', this.render);
+
+		this.listenTo(this.collection, 'update', this.render);
+
 
 		//this.$el.html('<img src="../img/spinner.gif">');
 		//this.$el.append('<div class="loading">Loading...</div>');
@@ -385,8 +319,7 @@ app.IozoneResultView = Backbone.View.extend({
 		this.collection.id = this.id;	
 		this.collection.fetch({
     		success: function (model, response, options) {
-            	//swal('Meow!', 'You can view the report of performance test', 'success');
-            	//self.render();
+    			console.log('success');
         	},
         	error: function (model, response, options) {
 				var responseObj = JSON.parse(response.responseText);
@@ -396,19 +329,32 @@ app.IozoneResultView = Backbone.View.extend({
 		});
 	},
 	render: function() {
+		console.log('======Render times!!!==========');
+		
 		var self = this;
 		this.$el.empty();
 		this.$el.html(this.template());
 
 		this.collection.each(function(submodel) {
-			var subView = new app.IozoneItemView ({
-				model: submodel
-			});
+			var subView;
+			console.log('Focus Here!');
+			console.log(submodel);
+
+
+			if (submodel.attributes.devicename.length > 0) {
+				subView = new app.IozoneItemView ({
+					model: submodel
+				});
+			} else {
+				subView = new app.IozoneItemViewTest ({
+					model: submodel
+				});
+			}
 
 			subView.parentView = self;
-			subView.render();
-		});
-
+			subView.render();	
+		}, this);
+		
 		return this;
 	},
 	remove: function() {
@@ -417,22 +363,6 @@ app.IozoneResultView = Backbone.View.extend({
 
     	return this;
 	},
-	/*
-	compareChecked: function(e) {
-		//alert($(e.currentTarget).is(':checked') ? 'checked' : 'unchecked');
-		//this.showCompletedEnquiries = e.currentTarget.checked;
-		//e.preventDefault();
-		e.stopPropagation();
-		//e.preventDefault();
-		console.log('compareChecked');
-		//console.log(e.currentTarget.checked);
-		console.log(this.collection.models[0].toJSON());
-		console.log(this.collection.models[1].toJSON());
-
-
-		//return true;
-	},
-	*/
 	compare: function () {
 		//var numberNotChecked = this.$el.find('input:checkbox:not(":checked")').length;
 		var numberChecked,
@@ -441,17 +371,26 @@ app.IozoneResultView = Backbone.View.extend({
 			i,
 			testmodetext,
 			testmode,
-			self;
-
-		self = this;
+			self = this;
 
 		numberChecked = this.$el.find('input[type="checkbox"]:checked').length;
 		checkedElement = this.$el.find('input[type="checkbox"]:checked.compare-checkbox');
 
 		testmodetext = this.collection.models[0].get('testmodetext');
 		testmode 	 = this.collection.models[0].get('testmode');
+		console.log(this.collection);
+
+		var lol;
 
 		for (i = 0; i < numberChecked; i++) {
+			
+			lol = this.collection.get(checkedElement[i].getAttribute('data-id'));
+
+			console.log(lol);	
+			/*
+			lol = self.collection.get('55efe411373d4f924df35304');
+			console.log(lol);
+			*/
 			arrChecked.push(checkedElement[i].getAttribute('data-id'));
 		}
 		console.log(arrChecked);
@@ -464,7 +403,7 @@ app.IozoneResultView = Backbone.View.extend({
 			closeOnConfirm: false,   
 			animation: 'slide-from-top',   
 			inputPlaceholder: 'Write something'
-		}, function(reportname){   
+		}, function(reportname, aaa){   
 			if (reportname === false) {
 				return false;      
 			}
@@ -477,29 +416,17 @@ app.IozoneResultView = Backbone.View.extend({
 
 			console.log(reportname);
 
-			self.testmodel = new app.IozoneCompareReport();
+			self.testmodel = new app.IozoneComparedReport();
 			self.testmodel.save({
-				/*
-				devicename: '',
-				emmcID: '',
-				flashID: '',
-				*/
 				reportname: reportname,
-				description: 'descriptionsssssssss',
 				testmodetext: testmodetext,
-				testmode: testmode,
-				/*
-				filesize: '',
-				recordsize: '',
-				measuredata: [],
-				*/
-				comparedReports: arrChecked
+				series: arrChecked
 			}, {		
 				success: function(model, response, options) {
-					console.log('Successfully save111');
+					console.log('ComaparedData save successfully');
 				}, 
 				error: function(model, response, options) {
-					console.log('Error save222');		
+					console.log('ComaparedData error save');		
 				}
 			});			
 		});
@@ -667,7 +594,6 @@ app.IozoneRegisterView = Backbone.View.extend({
 			flashID = this.$el.find('select[name="flashID"]').val(),
 			plant = this.$el.find('select[name="plant"]').val(),
 			flashCompany = this.$el.find('select[name="flashCompany"]').val();
-
 
 		this.$el.find('.btn-register').prop('disabled', true);
 		this.$el.find('.btn-register').addClass('disabled').text('Loading...');

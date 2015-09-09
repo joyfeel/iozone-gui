@@ -230,15 +230,17 @@
 						<p>FileSize: <%= filesize %></p>
 						<p>RecordSize: <%= recordsize %></p>
 
-						<button type="button" data-id="<%= reportID %>" class="btn btn-danger btn-delete-report"> 
-							 <span class="glyphicon glyphicon-trash"></span> Delete
-						</button>
+						<div>
+							<button type="button" data-id="<%= reportID %>" class="btn btn-danger btn-delete-report"> 
+								 <span class="glyphicon glyphicon-trash"></span> Delete
+							</button>
 
- 						<div class="checkbox">
-						    <label>
-						        <input data-id="<%= reportID %>" class='compare-checkbox' type='checkbox'>Compare
-						    </label>
-						 </div>
+	 						<div class="checkbox">
+							    <label>
+							        <input data-id="<%= reportID %>" class='compare-checkbox' type='checkbox'>Compare
+							    </label>
+							 </div>
+						</div>
 					</div>
 				</div>
 			</div>

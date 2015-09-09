@@ -78,7 +78,7 @@ var reportSchema = new Schema({
 	testmodetext: { type: String },
 	filesize: { type: String },
 	recordsize: {type: String},
-  measuredata: { type : Array , "default" : [] },
+    measuredata: { type : Array , "default" : [] },
 	emmcID: { type:Schema.ObjectId, ref:"Emmc", childPath:"reports" },
 	flashID: { type:Schema.ObjectId, ref:"Flash", childPath:"reports" }
 });
@@ -87,11 +87,21 @@ reportSchema.plugin(relationship, { relationshipPathName:'emmcID' });
 reportSchema.plugin(relationship, { relationshipPathName:'flashID' });
 var Report = mongoose.model('Report', reportSchema);
 
+
+var comparedReportSchema = new Schema({
+    reportname: { type: String },
+    testmodetext: { type: String },
+    series: { type: Array, "default" : [] }
+});
+
+var ComparedReport = mongoose.model('ComparedReport', comparedReportSchema);
+
 app.db = {
   model: {
   	Emmc: Emmc,
     Flash: Flash,
-    Report: Report
+    Report: Report,
+    ComparedReport: ComparedReport
   }
 };
 

@@ -101,6 +101,18 @@ router.post('/iozone-report', function(req, res, next) {
     console.log('/iozone-report/post');
     console.log(req.body);
 
+    //1. get the measuredata from series[0], series[1]...
+    //2................
+
+    /*
+        { 
+            id: null,
+            reportname: '3456',
+            testmodetext: 'write',
+            series: [ '55f00e8b56f31600391991b4', '55f00e9856f31600391991b5' ] 
+        }
+    */
+
     return res.status(200).json({status:'ok'});
 });
 

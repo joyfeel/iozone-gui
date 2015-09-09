@@ -1,31 +1,71 @@
-<div class="form-group">
-                    <label for="device" class="col-sm-2 control-label">Deivce</label>
-                    <div class="col-sm-6">
-                        <select class="form-control" id="device" name="device">
-                            
-                                <option value="55e663a167b083dd26d06f0d">D1/20150830/2CE/Meow/Hynix/7ddl</option>
-                            
-                                <option value="55e663a167b083dd26d06f0d">D1/20150830/2CE/Meow/Hynix/8ddl</option>
-                            
-                                <option value="55e669ba512ad1563a03c8a7">B/20150830/2CE/Meow/Hynix/7ddl</option>
-                            
-                                <option value="55e66d29b1cd3bee438ffb89">D1/20150830/4CE/Bark/Sandisk/8ddl</option>
-                            
-                                <option value="55e6a2470da83c0f37b31370">E/20150830/2CE/Meow/Hynix/2ddl</option>
-                            
-                                <option value="55e6a2590da83c0f37b31372">D1/20150830/4CE/Meow/Hynix/2ddl</option>
-                            
-                        </select>                   
-                    </div>
-                </div>
+/* 1 */
+{
+    "_id" : ObjectId("55efd243b777ea262418d550"),
+    "reportname"   : "Report 111",
+    "testmodetext" : "write",
+    "series" : [ 
+        {
+            "name" : "AAA",
+            "data" : [ 
+                12201, 
+                19866, 
+                24176, 
+                28474, 
+                41919, 
+                57782, 
+                68614, 
+                95138
+            ]
+        }, 
+        {
+            "name" : "BBB",
+            "data" : [ 
+                10000, 
+                20000, 
+                25000, 
+                30000, 
+                40000, 
+                60000, 
+                70000, 
+                100000
+            ]
+        }
+    ],
+    "__v" : 0
+}
 
-<div class="form-group">
-                    <label for="testmode" class="col-sm-2 control-label">Test mode</label>
-                    <div class="col-sm-6">
-                        <select class="form-control" id="testmode" name="testmode">
-                            <option value="-i 0">write/re-write</option>
-                            <option value="-i 0 -i 1">read/re-read</option>
-                            <option value="-i 0 -i 2">random-read/write</option>
-                        </select>
-                    </div>
-                </div>
+/* 2 */
+{
+    "_id" : ObjectId("55efd243b12345262418d550"),
+    "reportname"   : "Report 222",
+    "testmodetext" : "read",
+    "series" : [ 
+        {
+            "name" : "AAA",
+            "data" : [ 
+                12801, 
+                13466, 
+                21976, 
+                21274, 
+                48469, 
+                47182, 
+                23414, 
+                91138
+            ]
+        }, 
+        {
+            "name" : "BBB",
+            "data" : [ 
+                34500, 
+                84500, 
+                22400, 
+                76500, 
+                23400, 
+                35500, 
+                44600, 
+                336000
+            ]
+        }
+    ],
+    "__v" : 0
+}
