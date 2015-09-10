@@ -30,11 +30,43 @@ app.IozoneInput = Backbone.Model.extend({
 	}
 });
 
+
+/*
+var foo = function () {
+
+
+
+};
+
+var model = Backbone.Model.extend({
+
+
+});
+
+var view = Backbone.View.extend({
+
+
+});
+
+var collection = Backbone.Collection.extend({
+
+
+});
+
+var routes = Backbone.Router.extend({
+
+
+});
+*/
+
+
+
+
+
 app.IozoneReport = Backbone.Model.extend({
 	urlRoot: '',
-	//id: null,
+	id: null,
 	defaults: {
-		id: null,
 		reportID: '',
 		devicename: '',
 		reportname: '',
@@ -46,21 +78,7 @@ app.IozoneReport = Backbone.Model.extend({
 	}
 });
 
-app.IozoneComparedReport = app.IozoneReport.extend({
-	url: function() {
-		return 'http://localhost:3000/iozone-report' +
-					(this.id === null ? '' : '/' + this.id);		
-	},
-	idAttribute: '_id',
-	defaults: {
-		id: null,
-		reportname: '',
-		testmodetext: '',		
-		series: []
-	}
-});
-
-app.IozoneReportCollection = Backbone.Collection.extend({	
+app.IozoneReportCollection = Backbone.Collection.extend({
 	url: function() {
 		return 'http://localhost:3000/iozone-report' +
 					(this.id === null ? '' : '/' + this.id);		
@@ -68,6 +86,36 @@ app.IozoneReportCollection = Backbone.Collection.extend({
 	id: null,
 	model: app.IozoneReport	
 });
+
+
+app.IozoneComparedReport = Backbone.Model.extend({
+	url: function() {
+		return 'http://localhost:3000/iozone-compared-report' +
+					(this.id === null ? '' : '/' + this.id);		
+	},
+	id: null,
+	defaults: {		
+		reportID: '',
+		devicename: '',
+		reportname: '',
+		description: '',
+		testmodetext: '',
+		filesize: '',
+		recordsize: '',
+		measuredata: [],		
+		series: []
+	}
+});
+
+app.IozoneComparedReportCollection = Backbone.Collection.extend({
+	url: function() {
+		return 'http://localhost:3000/iozone-compared-report' +
+					(this.id === null ? '' : '/' + this.id);		
+	},
+	id: null,
+	model: app.IozoneComparedReport	
+});
+
 
 app.Router = Backbone.Router.extend({
 	routes: {
@@ -95,14 +143,24 @@ app.Router = Backbone.Router.extend({
 	iozoneResult: function() {
 		this._cleanUp();
 		this.view = new app.IozoneResultView({
-			collection: new app.IozoneReportCollection(),
+			collection: {
+				singleReportCollection: new app.IozoneReportCollection(),
+				comparedRportCollection: new app.IozoneComparedReportCollection()
+			},
+			/*
+			collection.singleReportCollection:  new app.IozoneReportCollection(),
+			collection.comparedRportCollection: new app.IozoneComparedReportCollection(),
+			*/
 			id: null
 		});
     },
     iozoneResultSingle: function (key) {
 		this._cleanUp();
 		this.view = new app.IozoneResultView({
-			collection: new app.IozoneReportCollection(),
+			collection: {
+				singleReportCollection: new app.IozoneReportCollection(),
+				comparedRportCollection: new app.IozoneComparedReportCollection()
+			},
 			id: key
 		});
     },
@@ -116,64 +174,85 @@ app.Router = Backbone.Router.extend({
 
 
 app.IozoneItemViewTest = Backbone.View.extend({
+	events: {
+		'click .btn-delete-report': 'delete'
+	},	
 	template: template('iozone-result-sub-template'),
 	render: function() {
 		this.$el.html(this.template(this.model.toJSON()));
-
-		//console.log(this.model.toJSON());
-		this.d3LineChart(this.model.get('series'));
+		this.d3LineChart(this.model.get('reportname'), this.model.get('series'));
 
 		this.parentView.$el.find('.chart-row').append( this.$el );
 
 		return this;
 	},
-	d3LineChart: function(series) {
+	d3LineChart: function(reportname, series) {
 		this.$el.find('.myd3-line-chart').highcharts({
+	        chart: {
+	            type: 'column'
+	        },
 	        title: {
-	            text: 'QQQQQQ',
-	            x: -20 //center
+		            text: reportname,
+		            //x: -20 //center
 	        },
 	        xAxis: {
-	            categories: ['4', '8', '16', '32', '64', '128', '256', '512']
+	            categories: ['4', '8', '16', '32', '64', '128', '256', '512'],
+	            crosshair: true
 	        },
 	        yAxis: {
+	            min: 0,
 	            title: {
 	                text: 'Speed (kB/sec)'
-	            },
-	            plotLines: [{
-	                value: 0,
-	                width: 1,
-	                color: '#808080'
-	            }]
-	        },
-	        tooltip: {
-	            //valueSuffix: 'kB/sec'
-	            crosshairs: true,
-	            formatter: function () {
-	            	return 'Speed for <b>' + this.x + 'k</b> is <b>' + this.y + '</b>';
 	            }
 	        },
-	        legend: {
-	            layout: 'vertical',
-	            align: 'right',
-	            verticalAlign: 'middle',
-	            borderWidth: 0
+	        tooltip: {
+	            formatter: function () {
+	                return 'Speed for <b>' + this.x + '</b> is <b>' + this.point.y + '</b>';
+	            }
+	        },
+	        plotOptions: {
+	            column: {
+	                pointPadding: 0.2,
+	                borderWidth: 0
+	            }
 	        },
 	        series: series,
 	        credits: {
-      			enabled: false
-  			},
-  			exporting: {
-  				filename: 'HHHIHI'
-  			},
-  			chart: {
- 				borderColor: '#EBBA95',
-            	borderWidth: 2,
-			    polar: true,
-			    type: 'line'
-			 }
+                enabled: false
+            },
+            exporting: {
+                filename: reportname
+            }            
 	    });
-	}
+	},
+	delete: function (e) {
+        e.preventDefault();
+
+        var id = $(e.target).data('id');
+
+        var self = this;
+
+		swal({   title: 'Are you sure?',   
+			text: 'You will not be able to recover this report!',   
+			type: 'warning',   showCancelButton: true,   confirmButtonColor: '#DD6B55',   
+			confirmButtonText: 'Yes, delete it!',   closeOnConfirm: false }, 
+			function () {   
+		        //self.model.attributes.id = id;
+		        //console.log(self.model.attributes.id );
+		        self.model.id = id;
+		        self.model.attributes.id = id;
+		        console.log(self.model);
+		        self.model.destroy({
+		    		success: function () {
+		            	swal('Deleted!', 'Your report file has been deleted.', 'success'); 
+		        	},
+		        	error: function (model, response, options) {
+						var responseObj = JSON.parse(response.responseText);
+		        		swal('No report!', responseObj.errfor.info, 'error');
+		        	}        	
+		        });	
+			});		
+    }
 });
 
 app.IozoneItemView = Backbone.View.extend({
@@ -247,6 +326,7 @@ app.IozoneItemView = Backbone.View.extend({
         e.preventDefault();
 
         var id = $(e.target).data('id');
+
         var self = this;
 
 		swal({   title: 'Are you sure?',   
@@ -270,20 +350,6 @@ app.IozoneItemView = Backbone.View.extend({
     }
 });
 
-/*
-app.IozoneCompareReport = Backbone.Model.extend({
-	url: function() {
-			return 'http://localhost:3000/iozone-report' +
-						(this.id === null ? '' : '/' + this.id);		
-		},
-	id: null,
-	defaults: {
-		reportname: '',
-		testmodetext: '',
-		series: []
-	}
-});
-*/
 
 app.IozoneResultView = Backbone.View.extend({
 	el: '#global-div',
@@ -292,21 +358,31 @@ app.IozoneResultView = Backbone.View.extend({
 	},
 	template: template('iozone-result-template'),
 	initialize: function() {
-		/*
-		_.bindAll(this, 'render');
 
+		var hasReport = false,
+			hasComparedReport = false;
+
+		var self = this;
+
+		//var responseObj;
+		//this.trigger('spinner');
+		
+		//_.bindAll(this, 'compare');
+
+		/*
 		this.collection.on('change', this.render);
 		this.collection.on('add', this.render);
 		this.collection.on('remove', this.render);
 
 		*/
+		//this.bind('spinner', this.showSpinner, this);
 
-		//this.listenTo(this.collection, 'add', this.render);
-
-		this.listenTo(this.collection, 'update', this.render);
+		//this.listenTo(this.collection, 'update', this.render);
 
 
-		//this.$el.html('<img src="../img/spinner.gif">');
+		this.listenTo(this.collection.singleReportCollection, 'update', this.render);
+		this.listenTo(this.collection.comparedRportCollection, 'update', this.render);
+	
 		//this.$el.append('<div class="loading">Loading...</div>');
 /*
 		this.collection.on('reset', function() {
@@ -316,6 +392,15 @@ app.IozoneResultView = Backbone.View.extend({
 */
 		//this.render();
 
+
+/*
+
+			singleReportCollection:  new app.IozoneReportCollection(),
+			comparedRportCollection: new app.IozoneReportCollection(),
+
+*/
+
+/*
 		this.collection.id = this.id;	
 		this.collection.fetch({
     		success: function (model, response, options) {
@@ -327,34 +412,195 @@ app.IozoneResultView = Backbone.View.extend({
         		swal('No report!', responseObj.errfor.info, 'error');	
         	}
 		});
-	},
-	render: function() {
-		console.log('======Render times!!!==========');
-		
-		var self = this;
-		this.$el.empty();
-		this.$el.html(this.template());
-
-		this.collection.each(function(submodel) {
-			var subView;
-			console.log('Focus Here!');
-			console.log(submodel);
+*/
 
 
-			if (submodel.attributes.devicename.length > 0) {
-				subView = new app.IozoneItemView ({
-					model: submodel
-				});
-			} else {
-				subView = new app.IozoneItemViewTest ({
-					model: submodel
-				});
+/*
+		this.collection.id = this.id;	
+		this.collection.fetch({
+    		success: function (model, response, options) {
+    			console.log('success');
+        	},
+        	error: function (model, response, options) {
+				var responseObj = JSON.parse(response.responseText);
+
+        		swal('No report!', responseObj.errfor.info, 'error');	
+        	}
+		});
+*/
+
+		this.collection.singleReportCollection.id = this.id;
+		this.collection.comparedRportCollection.id = this.id;
+
+		$.when(		
+			self.collection.singleReportCollection.fetch({
+	    		success: function (model, response, options) {
+	    			console.log('When1');
+	    			hasReport = true;
+	        	},
+	        	error: function (model, response, options) {
+	        		console.log('When2');
+	    			
+	    			hasReport = false;
+	    			
+	    			
+	        	}
+			}), 		
+			self.collection.comparedRportCollection.fetch({
+	    		success: function (model, response, options) {
+	    			console.log('When3');
+	    			hasComparedReport = true;
+	    			/*
+	    			responseObj = JSON.parse(response.responseText);
+	    			hasComparedReport = responseObj.errfor.hasReports;
+	    			console.log(hasComparedReport);
+	    			*/
+	        	},
+	        	error: function (model, response, options) {
+	        		console.log('When4');
+
+	        		hasComparedReport = false;
+	        		/*
+	    			responseObj = JSON.parse(response.responseText);
+	    			hasComparedReport = responseObj.errfor.hasReports;
+	    			console.log(hasComparedReport);
+	    			*/
+	        	}
+			})
+		).done(function() {
+
+			console.log('EEEEEEEE');
+			console.log(hasReport);
+			console.log(hasComparedReport);
+
+			if (!hasReport || !hasComparedReport) {
+				swal('No report!', 'Just no!', 'error');	
 			}
+
+			//self.render();
+		}).fail(function() {
+			console.log('XXXXXXXXXX');
+			console.log(hasReport);
+			console.log(hasComparedReport);			
+		});
+		/*.done(function() {
+
+			console.log('EEEEEEEE1111');
+			console.log(hasReport);
+			console.log(hasComparedReport);
+
+			if (!hasReport || !hasComparedReport) {
+				swal('No report!', 'Just no!', 'error');	
+			}
+
+		}).fail(function() {
+			console.log('XXXXXXXXXX1111');
+			console.log(hasReport);
+			console.log(hasComparedReport);			
+		});
+		*/
+
+		
+/*
+		this.collection.singleReportCollection.id = this.id;	
+		this.collection.singleReportCollection.fetch({
+    		success: function (model, response, options) {
+    			console.log('success');
+        	},
+        	error: function (model, response, options) {
+				var responseObj = JSON.parse(response.responseText);
+
+        		swal('No report!', responseObj.errfor.info, 'error');	
+        	}
+		});
+
+		this.collection.comparedRportCollection.id = this.id;
+		this.collection.comparedRportCollection.fetch({
+    		success: function (model, response, options) {
+    			console.log('success');
+        	},
+        	error: function (model, response, options) {
+				var responseObj = JSON.parse(response.responseText);
+
+        		swal('No report!', responseObj.errfor.info, 'error');	
+        	}
+		});
+*/
+
+
+	},
+	showSpinner: function (){
+           this.$el.html('<img src="../img/spinner.gif">');
+    },	
+    /*
+    lolA: function() {
+    	var self = this;
+
+		this.collection.singleReportCollection.each(function(submodel) {
+			var subView;
+
+			console.log(submodel);
+			subView = new app.IozoneItemView ({
+				model: submodel
+			});
 
 			subView.parentView = self;
 			subView.render();	
 		}, this);
-		
+
+		return this;
+    },
+    lolB: function() {
+    	var self = this;
+
+		this.collection.comparedRportCollection.each(function(submodel) {
+			var subView;
+
+			console.log(submodel);
+			subView = new app.IozoneItemViewTest ({
+				model: submodel
+			});
+
+			subView.parentView = self;
+			subView.render();	
+		}, this);
+
+		return this;	
+    },
+    */
+	render: function() {
+		console.log('======Render times!!!==========');
+		var self = this;
+		//var self = this;
+		this.$el.empty();
+		//this.$el.html('<img src="../img/spinner.gif">');
+		this.$el.html(this.template());
+
+
+		this.collection.singleReportCollection.each(function(submodel) {
+			var subView;
+
+			console.log(submodel);
+			subView = new app.IozoneItemView ({
+				model: submodel
+			});
+
+			subView.parentView = self;
+			subView.render();	
+		}, this);
+
+		this.collection.comparedRportCollection.each(function(submodel) {
+			var subView;
+
+			console.log(submodel);
+			subView = new app.IozoneItemViewTest ({
+				model: submodel
+			});
+
+			subView.parentView = self;
+			subView.render();	
+		}, this);	
+
 		return this;
 	},
 	remove: function() {
@@ -366,34 +612,36 @@ app.IozoneResultView = Backbone.View.extend({
 	compare: function () {
 		//var numberNotChecked = this.$el.find('input:checkbox:not(":checked")').length;
 		var numberChecked,
-			arrChecked = [],
+			series = [],
 			checkedElement,
 			i,
 			testmodetext,
 			testmode,
-			self = this;
+			self = this,
+			findModel,
+			testObj;
 
 		numberChecked = this.$el.find('input[type="checkbox"]:checked').length;
 		checkedElement = this.$el.find('input[type="checkbox"]:checked.compare-checkbox');
 
-		testmodetext = this.collection.models[0].get('testmodetext');
-		testmode 	 = this.collection.models[0].get('testmode');
-		console.log(this.collection);
+		testmodetext = this.collection.singleReportCollection.models[0].get('testmodetext');
+		testmode 	 = this.collection.singleReportCollection.models[0].get('testmode');
 
-		var lol;
+		//console.log(lol.get('measuredata'));	
 
 		for (i = 0; i < numberChecked; i++) {
-			
-			lol = this.collection.get(checkedElement[i].getAttribute('data-id'));
+			findModel = this.collection.singleReportCollection.findWhere({ 
+				'reportID' : checkedElement[i].getAttribute('data-id')
+			});
 
-			console.log(lol);	
-			/*
-			lol = self.collection.get('55efe411373d4f924df35304');
-			console.log(lol);
-			*/
-			arrChecked.push(checkedElement[i].getAttribute('data-id'));
+			testObj = {
+				name: findModel.get('reportname'),
+				data: findModel.get('measuredata')
+			};
+			//push the measuredata
+			series.push(testObj);
 		}
-		console.log(arrChecked);
+		console.log(series);
 
 		swal({   
 			title: 'An input!',   
@@ -420,10 +668,28 @@ app.IozoneResultView = Backbone.View.extend({
 			self.testmodel.save({
 				reportname: reportname,
 				testmodetext: testmodetext,
-				series: arrChecked
-			}, {		
+				series: series
+			}, {
 				success: function(model, response, options) {
 					console.log('ComaparedData save successfully');
+
+
+					console.log(self.collection.comparedRportCollection.id);
+
+					self.collection.comparedRportCollection.id = self.id;	
+					self.collection.comparedRportCollection.fetch({
+			    		success: function (model, response, options) {
+			    			console.log('success');
+
+
+			        	},
+			        	error: function (model, response, options) {
+							var responseObj = JSON.parse(response.responseText);
+
+			        		swal('No report!', responseObj.errfor.info, 'error');	
+			        	}
+					});
+
 				}, 
 				error: function(model, response, options) {
 					console.log('ComaparedData error save');		

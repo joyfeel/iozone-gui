@@ -1,33 +1,45 @@
-/* 1 */
-{
-    "_id" : ObjectId("55e65627388dbd050c0b6bab"),
-    "flashID" : "7ddl",
-    "company" : "Hynix",
-    "parents" : [ 
-        ObjectId("55e65627388dbd050c0b6baa")
-    ],
-    "__v" : 0
-}
-
-/* 2 */
-{
-    "_id" : ObjectId("55e65640388dbd050c0b6bb1"),
-    "flashID" : "10ddl",
-    "company" : "Hynix",
-    "parents" : [ 
-        ObjectId("55e65627388dbd050c0b6baa"), 
-        ObjectId("55e6565b388dbd050c0b6bb4")
-    ],
-    "__v" : 0
-}
-
-/* 3 */
-{
-    "_id" : ObjectId("55e656c8388dbd050c0b6bb9"),
-    "flashID" : "8ddl",
-    "company" : "Hynix",
-    "parents" : [ 
-        ObjectId("55e656c8388dbd050c0b6bb8")
-    ],
-    "__v" : 0
-}
+        /*  
+            title: {
+                text: 'QQQQQQ',
+                x: -20 //center
+            },
+            xAxis: {
+                categories: ['4', '8', '16', '32', '64', '128', '256', '512']
+            },
+            yAxis: {
+                title: {
+                    text: 'Speed (kB/sec)'
+                },
+                plotLines: [{
+                    value: 0,
+                    width: 1,
+                    color: '#808080'
+                }]
+            },
+            tooltip: {
+                //valueSuffix: 'kB/sec'
+                crosshairs: true,
+                formatter: function () {
+                    return 'Speed for <b>' + this.x + 'k</b> is <b>' + this.y + '</b>';
+                }
+            },
+            legend: {
+                layout: 'vertical',
+                align: 'right',
+                verticalAlign: 'middle',
+                borderWidth: 0
+            },
+            series: series,
+            credits: {
+                enabled: false
+            },
+            exporting: {
+                filename: 'HHHIHI'
+            },
+            chart: {
+                borderColor: '#EBBA95',
+                borderWidth: 2,
+                polar: true,
+                type: 'line'
+             }
+        */

@@ -4,82 +4,55 @@ var events = require('events');
 
 function process (req, res) {
 	var workflow = new events.EventEmitter();
-	var resArray = [], reportLength;
+	var resArray = [];
 
 	workflow.outcome = {
 	    success: false,
 	    errfor: {}
 	};
 
-	workflow.on('validation', function(req, res) {
-	    console.log('validation');
-
+	workflow.on('getReport', function(req, res) {
 	    var ReportModel = req.app.db.model.Report;
 
 	    ReportModel.find({
 	    		'testmodetext' : req.params.key
 	    	}, function (err, reports) {
-	    	reportLength = reports.length;
 
 	    	if (err) {
 	    		workflow.outcome.success = false;
+	    		workflow.outcome.errfor.hasReports = false;
 	    		workflow.outcome.errfor.info = 'DB: get report error';
 	    		workflow.emit('response', req, res);	    
 	    	} 
 
-    		reports.forEach(function (report) {
-    			var objTemp = {};
-    			objTemp = {
-    				reportID: 		report._id,
-		    		devicename: 	report.devicename,
-			        reportname: 	report.reportname,
-			        description: 	report.description,
-			        testmodetext: 	report.testmodetext,
-			        filesize: 		report.filesize,
-			        recordsize: 	report.recordsize,
-			        measuredata:  	report.measuredata		
-    			};
-    			resArray.push(objTemp);
-    		});
-
-    		console.log(resArray);
-
-	    	workflow.emit('getComparedReport', req, res);	    	
-	    });
-	});
-
-	workflow.on('getComparedReport', function(req, res) {
-		var ComparedReportModel = req.app.db.model.ComparedReport;
-
-		ComparedReportModel.find({
-				'testmodetext' : req.params.key
-			}, function (err, comparedreports) {
-			if (err) {
+	    	if ( reports.length === 0 ) {
 	    		workflow.outcome.success = false;
-	    		workflow.outcome.errfor.info = 'DB: get comparedReport error';
-	    		workflow.emit('response', req, res);
-	    	}
-
-	    	if (comparedreports.length === 0 && reportLength === 0) { 
-	    		workflow.outcome.success = false;
-	    		workflow.outcome.errfor.info = 'You must at least test one device';
+	    		workflow.outcome.errfor.hasReports = false;
+	    		workflow.emit('response', req, res);    		
 	    	} else {
-	    		comparedreports.forEach(function (comparedreport) {
+	    		reports.forEach(function (report) {
 	    			var objTemp = {};
-
 	    			objTemp = {
-	    				reportname: 	comparedreport.reportname,
-	    				testmodetext: 	comparedreport.testmodetext,
-	    				series: 		comparedreport.series
+	    				reportID: 		report._id,
+			    		devicename: 	report.devicename,
+				        reportname: 	report.reportname,
+				        description: 	report.description,
+				        testmodetext: 	report.testmodetext,
+				        filesize: 		report.filesize,
+				        recordsize: 	report.recordsize,
+				        measuredata:  	report.measuredata		
 	    			};
 	    			resArray.push(objTemp);
 	    		});
-				workflow.outcome.success = true;		
-	    	}
 
-	    	workflow.emit('response', req, res);	    		
-		});
-	});	
+	    		console.log(resArray);
+
+	    		workflow.outcome.success = true;
+	    		workflow.outcome.errfor.hasReports = true;
+		    	workflow.emit('response', req, res);
+		    }    	
+	    });
+	});
 
 	workflow.on('response', function(req, res) {
 	    console.log('response');
@@ -91,7 +64,7 @@ function process (req, res) {
 	    } 
 	});	
 
-	workflow.emit('validation', req, res);
+	workflow.emit('getReport', req, res);
 }
 
 exports.process = process;

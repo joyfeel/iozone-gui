@@ -164,7 +164,7 @@ function process (req, res) {
 			flashID: req.body.flashID
 		});
 
-		reportInstance.save(function (err, newEmmc) {
+		reportInstance.save(function (err, doc) {
 			if (err) {
 				console.log('reportInstance err');
 

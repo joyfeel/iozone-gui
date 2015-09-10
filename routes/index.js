@@ -10,6 +10,7 @@ var registerEmmc = require('./modules/register-emmc.js');
 var getEmmc = require('./modules/get-emmc.js');
 
 var getReport = require('./modules/get-report.js');
+var getComparedReport = require('./modules/get-compared-report.js');
 
 //return res.status(200).json({status:'ok'});
 //return res.status(500).json({status:'not ok'})
@@ -35,25 +36,42 @@ router.get('/iozone-input', function(req, res, next) {
 
 router.post('/iozone-input', function(req, res, next) {
 
-    return iozone.process (req, res);  
+    return iozone.process(req, res);  
 });
 
 router.get('/iozone-report', function(req, res, next) {
+    console.log('XXXXX');
 
-    return getReport.process (req, res);
+    return getReport.process(req, res);
 });
 
 router.get('/iozone-report/:key', function(req, res, next) {
+    console.log('YYYYY');
 
-    return getReport.process (req, res);
+    return getReport.process(req, res);
 });
 
+router.get('/iozone-compared-report', function(req, res, next) {
+    console.log('WWWWW');
+
+    return getComparedReport.process(req, res);
+});
+
+router.get('/iozone-compared-report/:key', function(req, res, next) {
+    console.log('EEEEE');
+
+    return getComparedReport.process(req, res);
+});
+
+
 router.delete('/iozone-report/:key/:id', function(req, res, next) {
+    /*
     console.log('DElete');
     console.log(req.params.key.id);
     console.log(req.params.id);
     console.log(req.params.key);
-
+    */
+    console.log('AAAAA');
     var outcome = {
         success: false,
         errfor: {}
@@ -65,18 +83,20 @@ router.delete('/iozone-report/:key/:id', function(req, res, next) {
         if (err) {
             outcome.errfor.info = 'DB: Delete the report error';
             return res.status(500).send(outcome);
-        } else {
-            console.log(report);
-            outcome.success = true;
-            return res.status(200).send(outcome);                
         }
+
+        outcome.success = true;
+        return res.status(200).send(outcome);                
     });
 
 });
 
 router.delete('/iozone-report/:id', function(req, res, next) {
+    /*
     console.log('DElete');
     console.log(req.params.id);
+    */
+    console.log('BBBBB');
     var outcome = {
         success: false,
         errfor: {}
@@ -88,32 +108,93 @@ router.delete('/iozone-report/:id', function(req, res, next) {
         if (err) {
             outcome.errfor.info = 'DB: Delete the report error';
             return res.status(500).send(outcome);
-        } else {
-            console.log(report);
-            outcome.success = true;
-            return res.status(200).send(outcome);                
-        }
+        } 
+
+        outcome.success = true;
+        return res.status(200).send(outcome);                
     });
 
 });
 
-router.post('/iozone-report', function(req, res, next) {
-    console.log('/iozone-report/post');
-    console.log(req.body);
 
-    //1. get the measuredata from series[0], series[1]...
-    //2................
 
-    /*
-        { 
-            id: null,
-            reportname: '3456',
-            testmodetext: 'write',
-            series: [ '55f00e8b56f31600391991b4', '55f00e9856f31600391991b5' ] 
+
+/*
+router.delete('/iozone-compared-report/:key/:id', function(req, res, next) {
+    
+    console.log('DElete');
+    console.log(req.params.key.id);
+    console.log(req.params.id);
+    console.log(req.params.key);
+    
+    console.log('CCCCC');
+    var outcome = {
+        success: false,
+        errfor: {}
+    };
+
+    var ComparedReport = req.app.db.model.ComparedReport;
+
+
+    ComparedReport.findByIdAndRemove(req.params.id, function(err, comparedReport) {
+        if (err) {
+            outcome.errfor.info = 'DB: Delete the report error';
+            return res.status(500).send(outcome);
         }
-    */
 
-    return res.status(200).json({status:'ok'});
+        outcome.success = true;
+        return res.status(200).send(outcome);                
+    });
+
+});
+*/
+
+router.delete('/iozone-compared-report/:id', function(req, res, next) {
+    var outcome = {
+        success: false,
+        errfor: {}
+    };
+
+    var ComparedReport = req.app.db.model.ComparedReport;
+
+    ComparedReport.findByIdAndRemove(req.params.id, function(err, comparedReport) {
+        if (err) {
+            outcome.errfor.info = 'DB: Delete the report error';
+            return res.status(500).send(outcome);
+        } 
+
+        outcome.success = true;
+        return res.status(200).send(outcome);                
+    });
+
+});
+
+router.post('/iozone-compared-report', function(req, res, next) {
+    console.log('/iozone-report/post');
+    console.log(JSON.stringify(req.body));
+
+    var outcome = {
+        success: false,
+        errfor: {}
+    };
+
+    var ComparedReport = req.app.db.model.ComparedReport;
+
+    var comparedreportInstance = new ComparedReport({
+        reportname: req.body.reportname,
+        testmodetext: req.body.testmodetext,
+        series: req.body.series
+    });
+
+    comparedreportInstance.save(function (err, doc) {
+        if (err) {
+            outcome.errfor.info = 'DB: Save the comparedreport error';
+            return res.status(500).send(outcome);
+        }
+
+        outcome.success = true;
+        return res.status(200).send(outcome);
+    });
 });
 
 
