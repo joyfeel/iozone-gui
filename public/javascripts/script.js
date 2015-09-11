@@ -172,94 +172,23 @@ app.Router = Backbone.Router.extend({
     }
 });
 
+app.IozoneUtilityView = Backbone.View.extend({
+	template: template('iozone-page-utility-template'),
+	render: function () {
+		this.$el.html(this.template());
 
-app.IozoneItemViewTest = Backbone.View.extend({
-	events: {
-		'click .btn-delete-report': 'delete'
-	},	
-	template: template('iozone-result-sub-template'),
-	render: function() {
-		this.$el.html(this.template(this.model.toJSON()));
-		this.d3LineChart(this.model.get('reportname'), this.model.get('series'));
+		this.parentView.$el.find('.compare-row').append( this.$el );
 
-		this.parentView.$el.find('.chart-row').append( this.$el );
 
 		return this;
-	},
-	d3LineChart: function(reportname, series) {
-		this.$el.find('.myd3-line-chart').highcharts({
-	        chart: {
-	            type: 'column'
-	        },
-	        title: {
-		            text: reportname,
-		            //x: -20 //center
-	        },
-	        xAxis: {
-	            categories: ['4', '8', '16', '32', '64', '128', '256', '512'],
-	            crosshair: true
-	        },
-	        yAxis: {
-	            min: 0,
-	            title: {
-	                text: 'Speed (kB/sec)'
-	            }
-	        },
-	        tooltip: {
-	            formatter: function () {
-	                return 'Speed for <b>' + this.x + '</b> is <b>' + this.point.y + '</b>';
-	            }
-	        },
-	        plotOptions: {
-	            column: {
-	                pointPadding: 0.2,
-	                borderWidth: 0
-	            }
-	        },
-	        series: series,
-	        credits: {
-                enabled: false
-            },
-            exporting: {
-                filename: reportname
-            }            
-	    });
-	},
-	delete: function (e) {
-        e.preventDefault();
-
-        var id = $(e.target).data('id');
-
-        var self = this;
-
-		swal({   title: 'Are you sure?',   
-			text: 'You will not be able to recover this report!',   
-			type: 'warning',   showCancelButton: true,   confirmButtonColor: '#DD6B55',   
-			confirmButtonText: 'Yes, delete it!',   closeOnConfirm: false }, 
-			function () {   
-		        //self.model.attributes.id = id;
-		        //console.log(self.model.attributes.id );
-		        self.model.id = id;
-		        self.model.attributes.id = id;
-		        console.log(self.model);
-		        self.model.destroy({
-		    		success: function () {
-		            	swal('Deleted!', 'Your report file has been deleted.', 'success'); 
-		        	},
-		        	error: function (model, response, options) {
-						var responseObj = JSON.parse(response.responseText);
-		        		swal('No report!', responseObj.errfor.info, 'error');
-		        	}        	
-		        });	
-			});		
-    }
+	}
 });
 
 app.IozoneItemView = Backbone.View.extend({
 	events: {
 		'click .btn-delete-report': 'delete'
 	},
-	template: template('iozone-result-sub-template'),
+	template: template('iozone-report-template'),
 	render: function() {
 		this.$el.html(this.template(this.model.toJSON()));
 
@@ -350,6 +279,89 @@ app.IozoneItemView = Backbone.View.extend({
     }
 });
 
+app.IozoneItemViewTest = Backbone.View.extend({
+	events: {
+		'click .btn-delete-report': 'delete'
+	},	
+	template: template('iozone-compared-report-template'),
+	render: function() {
+		this.$el.html(this.template(this.model.toJSON()));
+		this.d3LineChart(this.model.get('reportname'), this.model.get('series'));
+
+		this.parentView.$el.find('.chart-row').append( this.$el );
+
+		return this;
+	},
+	d3LineChart: function(reportname, series) {
+		this.$el.find('.myd3-line-chart').highcharts({
+	        chart: {
+	            type: 'column'
+	        },
+	        title: {
+		            text: reportname,
+		            //x: -20 //center
+	        },
+	        xAxis: {
+	            categories: ['4', '8', '16', '32', '64', '128', '256', '512'],
+	            crosshair: true
+	        },
+	        yAxis: {
+	            min: 0,
+	            title: {
+	                text: 'Speed (kB/sec)'
+	            }
+	        },
+	        tooltip: {
+	            formatter: function () {
+	                return 'Speed for <b>' + this.x + '</b> is <b>' + this.point.y + '</b>';
+	            }
+	        },
+	        plotOptions: {
+	            column: {
+	                pointPadding: 0.2,
+	                borderWidth: 0
+	            }
+	        },
+	        series: series,
+	        credits: {
+                enabled: false
+            },
+            exporting: {
+                filename: reportname
+            }            
+	    });
+	},
+	delete: function (e) {
+        e.preventDefault();
+
+        var id = $(e.target).data('id');
+
+        var self = this;
+
+		swal({   title: 'Are you sure?',   
+			text: 'You will not be able to recover this report!',   
+			type: 'warning',   showCancelButton: true,   confirmButtonColor: '#DD6B55',   
+			confirmButtonText: 'Yes, delete it!',   closeOnConfirm: false }, 
+			function () {   
+		        //self.model.attributes.id = id;
+		        //console.log(self.model.attributes.id );
+		        self.model.id = id;
+		        self.model.attributes.id = id;
+		        console.log(self.model);
+		        self.model.destroy({
+		    		success: function () {
+		            	swal('Deleted!', 'Your report file has been deleted.', 'success'); 
+		        	},
+		        	error: function (model, response, options) {
+						var responseObj = JSON.parse(response.responseText);
+		        		swal('No report!', responseObj.errfor.info, 'error');
+		        	}        	
+		        });	
+			});		
+    }
+});
+
+
 
 app.IozoneResultView = Backbone.View.extend({
 	el: '#global-div',
@@ -363,6 +375,15 @@ app.IozoneResultView = Backbone.View.extend({
 			hasComparedReport = false;
 
 		var self = this;
+
+
+		//(1) null
+		//(2) write
+
+
+		//this.template = template('iozone-result-template');
+		//this.parentView.$el.find('.chart-row').append( this.$el );
+
 
 		//var responseObj;
 		//this.trigger('spinner');
@@ -576,11 +597,32 @@ app.IozoneResultView = Backbone.View.extend({
 		//this.$el.html('<img src="../img/spinner.gif">');
 		this.$el.html(this.template());
 
+		console.log('view id...');
+		console.log(this.id);
+
+		if (this.id == null) {
+			//this.$el.find()
+		} else {
+			//this.$el.find()
+			var utilityView;
+
+			utilityView = new app.IozoneUtilityView ({
+
+			});
+
+			utilityView.parentView = self;
+			utilityView.render();
+		}
+
+
+
+
+
 
 		this.collection.singleReportCollection.each(function(submodel) {
 			var subView;
 
-			console.log(submodel);
+			//console.log(submodel);
 			subView = new app.IozoneItemView ({
 				model: submodel
 			});
@@ -592,7 +634,7 @@ app.IozoneResultView = Backbone.View.extend({
 		this.collection.comparedRportCollection.each(function(submodel) {
 			var subView;
 
-			console.log(submodel);
+			//console.log(submodel);
 			subView = new app.IozoneItemViewTest ({
 				model: submodel
 			});
@@ -621,6 +663,8 @@ app.IozoneResultView = Backbone.View.extend({
 			findModel,
 			testObj;
 
+
+		console.log('++++++');
 		numberChecked = this.$el.find('input[type="checkbox"]:checked').length;
 		checkedElement = this.$el.find('input[type="checkbox"]:checked.compare-checkbox');
 

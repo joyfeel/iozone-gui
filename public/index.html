@@ -217,8 +217,8 @@
 		 <span class="glyphicon glyphicon-download-alt"></span> Save 
 	</button>
 -->						
-
-	<script type="text/template" id="iozone-result-sub-template">
+	<!-- For normal report -->
+	<script type="text/template" id="iozone-report-template">
 			<div class="col-sm-6 col-md-4">
 				<div class="thumbnail">
 					<div class = 'myd3-line-chart'>
@@ -246,17 +246,51 @@
 			</div>
 	</script>
 
+	<!-- For compared report -->
+	<script type="text/template" id="iozone-compared-report-template">
+			<div class="col-sm-6 col-md-4">
+				<div class="thumbnail">
+					<div class = 'myd3-line-chart'>
+					</div>
+					<div class="caption">
+						<h4><%= reportname %></h4>
+						<h5><p>Description: <%= description %></p></h5>
+						<p>Testmode: <%= testmodetext %></p>
+						<p>FileSize: <%= filesize %></p>
+						<p>RecordSize: <%= recordsize %></p>
+
+						<div>
+							<button type="button" data-id="<%= reportID %>" class="btn btn-danger btn-delete-report"> 
+								 <span class="glyphicon glyphicon-trash"></span> Delete
+							</button>
+
+	 						<div class="checkbox">
+							    <label>
+							        <input data-id="<%= reportID %>" class='compare-checkbox' type='checkbox' disabled>Compare
+							    </label>
+							 </div>
+						</div>
+					</div>
+				</div>
+			</div>
+	</script>
+
+	<script type="text/template" id="iozone-page-utility-template">
+		<div class="col-sm-6 col-md-4">
+			<button type="button" class="btn btn-primary btn-compare">
+				<span class="glyphicon glyphicon-stats"></span>
+				Compare
+			</button>
+		</div>
+	</script>
+
+
 	<!-- 
-		Full fill the line-chart sets lol.
+		For full fill the line-chart sets lol.
 	-->
 	<script type="text/template" id="iozone-result-template">
 		<div class="row compare-row">
-			<div class="col-sm-6 col-md-4">
-				<button type="button" class="btn btn-primary btn-compare">
-					<span class="glyphicon glyphicon-stats"></span>
-					Compare
-				</button>
-			</div>
+
 		</div>
 		<div class="row chart-row">
 			
