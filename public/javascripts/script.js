@@ -664,8 +664,15 @@ app.IozoneResultView = Backbone.View.extend({
 			testObj;
 
 
+		//
+
 		console.log('++++++');
 		numberChecked = this.$el.find('input[type="checkbox"]:checked').length;
+		if (numberChecked < 2) {
+			swal('Compare error', 'You need to select at least two reports', 'error');	
+			return false;
+		}
+
 		checkedElement = this.$el.find('input[type="checkbox"]:checked.compare-checkbox');
 
 		testmodetext = this.collection.singleReportCollection.models[0].get('testmodetext');
