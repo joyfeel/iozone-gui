@@ -10,6 +10,7 @@ workflow.outcome = {
 
 workflow.on('validation', function(req, res) {
 	console.log('Flow validation');
+	console.log(req.body.firmwareVersion);
 
 	var EmmcModel = req.app.db.model.Emmc,
 		FlashModel = req.app.db.model.Flash;

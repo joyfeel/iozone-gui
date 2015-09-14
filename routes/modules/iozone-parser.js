@@ -24,6 +24,14 @@ function process (req, res) {
 	        workflow.outcome.errfor.info = 'Need to register a device';
 	    }
 
+	    if (req.body.reportname.length === 0) {
+	    	workflow.outcome.errfor.info = 'Need the reportname';	
+	    }
+
+	    while (req.body.reportname.indexOf(' ') >= 0) {
+	    	req.body.reportname = req.body.reportname.replace(' ', '');
+	    }
+
 	    if (Object.keys(workflow.outcome.errfor).length !== 0) {
 	    	//console.log(Object.keys(workflow.outcome.errfor).length);
 	        workflow.outcome.success = false;

@@ -1,24 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<link rel="stylesheet" href="javascripts/bower_components/bootstrap/dist/css/bootstrap.css">
+	<link rel="stylesheet" href="javascripts/bower_components/bootstrap/dist/css/bootstrap.min.css">
 	<link rel="stylesheet" href="stylesheets/style.css">
 	<link rel="stylesheet" href="bower_components/sweetalert/dist/sweetalert.css">
+	<link rel="stylesheet" href="bower_components/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css">
 </head>
 <body>
 	<nav>
 		<ul>
 			<li><a href="/">Home</a></li>
-			<li><a href="#about">About</a></li>
+			<li><a href="#about">Abouts</a></li>
 			<li><a href="#iozone-register">Device Register</a></li>
 			<li><a href="#iozone-input">Performance Test</a></li>
 			<li><a href="#iozone-result">All Reports</a></li>
-			<li><a href="#iozone-result/write">Write Report</a></li>
-			<li><a href="#iozone-result/re-write">Re-Write Report</a></li>
-			<li><a href="#iozone-result/read">Read Report</a></li>
-			<li><a href="#iozone-result/re-read">Re-Read Report</a></li>
-			<li><a href="#iozone-result/random-write">Random Write Report</a></li>
-			<li><a href="#iozone-result/random-read">Random Read Report</a></li>
+			<li><a href="#iozone-result/write">Write</a></li>
+			<li><a href="#iozone-result/re-write">Re-Write</a></li>
+			<li><a href="#iozone-result/read">Read</a></li>
+			<li><a href="#iozone-result/re-read">Re-Read</a></li>
+			<li><a href="#iozone-result/random-write">Random Write</a></li>
+			<li><a href="#iozone-result/random-read">Random Read</a></li>
 		</ul>
 	</nav>
 
@@ -42,14 +43,6 @@
 							<option value="B">B</option>
 							<option value="C">C</option>
 							<option value="D">D</option>
-							<option value="E">e</option>
-							<option value="F">f</option>
-							<option value="G">g</option>
-							<option value="H">h</option>
-							<option value="I">i</option>
-							<option value="J">j</option>
-							<option value="K">k</option>
-							<option value="L">l</option>
 							<option selected="selected" value="D1">D1</option>
 						</select>
 					</div>
@@ -57,12 +50,7 @@
 				<div class="form-group">
 					<label for="firmwareVersion" class="col-sm-2 control-label">Firmware Version</label>
 					<div class="col-sm-6">
-
-						<select class="form-control" id="firmwareVersion" name="firmwareVersion">
-							<option value="20150828">20150828</option>
-							<option value="20150829">20150829</option>
-							<option selected="selected" value="20150830">20150830</option>
-						</select>
+						<input type='text' name="firmwareVersion" class="form-control" id="datetimepicker" required>
 					</div>
 				</div>
 				<div class="form-group">
@@ -87,26 +75,20 @@
 				<div class="form-group">
 					<label for="flashCompany" class="col-sm-2 control-label">Flash Company</label>
 					<div class="col-sm-6">
-						<select class="form-control" id="flashCompany" name="flashCompany">
+						<select class="form-control" id="foodgroup" name="flashCompany">
+							<option selected="selected" value="Samsung">Samsung</option>
+							<option value="Hynix">Hynix</option>
 							<option value="Toshiba">Toshiba</option>
-							<option selected="selected" value="Hynix">Hynix</option>
 							<option value="Sandisk">Sandisk</option>
 							<option value="Micron">Micron</option>
+							<option value="Intel">Intel</option>
 						</select>
 					</div>
 				</div>				
 				<div class="form-group">
 					<label for="flashID" class="col-sm-2 control-label">Flash ID</label>
 					<div class="col-sm-6">
-						<select class="form-control" id="flashID" name="flashID">
-							<option value="6ddl">6ddl</option>
-							<option selected="selected" value="7ddl">7ddl</option>
-							<option value="8ddl">8ddl</option>
-							<option value="9ddl">9ddl</option>
-							<option value="10ddl">10ddl</option>
-							<option value="1ddl">1ddl</option>
-							<option value="2ddl">2ddl</option>
-							<option value="3ddl">3ddl</option>							
+						<select class="form-control" id="foods" name="flashID">   
 						</select>
 					</div>
 				</div>
@@ -120,6 +102,8 @@
 			</form>
 		</div>
 	</script>
+
+
 
 	<script type="text/template" id="iozone-input-template">
 		<div class="row">
@@ -217,60 +201,60 @@
 -->						
 	<!-- For normal report -->
 	<script type="text/template" id="iozone-report-template">
-			<div class="col-sm-6 col-md-4">
-				<div class="thumbnail">
-					<div class = 'myd3-line-chart'>
-					</div>
-					<div class="caption">
-						<h4><%= reportname %></h4>
-						<h5><p>Description: <%= description %></p></h5>
-						<p>Testmode: <%= testmodetext %></p>
-						<p>FileSize: <%= filesize %></p>
-						<p>RecordSize: <%= recordsize %></p>
+		<div class="col-sm-6 col-md-4">
+			<div class="thumbnail">
+				<div class = 'myd3-line-chart'>
+				</div>
+				<div class="caption">
+					<h4><%= reportname %></h4>
+					<h5><p>Description: <%= description %></p></h5>
+					<p>Testmode: <%= testmodetext %></p>
+					<p>FileSize: <%= filesize %></p>
+					<p>RecordSize: <%= recordsize %></p>
 
-						<div>
-							<button type="button" data-id="<%= reportID %>" class="btn btn-danger btn-delete-report"> 
-								 <span class="glyphicon glyphicon-trash"></span> Delete
-							</button>
+					<div>
+						<button type="button" data-id="<%= reportID %>" class="btn btn-danger btn-delete-report"> 
+							 <span class="glyphicon glyphicon-trash"></span> Delete
+						</button>
 
-	 						<div class="checkbox">
-							    <label>
-							        <input data-id="<%= reportID %>" class='compare-checkbox' type='checkbox'>Compare
-							    </label>
-							 </div>
-						</div>
+ 						<div class="checkbox">
+						    <label>
+						        <input data-id="<%= reportID %>" class='compare-checkbox' type='checkbox'>Compare
+						    </label>
+						 </div>
 					</div>
 				</div>
 			</div>
+		</div>
 	</script>
 
 	<!-- For compared report -->
 	<script type="text/template" id="iozone-compared-report-template">
-			<div class="col-sm-6 col-md-4">
-				<div class="thumbnail">
-					<div class = 'myd3-line-chart'>
-					</div>
-					<div class="caption">
-						<h4><%= reportname %></h4>
-						<h5><p>Description: <%= description %></p></h5>
-						<p>Testmode: <%= testmodetext %></p>
-						<p>FileSize: <%= filesize %></p>
-						<p>RecordSize: <%= recordsize %></p>
+		<div class="col-sm-6 col-md-4">
+			<div class="thumbnail">
+				<div class = 'myd3-line-chart'>
+				</div>
+				<div class="caption">
+					<h4><%= reportname %></h4>
+					<h5><p>Description: <%= description %></p></h5>
+					<p>Testmode: <%= testmodetext %></p>
+					<p>FileSize: <%= filesize %></p>
+					<p>RecordSize: <%= recordsize %></p>
 
-						<div>
-							<button type="button" data-id="<%= reportID %>" class="btn btn-danger btn-delete-report"> 
-								 <span class="glyphicon glyphicon-trash"></span> Delete
-							</button>
+					<div>
+						<button type="button" data-id="<%= reportID %>" class="btn btn-danger btn-delete-report"> 
+							 <span class="glyphicon glyphicon-trash"></span> Delete
+						</button>
 
-	 						<div class="checkbox">
-							    <label>
-							        <input data-id="<%= reportID %>" class='compare-checkbox' type='checkbox' disabled>Compare
-							    </label>
-							 </div>
-						</div>
+ 						<div class="checkbox">
+						    <label>
+						        <input data-id="<%= reportID %>" class='compare-checkbox' type='checkbox' disabled>Compare
+						    </label>
+						 </div>
 					</div>
 				</div>
 			</div>
+		</div>
 	</script>
 
 	<script type="text/template" id="iozone-page-utility-template">
@@ -301,6 +285,9 @@
 	</div>
 
 	<script src="javascripts/bower_components/jquery/dist/jquery.js"></script>
+	<script src="/bower_components/moment/min/moment.min.js"></script>
+
+
 	<!-- 
 		<script src="javascripts/bower_components/d3/d3.js"></script>
 	-->
@@ -314,10 +301,13 @@
 	<script src="bower_components/highcharts-release/highcharts.js"></script>
 	<script src="bower_components/highcharts-release/modules/exporting.src.js"></script>
 
+  	<script src="bower_components/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js">
+  	</script>
+
 	<script src="javascripts/dist/script.min.js"></script>
 
-	<script>document.write('<script src="http://' + (location.host || 'localhost')
-.split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>')</script>
+
+
 
 </body>
 </html>

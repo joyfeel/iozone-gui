@@ -1,6 +1,6 @@
 'use strict';
 
-var moments = require('moment');
+//var moments = require('moment');
 
 var app = app || {};
 
@@ -10,7 +10,7 @@ var template = function(id) {
 
 app.IozoneInput = Backbone.Model.extend({
 	url: function() {
-		return 'http://localhost:3000/iozone-input' +
+		return 'http://10.5.48.1:3000/iozone-input' +
 					(this.id === null ? '' : '/' + this.id);
 	},
 	id: null,
@@ -80,7 +80,7 @@ app.IozoneReport = Backbone.Model.extend({
 
 app.IozoneReportCollection = Backbone.Collection.extend({
 	url: function() {
-		return 'http://localhost:3000/iozone-report' +
+		return 'http://10.5.48.1:3000/iozone-report' +
 					(this.id === null ? '' : '/' + this.id);		
 	},
 	id: null,
@@ -90,7 +90,7 @@ app.IozoneReportCollection = Backbone.Collection.extend({
 
 app.IozoneComparedReport = Backbone.Model.extend({
 	url: function() {
-		return 'http://localhost:3000/iozone-compared-report' +
+		return 'http://10.5.48.1:3000/iozone-compared-report' +
 					(this.id === null ? '' : '/' + this.id);		
 	},
 	id: null,
@@ -109,7 +109,7 @@ app.IozoneComparedReport = Backbone.Model.extend({
 
 app.IozoneComparedReportCollection = Backbone.Collection.extend({
 	url: function() {
-		return 'http://localhost:3000/iozone-compared-report' +
+		return 'http://10.5.48.1:3000/iozone-compared-report' +
 					(this.id === null ? '' : '/' + this.id);		
 	},
 	id: null,
@@ -207,7 +207,7 @@ app.IozoneItemView = Backbone.View.extend({
 	            x: -20 //center
 	        },
 	        xAxis: {
-	            categories: ['4', '8', '16', '32', '64', '128', '256', '512']
+	            categories: ['4k', '8k', '16k', '32k', '64k', '128k', '256k', '512k']
 	        },
 	        yAxis: {
 	            title: {
@@ -219,11 +219,24 @@ app.IozoneItemView = Backbone.View.extend({
 	                color: '#808080'
 	            }]
 	        },
+	        plotOptions: {
+	            series: {
+	                allowPointSelect: true
+	            }
+	            /*
+				line: {
+	                dataLabels: {
+	                    enabled: true
+	                },
+	                enableMouseTracking: true
+	            }
+	            */	            
+	        },	        
 	        tooltip: {
 	            //valueSuffix: 'kB/sec'
 	            crosshairs: true,
 	            formatter: function () {
-	            	return 'Speed for <b>' + this.x + 'k</b> is <b>' + this.y + '</b>';
+	            	return 'Speed for <b>' + this.x + '</b> is <b>' + this.y + '</b>';
 	            }
 	        },
 	        legend: {
@@ -302,7 +315,7 @@ app.IozoneItemViewTest = Backbone.View.extend({
 		            //x: -20 //center
 	        },
 	        xAxis: {
-	            categories: ['4', '8', '16', '32', '64', '128', '256', '512'],
+	            categories: ['4k', '8k', '16k', '32k', '64k', '128k', '256k', '512k'],
 	            crosshair: true
 	        },
 	        yAxis: {
@@ -600,9 +613,7 @@ app.IozoneResultView = Backbone.View.extend({
 		console.log('view id...');
 		console.log(this.id);
 
-		if (this.id == null) {
-			//this.$el.find()
-		} else {
+		if (this.id !== null) {
 			//this.$el.find()
 			var utilityView;
 
@@ -613,11 +624,6 @@ app.IozoneResultView = Backbone.View.extend({
 			utilityView.parentView = self;
 			utilityView.render();
 		}
-
-
-
-
-
 
 		this.collection.singleReportCollection.each(function(submodel) {
 			var subView;
@@ -652,7 +658,6 @@ app.IozoneResultView = Backbone.View.extend({
     	return this;
 	},
 	compare: function () {
-		//var numberNotChecked = this.$el.find('input:checkbox:not(":checked")').length;
 		var numberChecked,
 			series = [],
 			checkedElement,
@@ -662,9 +667,6 @@ app.IozoneResultView = Backbone.View.extend({
 			self = this,
 			findModel,
 			testObj;
-
-
-		//
 
 		console.log('++++++');
 		numberChecked = this.$el.find('input[type="checkbox"]:checked').length;
@@ -731,8 +733,6 @@ app.IozoneResultView = Backbone.View.extend({
 					self.collection.comparedRportCollection.fetch({
 			    		success: function (model, response, options) {
 			    			console.log('success');
-
-
 			        	},
 			        	error: function (model, response, options) {
 							var responseObj = JSON.parse(response.responseText);
@@ -795,7 +795,7 @@ app.IozoneInputView = Backbone.View.extend({
 		this.model = new app.IozoneInput();
 		this.model.bind('change:devices', this.render, this);
 
-		this.model.set('reportname', moments(new Date()));
+		this.model.set('reportname', moment(new Date()));
 
 		this.render();
 
@@ -844,7 +844,7 @@ app.IozoneInputView = Backbone.View.extend({
 				console.log('Successfully save');
 
 				swal('Performance test OK!', 'You can view the report of performance test', 'success');
-				self.model.set('reportname', moments(new Date()));
+				self.model.set('reportname', moment(new Date()));
 				self.render();
 			}, 
 			error: function(model, response, options) {
@@ -855,7 +855,7 @@ app.IozoneInputView = Backbone.View.extend({
 				swal('Performance test fail!', responseObj.errfor.info, 'error');
 
 				//alert(responseObj.errfor.info);
-				self.model.set('reportname', moments(new Date()));
+				self.model.set('reportname', moment(new Date()));
 				self.render();								
 			}
 		});
@@ -869,7 +869,7 @@ app.IozoneInputView = Backbone.View.extend({
 
 app.IozoneRegister = Backbone.Model.extend({
 	url: function() {
-		return 'http://localhost:3000/iozone-register' +
+		return 'http://10.5.48.1:3000/iozone-register' +
 					(this.id === null ? '' : '/' + this.id);
 	},
 	id: null,
@@ -897,7 +897,69 @@ app.IozoneRegisterView = Backbone.View.extend({
 	},
 	render: function() {
 		console.log('render!!!');
+
+		var self = this,
+			i;
+
+		var foods =  [
+				//Samsung
+				['K9G8G08U0C', 'K9GAG08U0F', 'K9GBG08U0M', 'K9GBG08U0A', 'K9GBG08U0A(new)', 
+					'K9GBGD8U0B', 'K9GCGY8S0A', 'K9LCG08U0A', 'K9LCG08U0A(new)', 
+					'K9AAGD8U0A', 'K9ABGD8U0C', 'K9ACGD8U0A', 'K9GCGD8U0A', 'K9GBG08U0B'],
+				//Hynix
+				['H27UAG8T2AT', 'H27UBG8T2MY', 'H27UBG8T2AT', 'H27UCG8T2M', 'H27UCG8T2ETRx', 
+					'H27UCG8T2ETRBC'],
+				//Toshiba
+				['TH58NVG5D2FTA', 'TH58NVG6D2FTA', 'TC58NVG6D2JTA00', 'TC58NVG6D2JTA00(new)', 'TC58NVG6D2HTA00', 
+					'TC58NVG6DCJTA00', 'TC58NVG6DCJTA00(new)', 'TH58TEG7DCJBA4C', 'TC58NVG6D2GTA00', 'TH58NVG8DCJTA20', 
+					'TC58NVC6DDJTA00', 'TH58TEG7DDJBA4C', 'TH58TEG7DDKBA4C', 'TH58TEG7DDKBA4C(new)', 'TH58TEG8DDHTA20', 
+					'TH58TEG9DDJBA89', 'TC58TEG6DDLTA00', 'TH58TEG7DDLTA00', 'TH58TEG8DDLTA00', 'TH58TFG8DFKBA4K', 
+					'TC58NVG5T2HTA00', 'TC58NVG5T2HTA00(new)', 'TC58NVG7T2JTA00', 'TC58NVG6T2HTA00', 'TC58NVG6T2HTA00(new)',
+					'TH58NVG6T2HTA20', 'TH58TEG6T2JBA4C', 'TH58TEG6T2JBA4C(new A)', 'TH58TEG7T2JBA4C(new B)', 'TH58TEG8D2HTA20', 
+					'TC58TEG6TCKTA00', 'TH58TFT0DFKBA8J', 'TC58TEG7TDKTA00'],
+				//Sandisk
+				['SDTNQCAMA008G', 'SDTNQCAMA008G(new)', 'SDTNQCAMA016G', 'SDTNQCAMA016G(new)', 'SDTNQCAMB032G'],
+				//Micron
+				['MT29F32G08CBACA', 'MT29F256G08CJA', 'MT29F256G08CJABB', 'MT29F128G08CFA1', 'MT29F128G08CFA1(new)', 
+					'MT29F128G08CJA', 'MT29F64G08CFA', 'MT29F32G08CBABA', 'MT29F32G08AFA', 'MT29F16G08CBACA', 
+					'MT29F32G08CBAAA', 'MT29F128G08CJAAA', 'MT29F64G08CBACA', 'MT29F128G08CBCAB', 'MICRON_M73_1', 
+					'MICRON_M73_2', 'MT29F512G08CKCAB', 'MT29F64G080CBCDB'],
+				//Intel
+				['JS29F16G08AAME1', 'JS29F32G08AAME1', 'JS29F16B08CAME1', 'JS29F16B08CAME1(new)', 'JS29F64G08AAMF1', 
+					'JS29F64G08CAMD1', 'JS29F64G08CAMDB']
+		];
+		
 		this.$el.html(this.template(this.model.toJSON()));
+		this.$el.find('#datetimepicker').datetimepicker({
+            viewMode: 'days',
+            format: 'YYYY/MM/DD',
+            defaultDate: new Date()
+        });
+
+
+		for (i = 0; i < foods[0].length; i++) {
+			this.$el.find('#foods')
+					.append($('<option>', { value : foods[0][i] })
+      				.text(foods[0][i])); 
+		}
+
+		this.$el.find('#foodgroup').on ('change', function () {
+			/*
+			console.log(this.selectedIndex);
+			console.log(this.options[this.selectedIndex].value);
+			var groupID = $(this).val();
+			console.log(groupID);
+			*/
+
+			self.$el.find('#foods').find('option').remove();
+
+			for (i = 0; i < foods[this.selectedIndex].length; i++) {
+				self.$el.find('#foods')
+					.append($('<option>', { value : foods[this.selectedIndex][i] })
+          			.text(foods[this.selectedIndex][i])); 
+			}
+		});
+
 
 		return this;
 	},
@@ -905,7 +967,7 @@ app.IozoneRegisterView = Backbone.View.extend({
 		e.preventDefault();
 
 		var self = this,
-			firmwareVersion = this.$el.find('select[name="firmwareVersion"]').val(),
+			firmwareVersion = this.$el.find('input[name="firmwareVersion"]').val(),
 			icVersion = this.$el.find('select[name="icVersion"]').val(),
 			factory = this.$el.find('select[name="factory"]').val(),
 			flashID = this.$el.find('select[name="flashID"]').val(),
@@ -977,7 +1039,11 @@ app.AboutView = Backbone.View.extend({
 
 //main
 $(document).ready(function() {
+
+
 	new app.Router();
+
+	$('#datetimepicker').datetimepicker();
 
 	Backbone.history.start();
 });
